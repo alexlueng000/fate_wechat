@@ -1,0 +1,91 @@
+.page { background:#efe9dd; min-height:100vh; }
+
+.card{
+  margin:24rpx;
+  background:#fff;
+  border-radius:20rpx;
+  box-shadow:0 12rpx 28rpx rgba(0,0,0,0.06);
+  padding:28rpx;
+}
+
+/* 标题行 */
+.title-row{
+  display:flex; align-items:center;
+  justify-content:space-between; margin-bottom:20rpx;
+}
+.title{ font-size:36rpx; color:#2b2b2b; font-weight:600; }
+.consult{ display:flex; align-items:center; gap:8rpx; color:#b73b53; }
+.consult-icon{ font-size:28rpx; }
+.consult-text{ font-size:26rpx; }
+
+/* 表格 */
+.table{
+  margin-top:12rpx; border:2rpx solid #ececec; border-radius:12rpx; overflow:hidden;
+}
+.thead,.trow{
+  display:flex; background:#fafafa;
+}
+.trow{ background:#fff; }
+.th,.td{
+  flex:1; padding:22rpx 0; text-align:center; border-right:2rpx solid #ececec;
+  font-size:28rpx; color:#5c4a3a;
+}
+.th:last-child,.td:last-child{ border-right:none; }
+.th.first,.td.first{
+  flex:1.1; background:#f5f1ec; color:#6a5744; font-weight:500;
+}
+.trow + .trow .td{ border-top:2rpx solid #ececec; }
+
+/* 小节 */
+.section{ margin-top:24rpx; background:#f7f7f7; border-radius:12rpx; padding:22rpx; }
+.sec-title{ font-size:30rpx; color:#5a5a5a; margin-bottom:18rpx; }
+
+/* 大运胶囊 */
+.luck-wrap{ display:flex; flex-wrap:wrap; gap:16rpx; }
+.chip{
+  padding:18rpx 22rpx; background:#fff; border:2rpx solid #e9e9e9;
+  border-radius:32rpx; display:flex; flex-direction:column; align-items:center;
+  min-width:120rpx; box-shadow:0 4rpx 10rpx rgba(0,0,0,.04);
+}
+.chip-text{ font-size:28rpx; color:#5a5a5a; }
+.chip-age{ font-size:22rpx; color:#8f8f8f; margin-top:6rpx; }
+
+/* 五行条 */
+.wuxing-row{
+  display:flex; align-items:center; gap:18rpx; margin:16rpx 0;
+}
+.wx-name{ width:52rpx; text-align:center; font-size:30rpx; color:#444; }
+.wx-bar{
+  flex:1; height:18rpx; border-radius:18rpx; background:#e6e8eb; overflow:hidden;
+}
+.wx-bar-fill{ height:100%; border-radius:18rpx; }
+.wx-pct{ width:80rpx; text-align:right; color:#666; font-size:26rpx; }
+
+/* 自定义颜色（接近截图） */
+.wx-gold { background: #e0a81e; }   /* 金 */
+.wx-wood { background: #2db55d; }   /* 木 */
+.wx-water{ background: #2f63f0; }   /* 水 */
+.wx-fire { background: #e24b4b; }   /* 火 */
+.wx-earth{ background: #b88b3a; }   /* 土 */
+
+/* 功能卡片 */
+.grid{
+  margin-top:18rpx;
+  display:grid; grid-template-columns:1fr 1fr; gap:20rpx;
+}
+.grid-item{
+  background:#f6dce1; color:#7c2a3b; border-radius:12rpx; padding:24rpx;
+  display:flex; align-items:center; gap:14rpx; justify-content:center;
+  box-shadow:0 6rpx 12rpx rgba(183,59,83,0.12);
+}
+.g-emoji{ font-size:34rpx; }
+.g-text{ font-size:28rpx; }
+
+/* CTA 按钮 */
+.cta{
+  margin-top:24rpx; width:100%;
+  height:96rpx; display:flex; align-items:center; justify-content:center;
+  background:#b73b53; color:#fff; border:none; border-radius:14rpx;
+  font-size:32rpx; font-weight:600;
+  box-shadow:0 10rpx 20rpx rgba(183,59,83,0.25);
+}

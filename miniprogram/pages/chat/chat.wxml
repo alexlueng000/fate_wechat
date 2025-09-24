@@ -1,0 +1,24 @@
+<view class="chat">
+  <scroll-view scroll-y class="list" scroll-with-animation scroll-into-view="{{toView}}">
+    <block wx:for="{{messages}}" wx:key="index">
+      <view class="msg {{item.role}}">
+        <text selectable="true">{{item.content}}</text>
+      </view>
+    </block>
+    <view id="{{toView}}"></view>
+  </scroll-view>
+
+  <!-- 快捷按钮工具栏 -->
+  <view class="toolbar">
+    <button class="toolBtn" size="mini" bindtap="onQuickDraw">🎴 抽一签</button>
+    <button class="toolBtn" size="mini" bindtap="onQuickGuide">✨ 今日指引</button>
+    <button class="toolBtn danger" size="mini" bindtap="onClear">🧹 清空</button>
+  </view>
+
+  <view class="inputBar">
+    <input class="ipt" placeholder="来说点什么…" value="{{input}}" bindinput="onInput" confirm-type="send" bindconfirm="onSend"/>
+    <button class="sendBtn" bindtap="onSend" loading="{{loading}}">发送</button>
+  </view>
+
+  <view class="tip">* 对话仅供参考，不构成专业建议 *</view>
+</view>

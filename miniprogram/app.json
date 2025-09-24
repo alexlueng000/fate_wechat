@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/history/history",
+    "pages/profile/profile",
+    "pages/help/help",
+    "pages/result/result"
+  ],
+  "window": {
+    "navigationBarTitleText": "命理八字",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundTextStyle": "dark",
+    "backgroundColor": "#efe9dd" 
+  },
+  
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
