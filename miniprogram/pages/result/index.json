@@ -1,3 +1,4 @@
 {
-  "navigationBarTitleText": "八字排盘"
+  "navigationBarTitleText": "八字排盘",
+  "enablePullDownRefresh": false
 }

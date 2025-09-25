@@ -1,57 +1,48 @@
 // pages/result/index.ts
+import { request } from "../../utils/request";
 
 type FourPillars = {
-  year: [string, string];   // [天干, 地支]
+  year: [string, string];
   month: [string, string];
   day: [string, string];
   hour: [string, string];
 };
+type DayunItem = { age: number; start_year: number; pillar: string[] };
+type MingpanData = { four_pillars: FourPillars; dayun: DayunItem[] };
+type LastPaipan = { mingpan: MingpanData };
+type Msg = { role: "assistant" | "user"; content: string };
 
-type DayunItem = {
-  age: number;
-  start_year: number;
-  pillar: string[];         // ["甲","申"] 或 []
-};
+Page<Record<string, any>, {
+  // 摘要/折叠
+  pillars: { year: string; month: string; day: string; hour: string };
+  table: { tiangan: string[]; dizhi: string[]; changsheng: string[] };
+  dayun: Array<{ ganzhi: string; age: string }>;
+  summaryOpen: boolean;
 
-type MingpanResp = {
-  mingpan: {
-    four_pillars: FourPillars;
-    dayun: DayunItem[];
-    // 将来可扩: wuxing 等
-  };
-};
-
-interface TableData {
-  tiangan: string[];   // 年/月/日/时 天干
-  dizhi: string[];     // 年/月/日/时 地支
-  changsheng: string[]; // 先占位: ["—","—","—","—"]（等你后端给或前端计算）
-}
-
-interface WuxingItem {
-  name: string;
-  percent: number; // 0~100
-  cls: string;     // 颜色类名（如 'jin','mu'），你 wxss 里自行定义
-}
-
-Page({
+  // 聊天
+  messages: Msg[];
+  inputValue: string;
+  sending: boolean;
+  chatting: boolean;
+  scrollInto: string;
+  conversationId: string;
+}>({
   data: {
-    // 四柱表格
-    table: {
-      tiangan: [] as string[],
-      dizhi: [] as string[],
-      changsheng: ["—","—","—","—"] as string[],
-    } as TableData,
+    pillars: { year: "", month: "", day: "", hour: "" },
+    table: { tiangan: [], dizhi: [], changsheng: ["—","—","—","—"] },
+    dayun: [],
+    summaryOpen: false,
 
-    // 大运 chips
-    dayun: [] as Array<{ ganzhi: string; age: string }>,
-
-    // 五行（暂时无数据，先留空）
-    wuxing: [] as WuxingItem[],
+    messages: [],
+    inputValue: "",
+    sending: false,
+    chatting: false,
+    scrollInto: "bottom-anchor",
+    conversationId: "",
   },
 
   onLoad() {
-    // 1) 优先读取上个页面存的缓存
-    const cached: MingpanResp | null = wx.getStorageSync("last_paipan");
+    const cached: LastPaipan | null = wx.getStorageSync("last_paipan");
     if (!cached || !cached.mingpan) {
       wx.showToast({ title: "没有结果数据", icon: "none" });
       return;
@@ -59,36 +50,101 @@ Page({
     this.applyMingpan(cached.mingpan);
   },
 
-  applyMingpan(m: MingpanResp["mingpan"]) {
-    // 2) 解析四柱
+  applyMingpan(m: MingpanData) {
     const fp = m.four_pillars;
-    const tiangan = [fp.year[0], fp.month[0], fp.day[0], fp.hour[0]];
-    const dizhi   = [fp.year[1], fp.month[1], fp.day[1], fp.hour[1]];
-
-    // 3) 解析大运（把 pillar 数组拼成干支；age 带上起运年份更直观）
-    const dayun = (m.dayun || []).map((d) => ({
+    const pillars = {
+      year: fp.year.join(""),
+      month: fp.month.join(""),
+      day: fp.day.join(""),
+      hour: fp.hour.join(""),
+    };
+    const table = {
+      tiangan: [fp.year[0], fp.month[0], fp.day[0], fp.hour[0]],
+      dizhi:   [fp.year[1], fp.month[1], fp.day[1], fp.hour[1]],
+      changsheng: this.data.table.changsheng,
+    };
+    const dayun = (m.dayun || []).map(d => ({
       ganzhi: d.pillar?.length ? d.pillar.join("") : "—",
       age: `${d.age}岁 / ${d.start_year}`,
     }));
-
-    // 4) 五行：当前后端未给，保持空数组；若后续返回 {jin, mu, shui, huo, tu} 再映射
-
-    this.setData({
-      table: { tiangan, dizhi, changsheng: this.data.table.changsheng },
-      dayun,
-      // wuxing: [...]
-    });
+    this.setData({ pillars, table, dayun });
   },
 
-  // —— 下面是你 wxml 里绑定到的点击事件占位，避免未定义报错 ——
-  onConsult() {
-    wx.showToast({ title: "咨询功能开发中", icon: "none" });
+  toggleSummary() {
+    this.setData({ summaryOpen: !this.data.summaryOpen });
   },
-  onFeature(e: any) {
-    const key = e.currentTarget?.dataset?.key;
-    wx.showToast({ title: `功能 ${key} 开发中`, icon: "none" });
+
+  // 首次/重新生成解读（一次性返回 JSON）
+  async onStartChat() {
+    if (this.data.chatting) return;
+
+    const cached: LastPaipan | null = wx.getStorageSync("last_paipan");
+    if (!cached || !cached.mingpan) {
+      wx.showToast({ title: "没有命盘数据", icon: "none" });
+      return;
+    }
+
+    this.setData({ chatting: true });
+    wx.showLoading({ title: this.data.conversationId ? "重新生成…" : "生成解读…" });
+
+    try {
+      const resp = await request<{ conversation_id: string; reply: string }>(
+        `/chat/start?stream=0&_ts=${Date.now()}`,   // ★ 显式非流式 + 防缓存
+        "POST",
+        { paipan: cached.mingpan, kb_index_dir: "", kb_topk: 3 },
+        { Accept: "application/json" }             // ★ 兜底
+      );
+
+      const first = (resp.reply || "").replace(/\r\n/g, "\n");
+      // 清空旧消息，放入新首条
+      this.setData({
+        conversationId: resp.conversation_id,
+        messages: [{ role: "assistant", content: first }],
+      });
+      this.toBottom();
+    } catch (err: any) {
+      wx.showToast({ title: err?.message || "启动对话失败", icon: "none" });
+    } finally {
+      wx.hideLoading();
+      this.setData({ chatting: false });
+    }
   },
-  onStartChat() {
-    wx.showToast({ title: "对话模式稍后接入", icon: "none" });
+
+  // 继续一次性对话（/chat/send?stream=0）
+  async onSend() {
+    const text = (this.data.inputValue || "").trim();
+    if (!text) return;
+    if (this.data.sending) return;
+    if (!this.data.conversationId) {
+      wx.showToast({ title: "请先点击上方“开始对话”", icon: "none" });
+      return;
+    }
+
+    // 先落地用户消息
+    const nextMsgs = [...this.data.messages, { role: "user", content: text } as Msg];
+    this.setData({ messages: nextMsgs, inputValue: "", sending: true });
+    this.toBottom();
+
+    try {
+      const resp = await request<{ reply: string }>(
+        `/chat/send?stream=0&_ts=${Date.now()}`,     // ★ 显式非流式
+        "POST",
+        { conversation_id: this.data.conversationId, text },
+        { Accept: "application/json" }               // ★ 兜底
+      );
+      const ans = (resp.reply || "").replace(/\r\n/g, "\n");
+      this.setData({ messages: [...this.data.messages, { role: "assistant", content: ans }] });
+      this.toBottom();
+    } catch (err: any) {
+      wx.showToast({ title: err?.message || "发送失败", icon: "none" });
+    } finally {
+      this.setData({ sending: false });
+    }
   },
+
+  toBottom() {
+    this.setData({ scrollInto: "bottom-anchor" });
+  },
+
+  onInput(e: any) { this.setData({ inputValue: e.detail.value }); },
 });

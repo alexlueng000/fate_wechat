@@ -1,89 +1,81 @@
 <view class="page">
+  <!-- 摘要条（点击展开/收起） -->
+  <view class="summary" bindtap="toggleSummary">
+    <view class="sum-left">
+      <text class="sum-title">命盘摘要</text>
+      <view class="sum-pillars">
+        <text class="p-tag">年</text><text class="p-val">{{pillars.year}}</text>
+        <text class="p-tag">月</text><text class="p-val">{{pillars.month}}</text>
+        <text class="p-tag">日</text><text class="p-val">{{pillars.day}}</text>
+        <text class="p-tag">时</text><text class="p-val">{{pillars.hour}}</text>
+      </view>
+    </view>
+    <text class="sum-toggle">{{summaryOpen ? '收起 ▲' : '展开 ▼'}}</text>
+  </view>
 
-<!-- 顶部留白与容器 -->
-<view class="card">
+  <!-- 折叠内容：四柱表格 + 大运（复用你原来的表格） -->
+  <view wx:if="{{summaryOpen}}" class="card">
+    <!-- 四柱表格 -->
+    <view class="table">
+      <view class="thead">
+        <view class="th first">四柱</view>
+        <view class="th">年柱</view>
+        <view class="th">月柱</view>
+        <view class="th">日柱</view>
+        <view class="th">时柱</view>
+      </view>
+      <view class="trow">
+        <view class="td first">天干</view>
+        <view class="td" wx:for="{{table.tiangan}}" wx:key="index">{{item}}</view>
+      </view>
+      <view class="trow">
+        <view class="td first">地支</view>
+        <view class="td" wx:for="{{table.dizhi}}" wx:key="index">{{item}}</view>
+      </view>
+      <view class="trow">
+        <view class="td first">长生</view>
+        <view class="td" wx:for="{{table.changsheng}}" wx:key="index">{{item}}</view>
+      </view>
+    </view>
 
-  <!-- 标题行 -->
-  <view class="title-row">
-    <text class="title">八字排盘</text>
-    <view class="consult" bindtap="onConsult">
-      <text class="consult-icon">💬</text>
-      <text class="consult-text">咨询解读</text>
+    <!-- 大运（四列卡片） -->
+    <view class="section">
+      <view class="sec-title">大运</view>
+      <view class="luck-grid">
+        <block wx:for="{{dayun}}" wx:key="index">
+          <view class="luck-card4">
+            <text class="luck-ganzhi">{{item.ganzhi || '—'}}</text>
+            <text class="luck-age">{{item.age}}</text>
+          </view>
+        </block>
+      </view>
     </view>
   </view>
 
-  <!-- 四柱表格 -->
-  <view class="table">
-    <view class="thead">
-      <view class="th first">四柱</view>
-      <view class="th">年柱</view>
-      <view class="th">月柱</view>
-      <view class="th">日柱</view>
-      <view class="th">时柱</view>
-    </view>
-
-    <view class="trow">
-      <view class="td first">天干</view>
-      <view class="td" wx:for="{{table.tiangan}}" wx:key="index">{{item}}</view>
-    </view>
-    <view class="trow">
-      <view class="td first">地支</view>
-      <view class="td" wx:for="{{table.dizhi}}" wx:key="index">{{item}}</view>
-    </view>
-    <!-- <view class="trow">
-      <view class="td first">长生</view>
-      <view class="td" wx:for="{{table.changsheng}}" wx:key="index">{{item}}</view>
-    </view> -->
-  </view>
-
-  <!-- 大运 -->
-  <view class="section">
-    <view class="sec-title">大运</view>
-    <view class="luck-grid">
-      <block wx:for="{{dayun}}" wx:key="index">
-        <view class="luck-card4">
-          <text class="luck-ganzhi">{{item.ganzhi || '—'}}</text>
-          <text class="luck-age">{{item.age}}</text>
+  <!-- 聊天区 -->
+  <scroll-view class="chat" scroll-y="true" scroll-into-view="{{scrollInto}}" enable-back-to-top="true">
+    <view class="chat-inner">
+      <block wx:for="{{messages}}" wx:key="index">
+        <view id="msg-{{index}}" class="msg {{item.role === 'user' ? 'right' : 'left'}}">
+          <view class="bubble">
+            <text class="bubble-text">{{item.content}}</text>
+          </view>
         </view>
       </block>
+      <view id="bottom-anchor"></view>
     </view>
+  </scroll-view>
+
+  <!-- 按钮区：点击后向后端 /chat/start?stream=0，一次性拿首条解读 -->
+  <button class="cta" bindtap="onStartChat" loading="{{chatting}}" disabled="{{chatting}}">
+    {{conversationId ? '重新生成解读' : '开始对话'}}
+  </button>
+
+  <!-- 输入条：有会话后可继续提问（/chat/send?stream=0） -->
+  <view class="input-bar">
+    <input class="ipt" placeholder="跟AI继续聊聊…" value="{{inputValue}}" bindinput="onInput" confirm-type="send" bindconfirm="onSend" />
+    <button class="send" bindtap="onSend" loading="{{sending}}" disabled="{{sending || !conversationId}}">发送</button>
   </view>
 
-  <!-- 五行分析 -->
-  <!-- <view class="section">
-    <view class="sec-title">五行分析</view>
-    <view class="wuxing-row" wx:for="{{wuxing}}" wx:key="name">
-      <text class="wx-name">{{item.name}}</text>
-      <view class="wx-bar">
-        <view class="wx-bar-fill {{item.cls}}" style="width: {{item.percent}};"></view>
-      </view>
-      <text class="wx-pct">{{item.percent}}%</text>
-    </view>
-  </view> -->
-
-  <!-- 功能卡片 -->
-  <!-- <view class="grid">
-    <view class="grid-item" bindtap="onFeature" data-key="personality">
-      <text class="g-emoji">❤️</text>
-      <text class="g-text">人物性格</text>
-    </view>
-    <view class="grid-item" bindtap="onFeature" data-key="character">
-      <text class="g-emoji">👜</text>
-      <text class="g-text">人物性格</text>
-    </view>
-    <view class="grid-item" bindtap="onFeature" data-key="avatar">
-      <text class="g-emoji">🖼️</text>
-      <text class="g-text">人物画像</text>
-    </view>
-    <view class="grid-item" bindtap="onFeature" data-key="more">
-      <text class="g-emoji">🪙</text>
-      <text class="g-text">更多</text>
-    </view>
-  </view> -->
-
-  <!-- CTA -->
-  <button class="cta" bindtap="onStartChat" style="margin-top: 40px;">开始对话</button>
-</view>
-
-<view style="height:24rpx"></view>
+  <view style="height: env(safe-area-inset-bottom)"></view>
 </view>
