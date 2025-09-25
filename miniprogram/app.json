@@ -4,7 +4,7 @@
     "pages/history/history",
     "pages/profile/profile",
     "pages/help/help",
-    "pages/result/result"
+    "pages/result/index"
   ],
   "window": {
     "navigationBarTitleText": "命理八字",

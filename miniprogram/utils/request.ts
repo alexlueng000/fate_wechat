@@ -4,25 +4,42 @@ function getToken(): string {
   return wx.getStorageSync<string>("token") || "";
 }
 
-export function request<T>(path: string, method: WechatMiniprogram.RequestOption["method"] = "GET", data?: unknown): Promise<T> {
+function joinURL(base: string, path: string): string {
+  const b = base.replace(/\/+$/, "");
+  const p = path.startsWith("/") ? path : `/${path}`;
+  return b + p;
+}
+
+export function request<T>(
+  path: string,
+  method: WechatMiniprogram.RequestOption["method"] = "GET",
+  data?: unknown,
+  extraHeaders?: Record<string, string>
+): Promise<T> {
   return new Promise((resolve, reject) => {
+    console.log("base_url: ", BASE_URL)
     wx.request<T>({
-      url: BASE_URL + path,
+      
+      url: joinURL(BASE_URL, path),
       method,
       data,
       header: {
         "Content-Type": "application/json",
-        Authorization: getToken() ? `Bearer ${getToken()}` : ""
+        ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
+        ...extraHeaders,
       },
       timeout: 10000,
       success(res) {
         const { statusCode, data } = res;
-        if (statusCode >= 200 && statusCode < 300) resolve(data);
-        else reject({ status: statusCode, data });
+        if (statusCode >= 200 && statusCode < 300) {
+          resolve(data as T);
+        } else {
+          reject(new Error(`HTTP ${statusCode}: ${JSON.stringify(data)}`));
+        }
       },
       fail(err) {
-        reject(err);
-      }
+        reject(new Error(`Network error: ${err.errMsg || "unknown"}`));
+      },
     });
   });
 }

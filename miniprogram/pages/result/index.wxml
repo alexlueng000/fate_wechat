@@ -30,27 +30,27 @@
       <view class="td first">地支</view>
       <view class="td" wx:for="{{table.dizhi}}" wx:key="index">{{item}}</view>
     </view>
-    <view class="trow">
+    <!-- <view class="trow">
       <view class="td first">长生</view>
       <view class="td" wx:for="{{table.changsheng}}" wx:key="index">{{item}}</view>
-    </view>
+    </view> -->
   </view>
 
   <!-- 大运 -->
   <view class="section">
     <view class="sec-title">大运</view>
-    <view class="luck-wrap">
+    <view class="luck-grid">
       <block wx:for="{{dayun}}" wx:key="index">
-        <view class="chip">
-          <text class="chip-text">{{item.ganzhi}}</text>
-          <text class="chip-age">{{item.age}}</text>
+        <view class="luck-card4">
+          <text class="luck-ganzhi">{{item.ganzhi || '—'}}</text>
+          <text class="luck-age">{{item.age}}</text>
         </view>
       </block>
     </view>
   </view>
 
   <!-- 五行分析 -->
-  <view class="section">
+  <!-- <view class="section">
     <view class="sec-title">五行分析</view>
     <view class="wuxing-row" wx:for="{{wuxing}}" wx:key="name">
       <text class="wx-name">{{item.name}}</text>
@@ -59,10 +59,10 @@
       </view>
       <text class="wx-pct">{{item.percent}}%</text>
     </view>
-  </view>
+  </view> -->
 
   <!-- 功能卡片 -->
-  <view class="grid">
+  <!-- <view class="grid">
     <view class="grid-item" bindtap="onFeature" data-key="personality">
       <text class="g-emoji">❤️</text>
       <text class="g-text">人物性格</text>
@@ -79,10 +79,10 @@
       <text class="g-emoji">🪙</text>
       <text class="g-text">更多</text>
     </view>
-  </view>
+  </view> -->
 
   <!-- CTA -->
-  <button class="cta" bindtap="onStartChat">开始对话</button>
+  <button class="cta" bindtap="onStartChat" style="margin-top: 40px;">开始对话</button>
 </view>
 
 <view style="height:24rpx"></view>

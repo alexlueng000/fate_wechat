@@ -39,24 +39,37 @@
       </view>
     </view>
 
-<!-- 日期时间 -->
+<!-- 出生日期 -->
 <view class="input-wrap">
-  <text class="label">出生日期时间</text>
-  <picker mode="datetime" value="{{datetime}}" bindchange="onPickDatetime">
-    <view class="input placeholder">{{datetimeDisplay}}</view>
+  <text class="label">出生日期</text>
+  <picker mode="date" value="{{birth_date}}" start="1900-01-01" end="2099-12-31" bindchange="onPickDate">
+    <view class="input">{{birth_date || '选择日期'}}</view>
   </picker>
   <image class="input-icon" src="/images/icon-calendar.png" mode="widthFix"></image>
 </view>
 
-<!-- 出生地点 -->
-<view class="input-wrap disabled">
+<!-- 出生时间 -->
+<view class="input-wrap">
+  <text class="label">出生时间</text>
+  <picker mode="time" value="{{birth_time}}" start="00:00" end="23:59" bindchange="onPickTime">
+    <view class="input">{{birth_time || '选择时间'}}</view>
+  </picker>
+  <image class="input-icon" src="/images/icon-clock.png" mode="widthFix"></image>
+</view>
+
+<!-- 出生地点（占位） -->
+<view class="input-wrap">
   <text class="label">出生地点</text>
-  <view class="input placeholder">选择出生地点</view>
+  <input 
+    class="input" 
+    placeholder="请输入出生地点" 
+    value="{{birthplace}}" 
+    bindinput="onInputPlace" />
   <image class="input-icon" src="/images/icon-location.png" mode="widthFix"></image>
 </view>
 
-    <!-- 按钮 -->
-    <button class="cta" bindtap="onStart">开始排盘 ➜</button>
+<!-- 按钮 -->
+<button class="cta" loading="{{submitting}}" disabled="{{submitting}}" bindtap="onStart">开始排盘 ➜</button>
   </view>
 
   <!-- 卡片：开场白 -->
