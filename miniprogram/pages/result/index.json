@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "八字排盘",
-  "enablePullDownRefresh": false
+  "enablePullDownRefresh": false,
+  "usingComponents": {}
 }

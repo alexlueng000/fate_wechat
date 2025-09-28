@@ -1,66 +1,144 @@
-/* 背景与卡片（你已有可保留） */
-.page { background: #f7f3ea; min-height: 100vh; padding: 16rpx; box-sizing: border-box; }
-.card { background:#fff; border-radius: 16rpx; padding: 18rpx; box-shadow: 0 8rpx 24rpx rgba(0,0,0,.06); }
+.page { background:#f7f3ea; min-height:100vh; padding:16rpx; box-sizing:border-box; }
+.card { background:#fff; border-radius:16rpx; padding:18rpx; box-shadow:0 8rpx 24rpx rgba(0,0,0,.06); }
 
 /* 摘要条 */
-.summary {
+.summary{
   display:flex; align-items:center; justify-content:space-between;
   background:#fff; border-radius:16rpx; padding:18rpx 20rpx;
   box-shadow:0 8rpx 24rpx rgba(0,0,0,.06); margin-bottom:14rpx;
 }
-.sum-left { display:flex; flex-direction:column; gap:8rpx; }
-.sum-title { font-weight:700; color:#222; font-size:30rpx; }
-.sum-pillars { display:flex; gap:12rpx; flex-wrap:wrap; }
-.p-tag { font-size:22rpx; color:#8b5a00; background:#fff7e8; border:1rpx solid #e5c07b; border-radius:8rpx; padding:2rpx 8rpx; }
-.p-val { font-size:26rpx; color:#333; }
-.sum-toggle { color:#895d00; font-size:24rpx; }
+.sum-left{ display:flex; flex-direction:column; gap:8rpx; }
+.sum-title{ font-weight:700; color:#222; font-size:30rpx; }
+.sum-pillars{ display:flex; gap:12rpx; flex-wrap:wrap; }
+.p-tag{ font-size:22rpx; color:#8b5a00; background:#fff7e8; border:1rpx solid #e5c07b; border-radius:8rpx; padding:2rpx 8rpx; }
+.p-val{ font-size:26rpx; color:#333; }
+.sum-toggle{ color:#895d00; font-size:24rpx; }
 
-/* 表格（复用你已有） */
-.table { margin-top: 8rpx; border: 1rpx solid #eee; border-radius: 14rpx; overflow: hidden; }
-.thead, .trow { display: grid; grid-template-columns: 140rpx repeat(4, 1fr); align-items: stretch; }
-.thead { background: #fafafa; }
-.th, .td { padding: 18rpx 16rpx; border-bottom: 1rpx solid #f1f1f1; font-size: 26rpx; color: #333; text-align: center; }
-.th.first, .td.first { background: #fffaf0; font-weight: 600; color: #8b5a00; }
-.trow:last-child .td { border-bottom: 0 }
+/* 表格 */
+.table{ margin-top:8rpx; border:1rpx solid #eee; border-radius:14rpx; overflow:hidden; }
+.thead, .trow{ display:grid; grid-template-columns:140rpx repeat(4,1fr); align-items:stretch; }
+.thead{ background:#fafafa; }
+.th,.td{ padding:18rpx 16rpx; border-bottom:1rpx solid #f1f1f1; font-size:26rpx; color:#333; text-align:center; }
+.th.first,.td.first{ background:#fffaf0; font-weight:600; color:#8b5a00; }
+.trow:last-child .td{ border-bottom:0 }
 
 /* 大运四列 */
-.luck-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16rpx; }
-.luck-card4 {
+.section{ margin-top:28rpx; }
+.sec-title{ font-size:28rpx; font-weight:700; color:#333; margin-bottom:12rpx; position:relative; padding-left:16rpx; }
+.sec-title::before{ content:""; position:absolute; left:0; top:8rpx; bottom:8rpx; width:6rpx; border-radius:6rpx; background:#b83227; }
+
+.luck-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16rpx; }
+.luck-card4{
   height:160rpx; border-radius:18rpx;
-  background: linear-gradient(135deg, #fff5f2, #ffe9e4);
-  border: 2rpx solid #f2c1b9; box-shadow: 0 8rpx 18rpx rgba(184,50,39,0.12);
+  background:linear-gradient(135deg,#fff5f2,#ffe9e4);
+  border:2rpx solid #f2c1b9; box-shadow:0 8rpx 18rpx rgba(184,50,39,.12);
   display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
 }
-.luck-ganzhi { font-size:32rpx; font-weight:700; color:#b83227; }
-.luck-age { margin-top:8rpx; font-size:22rpx; color:#745a54; }
+.luck-ganzhi{ font-size:32rpx; font-weight:700; color:#b83227; }
+.luck-age{ margin-top:8rpx; font-size:22rpx; color:#745a54; }
 
 /* 聊天区 */
-.chat {
-  height: calc(100vh - 520rpx); /* 视情况调整，避免被输入条覆盖 */
+.chat{
+  height: calc(100vh - 540rpx);
   background:#fff; border-radius:16rpx; box-shadow:0 8rpx 24rpx rgba(0,0,0,.06);
   padding:16rpx; box-sizing:border-box; margin-top:14rpx;
 }
-.chat-inner { display:flex; flex-direction:column; gap:14rpx; }
-.msg { display:flex; width:100%; }
-.msg.left { justify-content:flex-start; }
-.msg.right { justify-content:flex-end; }
-.bubble { max-width:82%; padding:16rpx 18rpx; border-radius:16rpx; white-space:pre-wrap; line-height:1.6; }
-.msg.left .bubble { background:#fffaf0; border:1rpx solid #f0ddc0; color:#333; }
-.msg.right .bubble { background:#b83227; color:#fff; }
-.bubble-text { font-size:26rpx; }
+.chat-inner{ display:flex; flex-direction:column; gap:14rpx; }
 
-/* CTA 按钮与输入条 */
-.cta {
+.msg{ display:flex; width:100%; }
+.msg.left{ justify-content:flex-start; }
+.msg.right{ justify-content:flex-end; }
+.bubble{ max-width:82%; padding:16rpx 18rpx; border-radius:16rpx; white-space:pre-wrap; line-height:1.7; }
+.msg.left .bubble{ background:#fffaf0; border:1rpx solid #f0ddc0; color:#333; }
+.msg.right .bubble{ background:#b83227; color:#fff; }
+.bubble-text{ font-size:26rpx; }
+
+/* Markdown 富文本 */
+.bubble .md{ font-size:26rpx; line-height:1.8; }
+.bubble .md h1{ font-size:34rpx; margin:12rpx 0; }
+.bubble .md h2{ font-size:30rpx; margin:10rpx 0; }
+.bubble .md h3{ font-size:28rpx; margin:8rpx 0; }
+.bubble .md p{ margin:8rpx 0; }
+.bubble .md ul, .bubble .md ol{ padding-left:28rpx; margin:8rpx 0; }
+.bubble .md li{ margin:6rpx 0; }
+.bubble .md blockquote{ margin:10rpx 0; padding:10rpx 14rpx; border-left:6rpx solid #e5c07b; background:#fffaf0; border-radius:6rpx; }
+.bubble .md pre{ background:#2d2d2d; color:#f8f8f2; padding:12rpx; border-radius:8rpx; overflow:auto; }
+.bubble .md code{ background:#f5f5f5; padding:2rpx 6rpx; border-radius:4rpx; }
+.bubble .md a{ color:#b83227; text-decoration:underline; }
+
+/* CTA + 输入条 */
+.cta{
   width:100%; margin-top:16rpx; background:#b83227; color:#fff; border-radius:14rpx;
   padding:22rpx 0; font-size:30rpx; font-weight:700; box-shadow:0 8rpx 20rpx rgba(184,50,39,.25);
 }
-.input-bar {
+.input-bar{
   position: sticky; bottom:0; left:0; right:0;
   display:flex; gap:12rpx; align-items:center;
   background:#f7f3ea; padding:12rpx 0 16rpx 0;
 }
-.ipt { flex:1; background:#fff; border-radius:999rpx; padding:18rpx 24rpx; font-size:28rpx; border:1rpx solid #eee; }
-.send { flex:0 0 auto; padding:0 26rpx; height:72rpx; line-height:72rpx; background:#b83227; color:#fff; border-radius:999rpx; font-weight:700; font-size:28rpx; box-shadow:0 8rpx 20rpx rgba(184,50,39,.25); }
+.ipt{ flex:1; background:#fff; border-radius:999rpx; padding:18rpx 24rpx; font-size:28rpx; border:1rpx solid #eee; }
+.send{ flex:0 0 auto; padding:0 26rpx; height:72rpx; line-height:72rpx; background:#b83227; color:#fff; border-radius:999rpx; font-weight:700; font-size:28rpx; box-shadow:0 8rpx 20rpx rgba(184,50,39,.25); }
 
 /* 安全区 */
-.page::after { content:""; display:block; height: env(safe-area-inset-bottom); }
+.page::after{ content:""; display:block; height: env(safe-area-inset-bottom); }
+
+
+/* 统一卡片 */
+.card {
+  background:#fff;
+  border-radius: 24rpx;
+  box-shadow: 0 10rpx 28rpx rgba(0,0,0,.06);
+  padding: 24rpx;
+  margin-top: 20rpx;
+}
+
+/* 快捷分析 */
+.quick-card { border: 2rpx solid #f3e7df; }
+.quick-title {
+  font-size: 28rpx; font-weight: 700; color:#333; margin-bottom: 14rpx;
+}
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 两列更稳，和你的截图一致 */
+  gap: 16rpx;
+}
+.quick-chip {
+  background: #fffdfb;
+  border: 2rpx dashed #f0cfc3;
+  color: #b05544;
+  border-radius: 20rpx;
+  padding: 18rpx 0;
+  text-align: center;
+  font-size: 26rpx;
+}
+.quick-chip.wide {
+  grid-column: 1 / span 2;   /* 占一整行 */
+}
+
+/* 作文框/操作区 */
+.composer { border: 2rpx solid #f3e7df; }
+.composer-textarea {
+  background: #fffdfb;
+  border: 1rpx solid #f0e6e0;
+  border-radius: 18rpx;
+  padding: 18rpx;
+  font-size: 28rpx;
+  min-height: 120rpx;
+}
+.composer-hint {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #9a8f86;
+}
+
+/* 按钮行 */
+.btn-row { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 16rpx; margin-top: 18rpx; }
+.btn { height: 88rpx; line-height: 88rpx; border-radius: 18rpx; font-size: 28rpx; }
+.btn-primary {
+  background:#b83227; color:#fff; box-shadow: 0 10rpx 24rpx rgba(184,50,39,.25);
+}
+.btn-ghost { background:#fff7f3; color:#b05544; border: 2rpx solid #f0cfc3; }
+.btn-outline { background:#fff; color:#7a6f67; border: 2rpx solid #e9dfd8; }
+
+/* 让聊天区别被底部卡片挤压，可适当调高 */
+.chat { margin-bottom: 20rpx; }
