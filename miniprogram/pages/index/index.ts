@@ -43,6 +43,7 @@ Page<Record<string, any>, PageData>({
   onLoad() {
     const t = todayStr();
     this.setData({ birth_date: t.date, birth_time: t.time });
+    this.testPing();
   },
 
   onPickDate(e: any) { this.setData({ birth_date: e.detail.value || this.data.birth_date }); },
@@ -52,6 +53,18 @@ Page<Record<string, any>, PageData>({
   setFemale() { this.setData({ gender: "女" }); },
   setSolar()  { this.setData({ calendar: "公历" }); },
   setLunar()  { this.setData({ calendar: "农历" }); },
+
+  testPing() {
+    request('/api/ping', 'GET')
+      .then((res) => {
+        // 你的后端可能返回 {status:"ok"} 或字符串
+        this.setData({ ping: JSON.stringify(res) });
+      })
+      .catch((e) => {
+        console.error('ping失败', e);
+        wx.showToast({ title: 'ping 失败', icon: 'none' });
+      });
+  },
 
   async onStart() {
     if (this.data.submitting) return;
