@@ -1,21 +1,19 @@
 // pages/result/index.ts
 import { request } from "../../utils/request";
 
-// —— 安全引入 marked，并提供兜底 ——
-// 有些项目没构建 NPM 或打包异常会导致 import 失败，我们用 try/catch 兜底为“纯文本换行”
+/** ========== marked 安全加载，失败则降级为换行 ========== */
 let parseMarkdown: (md: string) => string = (md) =>
-  md.replace(/\r\n/g, "\n").replace(/\n/g, "<br/>");
-
+  (md || "").replace(/\r\n/g, "\n").replace(/\n/g, "<br/>");
 try {
-  // 构建了 NPM 的正常路径
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { marked } = require("marked");
   marked.setOptions({ gfm: true, breaks: true });
-  parseMarkdown = (md: string) => marked.parse(md || "") as string;
+  parseMarkdown = (md: string) => (marked.parse(md || "") as string);
 } catch (e) {
   console.warn("marked 加载失败，降级为纯文本换行：", e);
 }
 
+/** ========== 类型定义 ========== */
 type FourPillars = {
   year: [string, string];
   month: [string, string];
@@ -27,6 +25,24 @@ type MingpanData = { four_pillars: FourPillars; dayun: DayunItem[] };
 type LastPaipan = { mingpan: MingpanData };
 type Msg = { role: "assistant" | "user"; content: string; html?: string };
 
+type PillarsFlat = { year: string; month: string; day: string; hour: string };
+type Table = { tiangan: string[]; dizhi: string[]; changsheng: string[] };
+
+interface Data {
+  pillars: PillarsFlat;
+  table: Table;
+  dayun: Array<{ ganzhi: string; age: string }>;
+  summaryOpen: boolean;
+
+  messages: Msg[];
+  inputValue: string;
+  sending: boolean;
+  chatting: boolean;
+  scrollInto: string;
+  conversationId: string;
+}
+
+/** ========== 快捷提问 ========== */
 const QUICK_MAP: Record<string, string> = {
   personality: "请基于我的八字概述性格优点、潜在短板，并给出改进建议。",
   avatar: "请用三五句话写出我的人物画像（气质、处事风格、优势场景）。",
@@ -37,22 +53,11 @@ const QUICK_MAP: Record<string, string> = {
   love_timing: "近期（未来12个月）与感情相关的关键时间点与建议。",
 };
 
-Page<Record<string, any>, {
-  pillars: { year: string; month: string; day: string; hour: string };
-  table: { tiangan: string[]; dizhi: string[]; changsheng: string[] };
-  dayun: Array<{ ganzhi: string; age: string }>;
-  summaryOpen: boolean;
-
-  messages: Msg[];
-  inputValue: string;
-  sending: boolean;
-  chatting: boolean;
-  scrollInto: string;
-  conversationId: string;
-}>({
+/** ========== 页面定义 ========== */
+Page<Data>({
   data: {
     pillars: { year: "", month: "", day: "", hour: "" },
-    table: { tiangan: [], dizhi: [], changsheng: ["—","—","—","—"] },
+    table: { tiangan: [], dizhi: [], changsheng: ["—", "—", "—", "—"] },
     dayun: [],
     summaryOpen: true,
 
@@ -79,22 +84,48 @@ Page<Record<string, any>, {
   },
 
   applyMingpan(m: MingpanData) {
-    const fp = m.four_pillars;
-    const pillars = {
-      year: fp.year.join(""),
-      month: fp.month.join(""),
-      day: fp.day.join(""),
-      hour: fp.hour.join(""),
+    const fp = m && m.four_pillars ? m.four_pillars : {
+      year: ["", ""],
+      month: ["", ""],
+      day: ["", ""],
+      hour: ["", ""],
     };
-    const table = {
-      tiangan: [fp.year[0], fp.month[0], fp.day[0], fp.hour[0]],
-      dizhi:   [fp.year[1], fp.month[1], fp.day[1], fp.hour[1]],
-      changsheng: this.data.table.changsheng,
+
+    const y = Array.isArray(fp.year) ? fp.year : ["", ""];
+    const mo = Array.isArray(fp.month) ? fp.month : ["", ""];
+    const d = Array.isArray(fp.day) ? fp.day : ["", ""];
+    const h = Array.isArray(fp.hour) ? fp.hour : ["", ""];
+
+    const pillars: PillarsFlat = {
+      year: y.join(""),
+      month: mo.join(""),
+      day: d.join(""),
+      hour: h.join(""),
     };
-    const dayun = (m.dayun || []).map(d => ({
-      ganzhi: d.pillar?.length ? d.pillar.join("") : "—",
-      age: `${d.age}岁 / ${d.start_year}`,
-    }));
+
+    const table: Table = {
+      tiangan: [y[0], mo[0], d[0], h[0]],
+      dizhi: [y[1], mo[1], d[1], h[1]],
+      changsheng:
+        this.data && this.data.table && Array.isArray(this.data.table.changsheng)
+          ? this.data.table.changsheng
+          : [],
+    };
+
+    const dayunSrc: DayunItem[] = Array.isArray(m.dayun) ? m.dayun : [];
+    const dayun = dayunSrc.map(function (item) {
+      const p = item && Array.isArray(item.pillar) ? item.pillar : null;
+      const hasP = p && p.length > 0;
+      const ageStr =
+        (item && item.age != null ? String(item.age) : "") +
+        "岁 / " +
+        (item && item.start_year != null ? String(item.start_year) : "");
+      return {
+        ganzhi: hasP ? p!.join("") : "—",
+        age: ageStr,
+      };
+    });
+
     this.setData({ pillars, table, dayun });
   },
 
@@ -102,7 +133,7 @@ Page<Record<string, any>, {
     this.setData({ summaryOpen: !this.data.summaryOpen });
   },
 
-  // 生成/重新生成解读（一次性 JSON）
+  /** 生成/重新生成解读（一次性 JSON） */
   async onStartChat() {
     if (this.data.chatting) return;
 
@@ -113,34 +144,39 @@ Page<Record<string, any>, {
     }
 
     this.setData({ chatting: true });
-    wx.showLoading({ title: this.data.conversationId ? "重新生成…" : "生成解读…" });
+    wx.showLoading({
+      title: this.data.conversationId ? "重新生成…" : "生成解读…",
+    });
 
     try {
       const resp = await request<{ conversation_id: string; reply: string }>(
-        `/chat/start?stream=0&_ts=${Date.now()}`,
+        "/chat/start?stream=0&_ts=" + Date.now(),
         "POST",
         { paipan: cached.mingpan, kb_index_dir: "", kb_topk: 3 },
         { Accept: "application/json" }
       );
 
-      const md = (resp.reply || "").replace(/\r\n/g, "\n");
+      const md = ((resp && resp.reply) ? resp.reply : "").replace(/\r\n/g, "\n");
       const html = parseMarkdown(md);
 
       this.setData({
-        conversationId: resp.conversation_id,
+        conversationId: resp ? resp.conversation_id : "",
         messages: [{ role: "assistant", content: md, html }],
       });
       this.toBottom();
-    } catch (err: any) {
+    } catch (err) {
       console.error("chat/start error:", err);
-      wx.showToast({ title: err?.message || "启动对话失败", icon: "none" });
+      const anyErr: any = err as any;
+      const title =
+        anyErr && anyErr.message ? anyErr.message : "启动对话失败";
+      wx.showToast({ title, icon: "none" });
     } finally {
       wx.hideLoading();
       this.setData({ chatting: false });
     }
   },
 
-  // 继续一次性对话
+  /** 继续一次性对话 */
   async onSend() {
     const text = (this.data.inputValue || "").trim();
     if (!text) return;
@@ -150,29 +186,33 @@ Page<Record<string, any>, {
       return;
     }
 
-    // 先落地用户消息（纯文本）
-    const nextMsgs = [...this.data.messages, { role: "user", content: text } as Msg];
+    const nextMsgs = [
+      ...this.data.messages,
+      { role: "user", content: text } as Msg,
+    ];
     this.setData({ messages: nextMsgs, inputValue: "", sending: true });
     this.toBottom();
 
     try {
       const resp = await request<{ reply: string }>(
-        `/chat/send?stream=0&_ts=${Date.now()}`,
+        "/chat/send?stream=0&_ts=" + Date.now(),
         "POST",
         { conversation_id: this.data.conversationId, text },
         { Accept: "application/json" }
       );
 
-      const md = (resp.reply || "").replace(/\r\n/g, "\n");
+      const md = ((resp && resp.reply) ? resp.reply : "").replace(/\r\n/g, "\n");
       const html = parseMarkdown(md);
 
       this.setData({
         messages: [...this.data.messages, { role: "assistant", content: md, html }],
       });
       this.toBottom();
-    } catch (err: any) {
+    } catch (err) {
       console.error("chat/send error:", err);
-      wx.showToast({ title: err?.message || "发送失败", icon: "none" });
+      const e: any = err as any;
+      const title = e && e.message ? e.message : "发送失败";
+      wx.showToast({ title, icon: "none" });
     } finally {
       this.setData({ sending: false });
     }
@@ -183,18 +223,23 @@ Page<Record<string, any>, {
   },
 
   onQuickAsk(e: any) {
-    const key = e.currentTarget?.dataset?.key as string;
-    const text = QUICK_MAP[key] || "";
+    const ds =
+      e && e.currentTarget && e.currentTarget.dataset
+        ? e.currentTarget.dataset
+        : {};
+    const key: string = ds && (ds as any).key != null ? String((ds as any).key) : "";
+    const text = QUICK_MAP && QUICK_MAP[key] ? QUICK_MAP[key] : "";
     if (!text) return;
     this.setData({ inputValue: text });
-    // 如果想点击即发送，取消下行注释：
     // this.onSend();
   },
-  
+
   onClearChat() {
     this.setData({ messages: [] });
     wx.showToast({ title: "已清空", icon: "none" });
   },
 
-  onInput(e: any) { this.setData({ inputValue: e.detail.value }); },
+  onInput(e: any) {
+    this.setData({ inputValue: e && e.detail ? e.detail.value : "" });
+  },
 });

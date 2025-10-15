@@ -53,9 +53,17 @@ export function request<T>(
           reject(new Error(`HTTP ${statusCode}: ${typeof res.data === "string" ? res.data : JSON.stringify(res.data)}`));
         }
       },
-      fail(err) {
+      fail: (err: any) => {
         console.error("❌ fail:", err);
-        reject(new Error(`Network error: ${err?.errMsg || "unknown"}`));
+        let msg = "unknown";
+        if (typeof err === "string") {
+          msg = err;
+        } else if (err && (err.errMsg || err.message)) {
+          msg = err.errMsg || err.message;
+        } else if (err != null) {
+          try { msg = String(err); } catch {}
+        }
+        reject(new Error("Network error: " + msg));
       },
     } as WechatMiniprogram.RequestOption);
   });
