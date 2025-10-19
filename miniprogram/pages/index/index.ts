@@ -55,7 +55,7 @@ Page<Record<string, any>, PageData>({
   setLunar()  { this.setData({ calendar: "农历" }); },
 
   testPing() {
-    request('/api/ping', 'GET')
+    request('', 'GET')
       .then((res) => {
         // 你的后端可能返回 {status:"ok"} 或字符串
         this.setData({ ping: JSON.stringify(res) });
@@ -83,7 +83,7 @@ Page<Record<string, any>, PageData>({
         birthplace: (this.data.birthplace || "深圳").trim(),
       };
 
-      const resp = await request("/bazi/calc_paipan", "POST", payload);
+      const resp = await request("api/bazi/calc_paipan", "POST", payload);
 
       // 存排盘结果 + 表单，给 result & chat/start 用
       wx.setStorageSync("last_paipan", resp);
@@ -92,7 +92,10 @@ Page<Record<string, any>, PageData>({
       // 跳转结果页
       wx.navigateTo({ url: "/pages/result/index" });
     } catch (err: any) {
-      wx.showToast({ title: err?.message || "请求失败", icon: "none" });
+      wx.showToast({
+        icon: "none",
+        title: (err && err.message) ? err.message : "请求失败",
+      });
     } finally {
       this.setData({ submitting: false });
     }

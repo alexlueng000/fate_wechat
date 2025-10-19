@@ -1,7 +1,7 @@
 // utils/request.ts
 // import { BASE_URL } from "./env";
 
-const BASE_URL = 'https://api.fateinsight.site'
+const BASE_URL = 'http://127.0.0.1:8000'
 
 function getToken(): string {
   try { return wx.getStorageSync<string>("token") || ""; } catch { return ""; }
