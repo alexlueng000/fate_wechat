@@ -69,6 +69,7 @@
 /* CTA + 输入条 */
 .cta{
   width:100%; margin-top:16rpx; background:#b83227; color:#fff; border-radius:14rpx;
+  margin-top: 20px;
   padding:22rpx 0; font-size:30rpx; font-weight:700; box-shadow:0 8rpx 20rpx rgba(184,50,39,.25);
 }
 .input-bar{
