@@ -45,14 +45,53 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     toView: "end",
   },
 
-  onLoad() {
-    // ✅ 保留你的开场白
+  onLoad(options) {
+    // 你的开场白，保留
     this.appendAssistant(
       "你好呀～（微笑）\n" +
         "我不是来剧透你人生的编剧，只是帮你找找藏在命盘里的小彩蛋——可能是你还没发现的潜力，或是未来路上悄悄亮起的路灯（✨）\n" +
         "毕竟你才是人生的主角，我嘛…只是个带地图的导游～（轻松摊手）\n" +
         "准备好一起逛逛你的‘人生剧本杀’了吗？放心，不用怕泄露天机，我今天的‘仙气’储备充足！"
     );
+  
+    let injected = false;
+  
+    // 1) 优先：eventChannel
+    const ec = (this as any).getOpenerEventChannel?.();
+    if (ec && ec.on) {
+      ec.on("startData", (payload: { cid?: string; reply?: string }) => {
+        if (payload?.cid) {
+          this.setData({ conversationId: payload.cid });
+          wx.setStorageSync("conversation_id", payload.cid);
+        }
+        if (!injected && payload?.reply) {
+          this.appendAssistant(payload.reply);
+          injected = true;
+        }
+        // 再保险一层，确保兜底不会触发
+        wx.removeStorageSync("start_reply");
+      });
+    }
+  
+    // 2) 兜底：仅当上面没成功注入时再读 storage
+    if (!injected) {
+      const boot = (wx.getStorageSync("start_reply") as string) || "";
+      if (boot) {
+        this.appendAssistant(boot);
+        injected = true;
+        wx.removeStorageSync("start_reply");
+      }
+    }
+  
+    // 3) 解析 URL ?cid= 场景（从分享或外部直接打开）
+    const qCid = (options as any)?.cid ? String((options as any).cid) : "";
+    if (qCid) {
+      this.setData({ conversationId: qCid });
+      wx.setStorageSync("conversation_id", qCid);
+    } else if (!this.data.conversationId) {
+      const saved = (wx.getStorageSync("conversation_id") as string) || "";
+      if (saved) this.setData({ conversationId: saved });
+    }
   },
 
   /** 输入框 */
@@ -154,7 +193,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     this.appendUser(text);
     this.appendAssistant("思考中…");
   
-    const url = `${API_BASE}/chat?stream=0&_ts=${Date.now()}`;
+    const url = `${API_BASE}/api/chat?stream=0&_ts=${Date.now()}`;
     const payload = { conversation_id: cid, message: text };
   
     // —— 打点，方便你在控制台确认 —— 
