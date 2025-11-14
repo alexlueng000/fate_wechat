@@ -1,45 +1,56 @@
-<view class="chat-page">
-  <!-- 会话列表 -->
-  <scroll-view scroll-y class="list" scroll-with-animation scroll-into-view="{{toView}}">
-    <block wx:for="{{messages}}" wx:key="index" wx:for-index="i" wx:for-item="m">
-      <view class="msg {{m.role}}">
-        <view class="avatar">{{ m.role === 'user' ? '我' : 'AI' }}</view>
-        <view class="bubble"><text class="text" selectable="true">{{m.content}}</text></view>
+<view class="page">
+
+<!-- 聊天列表 -->
+<scroll-view
+  class="chat"
+  scroll-y="true"
+  scroll-with-animation="true"
+  scroll-into-view="{{toView}}"
+>
+  <view class="chat-inner">
+    <block wx:for="{{messages}}" wx:key="index" wx:for-item="msg" wx:for-index="index">
+      <view id="msg-{{index}}" class="msg {{msg.role === 'user' ? 'right' : 'left'}}">
+        <view class="bubble">
+          <text class="bubble-text">
+            {{msg.content}}
+          </text>
+        </view>
       </view>
     </block>
-    <view id="{{toView}}"></view>
-  </scroll-view>
+    <view id="end"></view>
+  </view>
+</scroll-view>
 
-  <!-- 快捷方式：4列×2行，固定两排 -->
+<!-- 快捷分析 -->
+<view class="card quick-card">
+  <view class="quick-title">快捷分析</view>
   <view class="quick-grid">
-    <view class="q-item" bindtap="onQuickAsk" data-key="personality">性格特征</view>
-    <view class="q-item" bindtap="onQuickAsk" data-key="avatar">人物画像</view>
-    <view class="q-item" bindtap="onQuickAsk" data-key="partner_avatar">正缘画像</view>
-    <view class="q-item" bindtap="onQuickAsk" data-key="career">事业建议</view>
-    <view class="q-item" bindtap="onQuickAsk" data-key="wealth">财运</view>
-    <view class="q-item" bindtap="onQuickAsk" data-key="health">健康</view>
-    <view class="q-item wide" bindtap="onQuickAsk" data-key="love_timing">正缘应期</view>
-    <view class="q-item ghost" bindtap="onClear">清空对话</view>
+    <view class="quick-chip" bindtap="onQuickAsk" data-key="personality" data-label="性格特征">性格特征</view>
+    <view class="quick-chip" bindtap="onQuickAsk" data-key="avatar" data-label="人物画像">人物画像</view>
+    <view class="quick-chip" bindtap="onQuickAsk" data-key="love_timing" data-label="正缘应期">正缘应期</view>
+    <view class="quick-chip" bindtap="onQuickAsk" data-key="career" data-label="事业建议">事业建议</view>
+    <view class="quick-chip" bindtap="onQuickAsk" data-key="wealth" data-label="财运">财运</view>
+    <view class="quick-chip" bindtap="onQuickAsk" data-key="health" data-label="健康">健康</view>
   </view>
+</view>
 
-  <!-- 固定底部：免责声明 + 输入条（一个整体，不会互相遮挡） -->
-  <view class="footer">
-    <!-- <view class="tip">* 对话仅供参考，不构成专业建议 *</view> -->
-    <view class="inputBar">
-      <input class="ipt"
-             placeholder="来说点什么…"
-             value="{{input}}"
-             bindinput="onInput"
-             confirm-type="send"
-             bindconfirm="onSend"
-             cursor-spacing="14"/>
-      <button class="sendBtn"
-              bindtap="onSend"
-              loading="{{loading}}"
-              disabled="{{loading}}">发送</button>
-    </view>
-  </view>
+<!-- 输入区 -->
+<view class="inputBar">
+  <input
+    class="ipt"
+    placeholder="来说点什么…"
+    value="{{input}}"
+    bindinput="onInput"
+    confirm-type="send"
+    bindconfirm="onSend"
+  />
+  <button class="sendBtn" bindtap="onSend" loading="{{loading}}" disabled="{{loading}}">
+    发送
+  </button>
+</view>
 
-  <!-- 占位：给 iOS 安全区兜底（即使 footer 高度变化也不抖） -->
-  <view class="spacer"></view>
+<!-- 免责声明 -->
+<view class="tip">* 对话仅供参考，不构成专业建议 *</view>
+
+<view style="height: env(safe-area-inset-bottom)"></view>
 </view>

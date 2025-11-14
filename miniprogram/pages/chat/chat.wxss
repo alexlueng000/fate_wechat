@@ -1,60 +1,133 @@
-/* 主题 */
-.chat-page{display:flex;flex-direction:column;height:100vh;background:#f7f3ea}
+.page {
+  background: #f7f3ea;
+  min-height: 100vh;
+  padding: 16rpx;
+  box-sizing: border-box;
+}
 
-/* 列表：底部留白=快捷两排(220) + footer(160~180) + 余量 */
-.list{flex:1;box-sizing:border-box;padding:20rpx 24rpx 440rpx}
+/* 聊天区 */
+.chat {
+  height: calc(100vh - 420rpx); /* 保证上面有空间给快捷按钮和输入栏 */
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, .06);
+  padding: 16rpx;
+  box-sizing: border-box;
+}
 
-/* 消息 */
-.msg{display:flex;align-items:flex-start;margin:18rpx 0}
-.avatar{
-  width:56rpx;height:56rpx;border-radius:50%;margin-right:16rpx;
-  background:#fff7e8;color:#8b5a00;border:1rpx solid #e5c07b;
-  display:flex;align-items:center;justify-content:center;font-size:24rpx;
-  box-shadow:0 8rpx 24rpx rgba(0,0,0,.06)
+.chat-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
 }
-.msg.user{flex-direction:row-reverse}
-.msg.user .avatar{margin-left:16rpx;margin-right:0;background:#ffe9e4;color:#b83227;border-color:#f2c1b9}
-.bubble{
-  max-width:78%;padding:20rpx 24rpx;border-radius:18rpx;line-height:1.8;white-space:pre-wrap;word-break:break-word;
-  background:#fff;color:#333;border:1rpx solid #e9dfd8;box-shadow:0 8rpx 24rpx rgba(0,0,0,.06)
-}
-.msg.user .bubble{background:#b83227;color:#fff;border-color:transparent;box-shadow:0 8rpx 24rpx rgba(184,50,39,.25)}
-.text{font-size:28rpx}
 
-/* 快捷两排（固定两行，不滚动；与 footer 留出间距） */
-.quick-grid{
-  position:relative; /* 参与文档流 */
-  display:grid;grid-template-columns:repeat(4,1fr);gap:16rpx;padding:12rpx 20rpx 0;margin-bottom:48rpx
+/* 气泡布局 */
+.msg {
+  display: flex;
+  width: 100%;
 }
-.q-item{
-  background:#fff;border:2rpx dashed #f0cfc3;color:#b05544;border-radius:20rpx;height:88rpx;
-  display:flex;align-items:center;justify-content:center;font-size:28rpx;font-weight:600;
-  box-shadow:0 8rpx 18rpx rgba(0,0,0,.06)
-}
-.q-item.wide{grid-column:span 2}
-.q-item.ghost{background:#fffdfb}
 
-/* 固定底部：免责声明 + 输入条  */
-.footer{
-  position:fixed;left:0;right:0;bottom:0;z-index:999;
-  background:#f7f3ea;border-top:1rpx solid #e9dfd8;
-  padding-bottom:env(safe-area-inset-bottom)
+.msg.left {
+  justify-content: flex-start;
 }
-.tip{ text-align:center;color:#9a8f86;font-size:22rpx;padding:8rpx 0 6rpx }
 
-/* 输入条 */
-.inputBar{display:flex;align-items:center;gap:14rpx;padding:8rpx 20rpx 12rpx}
-.ipt{
-  flex:1;background:#fff;border:2rpx solid #e9dfd8;border-radius:999rpx;
-  padding:20rpx 26rpx;font-size:28rpx;color:#333
+.msg.right {
+  justify-content: flex-end;
 }
-.sendBtn{
-  min-width:176rpx;height:76rpx;border-radius:999rpx;padding:0;
-  background:#b83227;color:#fff;font-weight:700;font-size:28rpx;
-  display:flex;align-items:center;justify-content:center;text-align:center;
-  box-shadow:0 10rpx 24rpx rgba(184,50,39,.25)
-}
-.sendBtn:disabled{opacity:.6}
 
-/* 占位：保证页面最底部可滚动到 footer 顶部，不被遮 */
-.spacer{height:24rpx}
+.bubble {
+  max-width: 82%;
+  padding: 16rpx 18rpx;
+  border-radius: 16rpx;
+  white-space: pre-wrap;
+  line-height: 1.7;
+}
+
+.msg.left .bubble {
+  background: #fffaf0;
+  border: 1rpx solid #f0ddc0;
+  color: #333;
+}
+
+.msg.right .bubble {
+  background: #b83227;
+  color: #fff;
+}
+
+.bubble-text {
+  font-size: 26rpx;
+}
+
+/* 快捷分析 */
+.card {
+  background: #fff;
+  border-radius: 24rpx;
+  box-shadow: 0 10rpx 28rpx rgba(0, 0, 0, .06);
+  padding: 22rpx;
+  margin-top: 18rpx;
+}
+
+.quick-card {
+  border: 2rpx solid #f3e7df;
+}
+
+.quick-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 14rpx;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+}
+
+.quick-chip {
+  background: #fffdfb;
+  border: 2rpx dashed #f0cfc3;
+  color: #b05544;
+  border-radius: 20rpx;
+  padding: 16rpx 0;
+  text-align: center;
+  font-size: 24rpx;
+}
+
+/* 输入区 + 发送按钮 */
+.inputBar {
+  margin-top: 18rpx;
+  display: flex;
+  gap: 12rpx;
+  align-items: center;
+}
+
+.ipt {
+  flex: 1;
+  background: #fff;
+  border-radius: 999rpx;
+  padding: 18rpx 24rpx;
+  font-size: 26rpx;
+  border: 1rpx solid #eee;
+}
+
+.sendBtn {
+  flex: 0 0 auto;
+  padding: 0 40rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  background: #b83227;
+  color: #fff;
+  border-radius: 999rpx;
+  font-weight: 700;
+  font-size: 28rpx;
+  box-shadow: 0 8rpx 20rpx rgba(184, 50, 39, .25);
+}
+
+/* 免责声明 */
+.tip {
+  margin-top: 12rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: #9a8f86;
+}
