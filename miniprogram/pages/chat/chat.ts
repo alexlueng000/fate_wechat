@@ -3,19 +3,21 @@ import { API_BASE } from "../../utils/config";
 import type { ChatMessage } from "../../../typings/types/message";
 import { request } from "../../utils/request";
 
-// 启动解读接口返回
 type StartResp = { conversation_id: string; reply: string };
 
-// --------- Page 的 data 类型 ----------
-interface Data {
-  messages: ChatMessage[];
-  input: string;
-  loading: boolean;
-  toView: string;          // 用于滚动到底部
-  conversationId: string;  // 当前会话 id
+// 每条消息：在原有 ChatMessage 上加一个 nodes 字段给 rich-text 用
+interface UIMsg extends ChatMessage {
+  nodes: any[];
 }
 
-// --------- 自定义方法类型 ----------
+interface Data {
+  messages: UIMsg[];
+  input: string;
+  loading: boolean;
+  toView: string;
+  conversationId: string;
+}
+
 type Custom = {
   onInput(e: WechatMiniprogram.Input): void;
   onSend(): void;
@@ -27,10 +29,8 @@ type Custom = {
   onClear(): void;
   onStartFromChat(): void;
   autoSendPrompt(actual: string): Promise<void>;
-  formatMarkdown(text: string): any[];
 };
 
-// --------- 快捷问法映射 ----------
 const QUICK_MAP: Record<string, string> = {
   personality: "结合原局，用子平和盲派深度分析人物性格优势",
   avatar: "结合原局（加入性别），用子平和盲派深度分析人物画像身高体型气质动作等等",
@@ -43,62 +43,154 @@ const QUICK_MAP: Record<string, string> = {
     "结合原局和大运流年，用子平和盲派深度分析哪个流年应期概率最高（需要引导客户补充背景，当前单身/有对象，已婚/离异）",
 };
 
-// 简单把 Markdown 语法清洗掉，变成正常段落
 function normalizeReply(text: string): string {
   if (!text) return text;
-  return text
+
+  const lines = text
     .replace(/\r\n/g, "\n")
+    .replace(/\u00A0/g, " ")
+    .replace(/\u2002|\u2003|\u2009/g, " ")
     .split("\n")
-    .map((line) => {
-      let s = line.trim();
-      if (!s) return "";
+    .map((line) =>
+      line.replace(/^[\uFEFF\u3000\u00A0\u2002\u2003\u2009 \t]+/, "")
+    );
 
-      // 标题
-      if (s.startsWith("### ")) return s.slice(4);
-      if (s.startsWith("## ")) return s.slice(3);
-      if (s.startsWith("# ")) return s.slice(2);
+  let start = 0;
+  while (start < lines.length && lines[start].trim() === "") start++;
+  const cleaned = lines.slice(start);
 
-      // 列表项
-      if (s.startsWith("- #### ")) return "• " + s.slice(7);
-      if (s.startsWith("- ### ")) return "• " + s.slice(6);
-      if (s.startsWith("- ")) return "• " + s.slice(2);
+  const collapsed: string[] = [];
+  for (const l of cleaned) {
+    if (!l.trim()) {
+      if (!collapsed.length) continue;
+      if (collapsed[collapsed.length - 1] === "") continue;
+      collapsed.push("");
+    } else {
+      collapsed.push(l);
+    }
+  }
 
-      return s;
-    })
-    .join("\n");
+  return collapsed.join("\n");
 }
 
+// ===== 内联加粗：**xxx** =====
+function parseInline(str: string): any[] {
+  const children: any[] = [];
+  const boldRe = /\*\*(.+?)\*\*/g;
+  let lastIndex = 0;
+  let m: RegExpExecArray | null;
 
-// --------- Markdown -> rich-text 的简单转换 ----------
-const formatMarkdownImpl = (text: string): any[] => {
+  while ((m = boldRe.exec(str)) !== null) {
+    const idx = m.index;
+    if (idx > lastIndex) {
+      children.push({ type: "text", text: str.slice(lastIndex, idx) });
+    }
+    children.push({
+      name: "strong",
+      children: [{ type: "text", text: m[1] }],
+    });
+    lastIndex = idx + m[0].length;
+  }
+
+  if (lastIndex < str.length) {
+    children.push({ type: "text", text: str.slice(lastIndex) });
+  }
+
+  if (!children.length) {
+    children.push({ type: "text", text: str });
+  }
+
+  return children;
+}
+
+// ===== Markdown -> rich-text nodes =====
+function formatMarkdownImpl(text: string): any[] {
   if (!text) return [];
 
-  return text
-    .replace(/\r\n/g, "\n")
-    .replace(/\n/g, "<br/>")
-    .replace(/### (.*?)<br\/>/g, "<h2>$1</h2>")
-    .replace(/## (.*?)<br\/>/g, "<h1>$1</h1>")
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .split("<br/>")
-    .map((p) => ({
-      name: "p",
-      children: [{ type: "text", text: p }],
-    }));
-};
+  const lines = text.replace(/\r\n/g, "\n").split("\n");
+  const nodes: any[] = [];
 
-/** Page 配置 —— 注意泛型顺序：Options<Data, Custom> */
+  let paraBuf: string[] = [];
+  let listBuf: string[] | null = null;
+
+  const flushPara = () => {
+    if (!paraBuf.length) return;
+    const content = paraBuf.join(" ").trim();
+    if (!content) {
+      paraBuf = [];
+      return;
+    }
+    nodes.push({
+      name: "p",
+      children: parseInline(content),
+    });
+    paraBuf = [];
+  };
+
+  const flushList = () => {
+    if (!listBuf || !listBuf.length) return;
+    nodes.push({
+      name: "ul",
+      children: listBuf.map((item) => ({
+        name: "li",
+        children: parseInline(item.trim()),
+      })),
+    });
+    listBuf = null;
+  };
+
+  for (let raw of lines) {
+    const line = raw.replace(/\s+$/g, "");
+    const trimmed = line.trim();
+
+    if (!trimmed) {
+      flushPara();
+      flushList();
+      continue;
+    }
+
+    // 标题：支持前空格 & 无空格写法
+    const headingMatch = trimmed.match(/^(#{1,6})\s*(.*)$/);
+    if (headingMatch) {
+      flushPara();
+      flushList();
+      const level = Math.min(headingMatch[1].length, 3);
+      const tag = ("h" + level) as "h1" | "h2" | "h3";
+      const content = headingMatch[2].trim();
+      nodes.push({
+        name: tag,
+        children: parseInline(content),
+      });
+      continue;
+    }
+
+    // 列表
+    const listMatch = trimmed.match(/^[-*+]\s+(.*)$/);
+    if (listMatch) {
+      flushPara();
+      if (!listBuf) listBuf = [];
+      listBuf.push(listMatch[1]);
+      continue;
+    }
+
+    // 普通段落
+    paraBuf.push(trimmed);
+  }
+
+  flushPara();
+  flushList();
+
+  return nodes;
+}
+
+// ========== Page ==========
 const options: WechatMiniprogram.Page.Options<Data, Custom> = {
   data: {
-    messages: [] as ChatMessage[],
+    messages: [] as UIMsg[],
     input: "",
     loading: false,
     toView: "end",
     conversationId: "",
-  },
-
-  // 让 WXML 能直接用 formatMarkdown(msg.content)
-  formatMarkdown(text: string) {
-    return formatMarkdownImpl(text);
   },
 
   onLoad(options) {
@@ -112,7 +204,6 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
     let injected = false;
 
-    // 1) eventChannel 带过来的启动解读
     const ec = (this as any).getOpenerEventChannel?.();
     if (ec && ec.on) {
       ec.on("startData", (payload: { cid?: string; reply?: string }) => {
@@ -128,7 +219,6 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       });
     }
 
-    // 2) 兜底：从 storage 兜启动解读
     if (!injected) {
       const boot = (wx.getStorageSync("start_reply") as string) || "";
       if (boot) {
@@ -138,7 +228,6 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       }
     }
 
-    // 3) URL ?cid= 场景
     const qCid = (options as any)?.cid ? String((options as any).cid) : "";
     if (qCid) {
       this.setData({ conversationId: qCid });
@@ -149,42 +238,54 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     }
   },
 
-  /** 输入框 */
   onInput(e) {
     const val = (e.detail as any).value as string;
     this.setData({ input: val });
   },
 
-  /** 滚到底部 */
   toBottom() {
     this.setData({ toView: "end" });
   },
 
-  /** 追加用户消息 */
   appendUser(text) {
-    const msgs = this.data.messages.concat([{ role: "user", content: text }]);
-    this.setData({ messages: msgs }, this.toBottom);
+    const msg: UIMsg = {
+      role: "user",
+      content: text,
+      nodes: formatMarkdownImpl(text),
+    } as any;
+    const msgs = this.data.messages.concat(msg);
+    this.setData({ messages: msgs }, () => this.toBottom());
   },
 
-  /** 追加助手消息 */
   appendAssistant(text) {
     const clean = normalizeReply(text);
-    const msgs = this.data.messages.concat([{ role: "assistant", content: clean }]);
-    this.setData({ messages: msgs }, this.toBottom);
+    const msg: UIMsg = {
+      role: "assistant",
+      content: clean,
+      nodes: formatMarkdownImpl(clean),
+    } as any;
+    const msgs = this.data.messages.concat(msg);
+    this.setData({ messages: msgs }, () => this.toBottom());
   },
 
-  /** 替换最后一条助手消息（或追加） */
   replaceLastAssistant(text) {
     const clean = normalizeReply(text);
     const msgs = this.data.messages.slice();
+    const node = formatMarkdownImpl(clean);
+
     if (msgs.length && msgs[msgs.length - 1].role === "assistant") {
       msgs[msgs.length - 1].content = clean;
+      (msgs[msgs.length - 1] as any).nodes = node;
     } else {
-      msgs.push({ role: "assistant", content: clean });
+      msgs.push({
+        role: "assistant",
+        content: clean,
+        nodes: node,
+      } as any);
     }
-    this.setData({ messages: msgs }, this.toBottom);
+    this.setData({ messages: msgs }, () => this.toBottom());
   },
-  /** 快捷按钮：显示 label，发送映射 prompt */
+
   onQuickAsk(e: WechatMiniprogram.BaseEvent) {
     const ds: any = e?.currentTarget?.dataset || {};
     const key: string = String(ds.key || "");
@@ -196,14 +297,12 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     }
     if (this.data.loading) return;
 
-    // 界面展示：按钮文案
     this.appendUser(label);
 
     const actual = QUICK_MAP[key] || label;
     this.autoSendPrompt(actual);
   },
 
-  /** 复用发送流程：用真实 prompt 调用 /chat ，不显示在界面里 */
   async autoSendPrompt(actual: string) {
     this.setData({ loading: true });
     this.appendAssistant("思考中…");
@@ -217,6 +316,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       );
       const reply = normalizeReply((resp?.reply || "").replace(/\r\n/g, "\n"));
       this.replaceLastAssistant(reply);
+      console.log("raw reply:", JSON.stringify(reply));
       this.setData({ toView: "end" });
     } catch (err) {
       this.replaceLastAssistant("网络似乎有点慢，稍后再试～");
@@ -225,14 +325,12 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     }
   },
 
-  /** 清空对话 */
   onClear() {
     this.setData({ messages: [] });
     wx.showToast({ title: "已清空", icon: "none" });
     this.toBottom();
   },
 
-  /** 从 chat 页重新触发一次 start_chat（一般用不到，只是兜底） */
   onStartFromChat() {
     if (this.data.loading) return;
 
@@ -254,7 +352,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       .then((resp) => {
         wx.setStorageSync("conversation_id", resp.conversation_id);
         this.setData({ conversationId: resp.conversation_id as any });
-      
+
         const reply = normalizeReply(resp.reply || "（无响应）");
         this.appendAssistant(reply);
       })
@@ -262,17 +360,18 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
         wx.showToast({ title: err?.message || "启动失败", icon: "none" });
       })
       .finally(() => {
-        this.setData({ loading: false }, this.toBottom);
+        this.setData({ loading: false }, () => this.toBottom());
         wx.hideLoading();
       });
   },
 
-  /** 普通输入发送 */
   onSend() {
     const text = this.data.input.trim();
     if (!text || this.data.loading) return;
 
-    const cid = this.data.conversationId || (wx.getStorageSync("conversation_id") as string) || "";
+    const cid =
+      this.data.conversationId ||
+      ((wx.getStorageSync("conversation_id") as string) || "");
     if (!cid) {
       wx.showToast({ title: "请先在排盘页点击“开始对话”", icon: "none" });
       return;
@@ -290,18 +389,22 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     wx.request<{ reply: string }>({
       url,
       method: "POST",
-      header: { "content-type": "application/json", Accept: "application/json" },
+      header: {
+        "content-type": "application/json",
+        Accept: "application/json",
+      },
       data: payload,
       timeout: 15000,
       success: (res) => {
         const { statusCode } = res;
         if (statusCode >= 200 && statusCode < 300) {
           const raw =
-            (res.data && typeof (res.data as any).reply === "string")
+            res.data && typeof (res.data as any).reply === "string"
               ? (res.data as any).reply
               : "（无响应）";
           const reply = normalizeReply(raw);
           this.replaceLastAssistant(reply);
+          console.log("raw reply:", JSON.stringify(raw));
         } else {
           const msg =
             (res.data as any)?.detail?.[0]?.msg ||
@@ -314,7 +417,8 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
         console.warn("[chat] request fail:", err);
         this.replaceLastAssistant("网络连接失败，请稍后再试。");
       },
-      complete: () => this.setData({ loading: false }, this.toBottom),
+      complete: () =>
+        this.setData({ loading: false }, () => this.toBottom()),
     });
   },
 };

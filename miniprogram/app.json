@@ -1,20 +1,47 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/history/history",
-    "pages/profile/profile",
-    "pages/help/help",
     "pages/result/index",
-    "pages/chat/chat"
+    "pages/chat/chat",
+    "pages/profile/profile"
   ],
+
   "window": {
     "navigationBarTitleText": "命理八字",
     "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTextStyle": "black",
     "backgroundTextStyle": "dark",
-    "backgroundColor": "#efe9dd" 
+    "backgroundColor": "#efe9dd"
   },
-  
+
+  "tabBar": {
+    "color": "#888888",
+    "selectedColor": "#b83227",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "排盘",
+        "iconPath": "assets/tab-index.png",
+        "selectedIconPath": "assets/tab-index-selected.png"
+      },
+      {
+        "pagePath": "pages/chat/chat",
+        "text": "解读",
+        "iconPath": "assets/tab-chat.png",
+        "selectedIconPath": "assets/tab-chat-selected.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "assets/tab-user.png",
+        "selectedIconPath": "assets/tab-user-selected.png"
+      }
+    ]
+  },
+
   "style": "v2",
   "sitemapLocation": "sitemap.json"
 }

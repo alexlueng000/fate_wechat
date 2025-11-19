@@ -43,7 +43,7 @@ Page<Record<string, any>, PageData>({
   onLoad() {
     const t = todayStr();
     this.setData({ birth_date: t.date, birth_time: t.time });
-    this.testPing();
+    // this.testPing();
   },
 
   onPickDate(e: any) { this.setData({ birth_date: e.detail.value || this.data.birth_date }); },

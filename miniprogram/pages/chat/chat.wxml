@@ -2,24 +2,27 @@
 
 <!-- 聊天列表 -->
 <scroll-view
-  class="chat"
-  scroll-y="true"
-  scroll-with-animation="true"
-  scroll-into-view="{{toView}}"
->
-  <view class="chat-inner">
-    <block wx:for="{{messages}}" wx:key="index" wx:for-item="msg" wx:for-index="index">
-      <view id="msg-{{index}}" class="msg {{msg.role === 'user' ? 'right' : 'left'}}">
-        <view class="bubble">
-          <text class="bubble-text">
-            {{msg.content}}
-          </text>
+    class="chat"
+    scroll-y="true"
+    scroll-with-animation="true"
+    scroll-into-view="{{toView}}"
+  >
+    <view class="chat-inner">
+      <block wx:for="{{messages}}" wx:key="index">
+        <view class="msg {{item.role === 'assistant' ? 'left' : 'right'}}">
+          <view class="bubble">
+            <!-- 必须用 rich-text + formatMarkdown -->
+            <rich-text
+              class="md"
+              nodes="{{item.nodes}}"
+            ></rich-text>
+          </view>
         </view>
-      </view>
-    </block>
-    <view id="end"></view>
-  </view>
+      </block>
+      <view id="end"></view>
+    </view>
 </scroll-view>
+
 
 <!-- 快捷分析 -->
 <view class="card quick-card">

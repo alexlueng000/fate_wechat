@@ -5,26 +5,32 @@
   box-sizing: border-box;
 }
 
-/* 聊天区 */
+/* ========== 聊天区容器 ========== */
 .chat {
-  height: calc(100vh - 420rpx); /* 保证上面有空间给快捷按钮和输入栏 */
+  /* 预留空间给上面的标题 / 快捷区 / 输入栏 */
+  height: calc(100vh - 420rpx);
   background: #fff;
   border-radius: 16rpx;
   box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, .06);
   padding: 16rpx;
   box-sizing: border-box;
-}
-
-.chat-inner {
   display: flex;
   flex-direction: column;
-  gap: 14rpx;
 }
 
-/* 气泡布局 */
+/* 滚动区（如果你外面有 scroll-view，就挂在 scroll-view 上） */
+.chat-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  /* 消息之间间距 */
+}
+
+/* 单条消息行：左/右对齐气泡 */
 .msg {
   display: flex;
-  width: 100%;
+  margin-bottom: 4rpx;
 }
 
 .msg.left {
@@ -35,17 +41,21 @@
   justify-content: flex-end;
 }
 
+/* ========== 气泡本体 ========== */
 .bubble {
   max-width: 82%;
-  padding: 16rpx 18rpx;
+  padding: 8rpx 14rpx;
+  /* 上下 8，左右 14：瘦一点 */
   border-radius: 16rpx;
   white-space: pre-wrap;
-  line-height: 1.7;
+  line-height: 1.5;
+  /* 再收一点行高 */
+  box-sizing: border-box;
 }
 
+/* 用户 / 助手不同背景 */
 .msg.left .bubble {
-  background: #fffaf0;
-  border: 1rpx solid #f0ddc0;
+  background: #f8f3ee;
   color: #333;
 }
 
@@ -54,11 +64,117 @@
   color: #fff;
 }
 
+/* 所有文字统一左对齐、无缩进 */
+.bubble .md p,
+.bubble .md h1,
+.bubble .md h2,
+.bubble .md h3,
+.bubble .md ul,
+.bubble .md li,
+.bubble .md strong,
+.bubble .md em {
+  text-align: left !important;
+  text-indent: 0 !important;
+}
+
+/* 兼容你之前的 class，用在纯文本 span 上也没问题 */
 .bubble-text {
+  text-align: left;
+  text-indent: 0 !important;
+}
+
+/* ========== Markdown 富文本区 ========== */
+/* 假设 rich-text 用的是 <rich-text class="md" ...> */
+.bubble .md {
+  display: block;
+}
+
+/* 段落 & 标题：收紧间距，防止气泡纵向撑太高 */
+.bubble .md p,
+.bubble .md h1,
+.bubble .md h2,
+.bubble .md h3 {
+  margin: 4rpx 0;
+  /* 统一小段间距 */
+  padding: 0;
+  text-align: left;
+  text-indent: 0;
+}
+
+/* 第一行一定要贴顶，避免“第一句话不顶格”的视觉错觉 */
+.bubble .md p:first-child,
+.bubble .md h1:first-child,
+.bubble .md h2:first-child,
+.bubble .md h3:first-child {
+  margin-top: 0 !important;
+  text-align: left !important;
+  text-indent: 0 !important;
+}
+
+/* 最后一行不要额外 margin-bottom，气泡底边收紧一点 */
+.bubble .md p:last-child,
+.bubble .md h1:last-child,
+.bubble .md h2:last-child,
+.bubble .md h3:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* 标题字号比正文稍大，但不要夸张，避免撑高气泡 */
+.bubble .md h1 {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.bubble .md h2 {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.bubble .md h3 {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+/* 段落正文 */
+.bubble .md p {
   font-size: 26rpx;
 }
 
-/* 快捷分析 */
+/* 列表样式（formatMarkdown 已经转成 ul/li 的话） */
+.bubble .md ul {
+  padding-left: 32rpx;
+  /* 稍微缩进一点 */
+  margin: 4rpx 0;
+}
+
+.bubble .md li {
+  margin: 2rpx 0;
+  line-height: 1.5;
+}
+
+/* 粗体：不调大行高，避免单行撑高 */
+.bubble .md strong {
+  font-weight: 600;
+}
+
+/* 如果富文本里有其他全局 reset，强压一层优先级 */
+/* === 强制所有气泡内文字左对齐、无首行缩进 === */
+.bubble,
+.bubble view,
+.bubble text,
+.bubble rich-text,
+.bubble .md,
+.bubble .md p,
+.bubble .md h1,
+.bubble .md h2,
+.bubble .md h3,
+.bubble .md ul,
+.bubble .md li {
+  text-align: left !important;
+  text-indent: 0 !important;
+}
+
+/* ========== 快捷分析卡片区 ========== */
 .card {
   background: #fff;
   border-radius: 24rpx;
@@ -94,7 +210,7 @@
   font-size: 24rpx;
 }
 
-/* 输入区 + 发送按钮 */
+/* ========== 输入区 + 发送按钮 ========== */
 .inputBar {
   margin-top: 18rpx;
   display: flex;
@@ -111,6 +227,12 @@
   border: 1rpx solid #eee;
 }
 
+/* placeholder 也左对齐、不要缩进 */
+.ipt-input::-webkit-input-placeholder {
+  text-align: left;
+  text-indent: 0;
+}
+
 .sendBtn {
   flex: 0 0 auto;
   padding: 0 40rpx;
@@ -124,7 +246,7 @@
   box-shadow: 0 8rpx 20rpx rgba(184, 50, 39, .25);
 }
 
-/* 免责声明 */
+/* ========== 免责声明 ========== */
 .tip {
   margin-top: 12rpx;
   text-align: center;

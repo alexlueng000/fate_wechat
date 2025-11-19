@@ -1,2 +1,78 @@
-<!--pages/profile/profile.wxml-->
-<text>pages/profile/profile.wxml</text>
+<view class="page">
+
+<!-- 顶部用户卡片 -->
+<view class="card card-user">
+  <view class="avatar-wrap">
+    <view class="avatar-text">
+      {{initials}}
+    </view>
+  </view>
+
+  <view class="user-info">
+    <view class="user-name">
+      {{nickname || '未命名用户'}}
+    </view>
+    <view class="user-sub">
+      ID：{{userId || '未登录'}}
+    </view>
+    <view class="user-sub">
+      环境：{{env}} ｜ 账号类型：{{accountType}}
+    </view>
+  </view>
+</view>
+
+<!-- 账号与数据 -->
+<view class="card">
+  <view class="cell-title">账号与数据</view>
+
+  <view class="cell" bindtap="onClearLocal">
+    <view class="cell-left">
+      <text class="cell-label">清除排盘与对话数据</text>
+      <text class="cell-desc">清空本地命盘、会话记录（不影响账号登录）</text>
+    </view>
+    <text class="cell-arrow">›</text>
+  </view>
+
+  <view class="cell danger" bindtap="onLogout">
+    <view class="cell-left">
+      <text class="cell-label">退出登录</text>
+      <text class="cell-desc">清除当前账号 token，下次将重新登录</text>
+    </view>
+    <text class="cell-arrow">›</text>
+  </view>
+</view>
+
+<!-- 法律与安全 -->
+<view class="card">
+  <view class="cell-title">隐私与安全</view>
+
+  <view class="cell" bindtap="onPrivacy">
+    <view class="cell-left">
+      <text class="cell-label">隐私政策</text>
+      <text class="cell-desc">说明我们如何处理你的数据</text>
+    </view>
+    <text class="cell-arrow">›</text>
+  </view>
+
+  <view class="cell" bindtap="onAgreement">
+    <view class="cell-left">
+      <text class="cell-label">用户协议</text>
+      <text class="cell-desc">使用 FateInsight 前请先阅读</text>
+    </view>
+    <text class="cell-arrow">›</text>
+  </view>
+
+  <view class="cell" bindtap="onDisclaimer">
+    <view class="cell-left">
+      <text class="cell-label">免责声明</text>
+      <text class="cell-desc">命理内容仅供参考，不构成专业建议</text>
+    </view>
+    <text class="cell-arrow">›</text>
+  </view>
+</view>
+
+<!-- 底部版本号 -->
+<view class="footer">
+  <text>版本：{{version}}</text>
+</view>
+</view>

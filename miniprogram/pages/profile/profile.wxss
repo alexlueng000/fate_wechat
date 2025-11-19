@@ -1,1 +1,109 @@
-/* pages/profile/profile.wxss */
+.page {
+  min-height: 100vh;
+  background: #f7f3ea;
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+/* 卡片通用 */
+.card {
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 24rpx 24rpx 12rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.04);
+}
+
+/* 顶部用户卡片 */
+.card-user {
+  display: flex;
+  align-items: center;
+}
+
+.avatar-wrap {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 999rpx;
+  background: #f0d7cf;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  margin-right: 24rpx;
+}
+
+.avatar-text {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #b83227;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.user-sub {
+  font-size: 22rpx;
+  color: #9a8f86;
+}
+
+/* 分组标题 */
+.cell-title {
+  font-size: 24rpx;
+  color: #9a8f86;
+  margin-bottom: 8rpx;
+}
+
+/* 设置项 */
+.cell {
+  padding: 18rpx 0;
+  border-top: 1rpx solid #f0e5dc;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cell:first-of-type {
+  border-top: none;
+}
+
+.cell-left {
+  flex: 1;
+}
+
+.cell-label {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.cell-desc {
+  display: block;
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: #b0a59d;
+}
+
+.cell-arrow {
+  font-size: 32rpx;
+  color: #c5b9af;
+  padding-left: 16rpx;
+}
+
+/* 危险项 */
+.cell.danger .cell-label {
+  color: #c0392b;
+}
+
+.footer {
+  margin-top: 40rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: #b0a59d;
+}

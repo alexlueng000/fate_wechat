@@ -1,81 +1,50 @@
-<view class="page">
-  <!-- 顶部横幅 -->
-  <view class="banner">
-    <image class="pattern" src="/images/pattern.png" mode="scaleToFill"></image>
-    <view class="banner-inner">
-      <image class="logo" src="/images/logo.png" mode="heightFix"></image>
-      <view class="spacer"></view>
-      <image class="icon" src="/images/icon-moon.png" mode="widthFix" bindtap="onTheme"></image>
-      <image class="icon" src="/images/icon-gear.png" mode="widthFix" bindtap="onSetting"></image>
+<view class="card">
+  <view class="title">命理八字</view>
+  <view class="subtitle">人工智能趣味解读</view>
+
+  <!-- 性别 -->
+  <view class="field-row">
+    <view class="field-label">性别</view>
+    <view class="btn-group">
+      <button class="btn {{gender==='男'?'primary':''}}" size="mini" bindtap="setMale">男</button>
+      <button class="btn {{gender==='女'?'primary alt':''}}" size="mini" bindtap="setFemale">女</button>
     </view>
   </view>
 
-  <!-- 卡片：表单 -->
-  <view class="card">
-    <view class="title">命理八字</view>
-    <view class="subtitle">人工智能趣味解读</view>
-
-    <!-- 昵称
-    <view class="input-wrap">
-      <input class="input" placeholder="输入您的昵称" value="{{nickname}}" bindinput="onNickname"/>
-      <image class="input-icon" src="/images/icon-user.png" mode="widthFix"></image>
-    </view> -->
-
-    <!-- 性别 -->
-    <view class="field-row">
-      <view class="field-label">性别</view>
-      <view class="btn-group">
-        <button class="btn {{gender==='男'?'primary':''}}" size="mini" bindtap="setMale">男</button>
-        <button class="btn {{gender==='女'?'primary alt':''}}" size="mini" bindtap="setFemale">女</button>
-      </view>
+  <!-- 历法 -->
+  <view class="field-row">
+    <view class="field-label">历法选择</view>
+    <view class="btn-group">
+      <button class="btn {{calendar==='公历'?'primary':''}}" size="mini" bindtap="setSolar">公历</button>
+      <button class="btn {{calendar==='农历'?'primary alt':''}}" size="mini" bindtap="setLunar">农历</button>
     </view>
-
-    <!-- 历法选择 -->
-    <view class="field-row">
-      <view class="field-label">历法选择</view>
-      <view class="btn-group">
-        <button class="btn {{calendar==='公历'?'primary':''}}" size="mini" bindtap="setSolar">公历</button>
-        <button class="btn {{calendar==='农历'?'primary alt':''}}" size="mini" bindtap="setLunar">农历</button>
-      </view>
-    </view>
-
-<!-- 出生日期 -->
-<view class="input-wrap">
-  <text class="label">出生日期</text>
-  <picker mode="date" value="{{birth_date}}" start="1900-01-01" end="2099-12-31" bindchange="onPickDate">
-    <view class="input">{{birth_date || '选择日期'}}</view>
-  </picker>
-  <image class="input-icon" src="/images/icon-calendar.png" mode="widthFix"></image>
-</view>
-
-<!-- 出生时间 -->
-<view class="input-wrap">
-  <text class="label">出生时间</text>
-  <picker mode="time" value="{{birth_time}}" start="00:00" end="23:59" bindchange="onPickTime">
-    <view class="input">{{birth_time || '选择时间'}}</view>
-  </picker>
-  <image class="input-icon" src="/images/icon-clock.png" mode="widthFix"></image>
-</view>
-
-<!-- 出生地点（占位） -->
-<view class="input-wrap">
-  <text class="label">出生地点</text>
-  <input 
-    class="input" 
-    placeholder="请输入出生地点" 
-    value="{{birthplace}}" 
-    bindinput="onInputPlace" />
-  <image class="input-icon" src="/images/icon-location.png" mode="widthFix"></image>
-</view>
-
-<!-- 按钮 -->
-<button class="cta" loading="{{submitting}}" disabled="{{submitting}}" bindtap="onStart">开始排盘 ➜</button>
   </view>
 
-  <!-- 卡片：开场白 -->
-  <!-- <view class="card quote">
-    <text class="quote-text">"{{greet}}"</text>
-  </view> -->
+  <!-- 出生日期 -->
+  <view class="input-wrap">
+    <text class="label">出生日期</text>
+    <picker mode="date" value="{{birth_date}}" start="1900-01-01" end="2099-12-31" bindchange="onPickDate">
+      <view class="input">{{birth_date}}</view>
+    </picker>
+    <image class="input-icon" src="/images/icon-calendar.png"></image>
+  </view>
 
-  <view style="height:24rpx"></view>
+  <!-- 出生时间 -->
+  <view class="input-wrap">
+    <text class="label">出生时间</text>
+    <picker mode="time" value="{{birth_time}}" bindchange="onPickTime">
+      <view class="input">{{birth_time}}</view>
+    </picker>
+    <image class="input-icon" src="/images/icon-clock.png"></image>
+  </view>
+
+  <!-- 出生地点 -->
+  <view class="input-wrap">
+    <text class="label">出生地点</text>
+    <input class="input" placeholder="例如：深圳" value="{{birthplace}}" bindinput="onInputPlace"/>
+    <image class="input-icon" src="/images/icon-location.png"></image>
+  </view>
+
+  <!-- CTA 放在 card 内部！！ -->
+  <button class="cta" loading="{{submitting}}" disabled="{{submitting}}" bindtap="onStart">开始排盘 ➜</button>
 </view>

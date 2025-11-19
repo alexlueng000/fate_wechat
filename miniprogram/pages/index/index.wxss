@@ -1,162 +1,117 @@
-/* 背景色与整体布局 */
-.page { background: #efe9dd; min-height: 100vh; padding-bottom: 24rpx; }
-
-/* 顶部横幅 */
-.banner { position: relative; height: 112rpx; }
-.pattern { position:absolute; left:0; top:0; width:100%; height:112rpx; }
-.banner-inner {
-  position: relative; z-index:1; height:112rpx;
-  display:flex; align-items:center; padding: 0 24rpx;
-}
-.logo { height: 44rpx; }
-.spacer { flex:1; }
-.icon { width: 36rpx; height: 36rpx; margin-left: 20rpx; }
-
-/* 让输入类组件在容器内不溢出 */
-.card { 
-  margin: 24rpx;
-  background: #ffffff;
-  border-radius: 20rpx;
-  box-shadow: 0 12rpx 28rpx rgba(0,0,0,0.06);
-  padding: 28rpx;
-  overflow: hidden;                 /* NEW: 防溢出 */
+.page {
+  min-height: 100vh;
+  background: #f5ede1;
+  padding: 24rpx;
+  box-sizing: border-box;
 }
 
+/* ---- 卡片 ---- */
+.card {
+  background: #fff;
+  padding: 40rpx 32rpx;
+  border-radius: 24rpx;
+  box-shadow: 0 12rpx 36rpx rgba(0,0,0,0.06);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 标题 */
 .title {
-  font-size: 40rpx; text-align:center; color:#2b2b2b; font-weight: 600;
+  text-align: center;
+  font-size: 36rpx;
+  font-weight: 700;
 }
+
 .subtitle {
-  font-size: 26rpx; text-align:center; color:#8a8a8a; margin: 12rpx 0 28rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #8e8174;
+  margin-top: 8rpx;
 }
 
-/* 输入行容器占满宽度 */
-.input-wrap {
-  position: relative;
-  margin: 20rpx 0;
-  width: 100%;                      /* NEW */
-}
-
-.input {
-  width: 100%;
-  background: #f5f6f7;
-  border: 2rpx solid #e8e8e8;
-  border-radius: 12rpx;
-  padding: 24rpx 68rpx 24rpx 24rpx;
-  font-size: 28rpx; color:#333;
-}
-
-/* 统一输入/展示的盒模型，预留右侧图标空间，绝不超出 */
-.input,
-.input--display {                   /* NEW: 用于 picker 的展示视图 */
-  width: 100%;
-  min-height: 40px;
-  box-sizing: border-box;           /* NEW */
-  background: #f5f6f7;
-  border: 2rpx solid #e8e8e8;
-  border-radius: 12rpx;
-  padding: 24rpx 68rpx 24rpx 24rpx; /* NEW: 右侧给图标留位 */
-  font-size: 28rpx; 
-  color:#333;
-  overflow: hidden;                 /* NEW: 文本过长不撑破 */
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.input-icon {
-  position: absolute; right: 20rpx; top: 50%; transform: translateY(-50%);
-  width: 32rpx; height: 32rpx; opacity: .6;
-}
-.placeholder { color: #bfbfbf; }
-
-/* 字段行（左标题 + 右按钮组） */
-/* 让左侧标签统一宽度，按钮组始终对齐 */
+/* 字段行 */
 .field-row {
+  margin-top: 32rpx;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  margin: 24rpx 0 10rpx;
 }
 
 .field-label {
-  width: 140rpx;              /* 固定宽度，保证对齐 */
   font-size: 28rpx;
-  color: #555;
+  color: #444;
 }
 
-/* 按钮组占满剩余空间，按钮等宽 */
+/* 按钮组 */
 .btn-group {
-  flex: 1;
   display: flex;
-  gap: 16rpx;
+  gap: 18rpx;
 }
-.btn {
-  flex: 1;
-  height: 64rpx;
-  line-height: 64rpx;
-  padding: 0;
-  border-radius: 12rpx;
-  background: #e8e8ed;
-  color: #555;
+
+button::after {
   border: none;
-  text-align: center;
 }
+
+.btn {
+  min-width: 110rpx;
+  padding: 12rpx 0;
+  border-radius: 999rpx;
+  background: #f2f0ed;
+  color: #666;
+  border: 1rpx solid #ddd;
+}
+
 .btn.primary {
-  background: #b73b53;
+  background: #c93b3a;
   color: #fff;
+  border-color: #c93b3a;
 }
+
 .btn.primary.alt {
-  background: #d0d2d6;
-  color: #555;
+  background: #e45c5c;
+  border-color: #e45c5c;
 }
 
-
-/* 按钮组：两枚按钮等宽 */
-.btn-group { 
-  flex: 1;                          /* NEW: 占掉剩余空间 */
-  display:flex; 
-  gap: 16rpx;
-  padding-left: 30px;
-}
-.btn {
-  flex: 1;                          /* NEW: 两个按钮等宽 */
-  height: 64rpx; 
-  line-height: 64rpx; 
-  padding: 0 0;                     /* NEW: 让宽度由 flex 控制 */
-  border-radius: 12rpx; 
-  background: #e8e8ed; 
-  color: #555; 
-  border: none;
-  text-align: center;
-}
-.btn.primary { background: #b73b53; color: #fff; }
-.btn.primary.alt { background: #d0d2d6; color:#555; }
-
-/* 主按钮：用 Flex 精准居中，不依赖 line-height */
-.cta {
-  margin-top: 20rpx; 
-  width: 100%;
-  height: 88rpx;
-  display: flex;                    /* NEW */
-  align-items: center;              /* NEW: 垂直居中 */
-  justify-content: center;          /* NEW: 水平居中 */
-  background:#b73b53; 
-  color:#fff; 
-  border: none; 
-  border-radius: 12rpx;
-  font-size: 32rpx; 
-  font-weight: 600;
-  box-shadow: 0 8rpx 18rpx rgba(183,59,83,0.25);
-}
-
-/* 引用卡片 */
-.quote { padding: 24rpx; }
-.quote-text {
-  display:block; white-space:pre-wrap;
-  font-size: 28rpx; color:#444; line-height: 1.8;
+/* 输入行 */
+.input-wrap {
+  margin-top: 28rpx;
+  position: relative;
 }
 
 .label {
-  font-size: 26rpx;
-  color: #666;
-  margin-bottom: 8rpx;
   display: block;
+  margin-bottom: 8rpx;
+  font-size: 26rpx;
+}
+
+.input {
+  background: #f7f4f2;
+  padding: 24rpx;
+  font-size: 28rpx;
+  border-radius: 16rpx;
+}
+
+.input-icon {
+  width: 36rpx;
+  height: 36rpx;
+  position: absolute;
+  right: 24rpx;
+  bottom: 20rpx;
+  opacity: 0.5;
+}
+
+/* CTA 按钮（完美剧中） */
+.cta {
+  margin-top: 40rpx;
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #c93b3a, #e45c45);
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 700;
+  text-align: center;
+  border: none;
+  box-shadow: 0 16rpx 32rpx rgba(201,59,58,0.28);
 }
