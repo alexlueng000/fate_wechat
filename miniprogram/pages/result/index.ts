@@ -49,36 +49,33 @@ Page({
   async onStartChat() {
     const cached: any = wx.getStorageSync("last_paipan");
     if (!cached || !cached.mingpan) {
-      wx.showToast({ title: "没有命盘数据", icon: "none" }); return;
+      wx.showToast({ title: "没有命盘数据", icon: "none" });
+      return;
     }
-
+  
     wx.showLoading({ title: "生成解读…" });
+  
     try {
       const resp = await request<{ conversation_id: string; reply: string }>(
-        "/api/chat/start?stream=0&_ts=" + Date.now(),
+        "api/chat/start?stream=0&_ts=" + Date.now(),   // 没必要带前导 /
         "POST",
         { paipan: cached.mingpan, kb_index_dir: "", kb_topk: 3 },
         { Accept: "application/json" }
       );
-
-      // 成功拿到 resp 后
+  
+      // 存到 storage，给 chat 页在 onLoad 里兜底读取
       wx.setStorageSync("conversation_id", resp.conversation_id);
       wx.setStorageSync("start_reply", resp.reply || "");
-
-      wx.navigateTo({
+  
+      // 直接切到「解读」Tab，不再用 navigateTo + eventChannel
+      wx.switchTab({
         url: "/pages/chat/chat",
-        success(nav) {
-          // 首选：用 eventChannel 传过去
-          nav.eventChannel.emit("startData", {
-            cid: resp.conversation_id,
-            reply: resp.reply || "",
-          });
-          // 防止 chat 页又从 storage 兜底读到同一份
-          wx.removeStorageSync("start_reply");
-        },
       });
     } catch (e: any) {
-      wx.showToast({ title: e?.message || "启动对话失败", icon: "none" });
+      wx.showToast({
+        title: e?.message || "启动对话失败",
+        icon: "none",
+      });
     } finally {
       wx.hideLoading();
     }

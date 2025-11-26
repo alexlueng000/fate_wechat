@@ -5,7 +5,7 @@
   box-sizing: border-box;
 }
 
-/* 卡片通用 */
+/* 通用卡片 */
 .card {
   background: #ffffff;
   border-radius: 24rpx;
@@ -44,7 +44,7 @@
 .user-name {
   font-size: 32rpx;
   font-weight: 700;
-  color: #333;
+  color: #333333;
   margin-bottom: 8rpx;
 }
 
@@ -60,7 +60,7 @@
   margin-bottom: 8rpx;
 }
 
-/* 设置项 */
+/* 设置项行 */
 .cell {
   padding: 18rpx 0;
   border-top: 1rpx solid #f0e5dc;
@@ -80,7 +80,7 @@
 
 .cell-label {
   font-size: 28rpx;
-  color: #333;
+  color: #333333;
 }
 
 .cell-desc {
@@ -96,7 +96,7 @@
   padding-left: 16rpx;
 }
 
-/* 危险项 */
+/* 危险操作高亮 */
 .cell.danger .cell-label {
   color: #c0392b;
 }
