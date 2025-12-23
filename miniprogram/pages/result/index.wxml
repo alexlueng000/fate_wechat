@@ -1,8 +1,42 @@
 <view class="page">
-  <!-- 摘要条 -->
+
+<!-- ① 一句话结论（本地秒出） -->
+<view class="hero">
+  <view class="hero-title">你的命盘关键词</view>
+  <view class="hero-tags">
+    <text class="tag" wx:for="{{summary.keywords}}" wx:key="*this">{{item}}</text>
+  </view>
+  <view class="hero-one">{{summary.oneLiner}}</view>
+</view>
+
+<!-- ② 当前阶段（只给现在+下一步） -->
+<view class="stage">
+  <view class="stage-title">你现在的阶段</view>
+  <view class="stage-cards">
+    <view class="stage-card">
+      <view class="stage-h">当前大运</view>
+      <view class="stage-v">{{currentDayun.ganzhi}}</view>
+      <view class="stage-s">{{currentDayun.range}}</view>
+    </view>
+    <view class="stage-card" wx:if="{{nextDayun}}">
+      <view class="stage-h">下一步大运</view>
+      <view class="stage-v">{{nextDayun.ganzhi}}</view>
+      <view class="stage-s">{{nextDayun.range}}</view>
+    </view>
+  </view>
+</view>
+
+<!-- ③ CTA：明确动作 -->
+<button class="cta" loading="{{starting}}" disabled="{{starting}}" bindtap="onStartChat">
+  解读我的命盘
+</button>
+<view class="cta-sub">可继续问：事业 / 财运 / 感情</view>
+
+<!-- ④ 专业细节折叠 -->
+<view class="detail">
   <view class="summary" bindtap="toggleSummary">
     <view class="sum-left">
-      <text class="sum-title">命盘摘要</text>
+      <text class="sum-title">查看专业命盘结构</text>
       <view class="sum-pillars">
         <text class="p-tag">年</text><text class="p-val">{{pillars.year}}</text>
         <text class="p-tag">月</text><text class="p-val">{{pillars.month}}</text>
@@ -10,11 +44,11 @@
         <text class="p-tag">时</text><text class="p-val">{{pillars.hour}}</text>
       </view>
     </view>
-    <!-- <text class="sum-toggle">{{summaryOpen ? '收起 ▲' : '展开 ▼'}}</text> -->
+    <text class="sum-toggle">{{summaryOpen ? '收起 ▲' : '展开 ▼'}}</text>
   </view>
 
   <view wx:if="{{summaryOpen}}" class="card">
-    <!-- 四柱表 -->
+    <!-- 四柱表：你原来的 table 代码直接放进来 -->
     <view class="table">
       <view class="thead">
         <view class="th first">四柱</view>
@@ -33,20 +67,19 @@
       </view>
     </view>
 
-    <!-- 大运 -->
+    <!-- 大运（全量） -->
     <view class="section">
-      <view class="sec-title">大运</view>
+      <view class="sec-title">大运（全量）</view>
       <view class="luck-grid">
         <block wx:for="{{dayun}}" wx:key="index">
           <view class="luck-card4">
-            <text class="luck-ganzhi">{{item.ganzhi || '—'}}</text>
-            <text class="luck-age">{{item.age}}</text>
+            <text class="luck-ganzhi">{{item.ganzhi}}</text>
+            <text class="luck-age">{{item.range}}</text>
           </view>
         </block>
       </view>
     </view>
   </view>
+</view>
 
-  <!-- CTA：跳转到对话页 -->
-  <button class="cta" bindtap="onStartChat">开始对话</button>
 </view>
