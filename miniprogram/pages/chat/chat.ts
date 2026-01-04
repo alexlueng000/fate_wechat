@@ -26,6 +26,7 @@ type Custom = {
   replaceLastAssistant(text: string): void;
   toBottom(): void;
   onQuickAsk(e: WechatMiniprogram.BaseEvent): void;
+  onQuickStart(): void;
   onClear(): void;
   onStartFromChat(): void;
   autoSendPrompt(actual: string): Promise<void>;
@@ -73,25 +74,61 @@ function normalizeReply(text: string): string {
   return collapsed.join("\n");
 }
 
-// ===== 内联加粗：**xxx** =====
+// ===== 内联加粗：**xxx** 和 【xxx】 =====
 function parseInline(str: string): any[] {
   const children: any[] = [];
+  // 匹配 **bold** 或 【bracketed】
   const boldRe = /\*\*(.+?)\*\*/g;
+  const bracketRe = /【(.+?)】/g;
+
+  // 先处理【】
   let lastIndex = 0;
   let m: RegExpExecArray | null;
 
+  // 收集所有标记位置
+  const markers: { index: number; end: number; type: "bold" | "bracket"; content: string }[] = [];
+
   while ((m = boldRe.exec(str)) !== null) {
-    const idx = m.index;
-    if (idx > lastIndex) {
-      children.push({ type: "text", text: str.slice(lastIndex, idx) });
+    markers.push({ index: m.index, end: m.index + m[0].length, type: "bold", content: m[1] });
+  }
+  boldRe.lastIndex = 0;
+
+  while ((m = bracketRe.exec(str)) !== null) {
+    markers.push({ index: m.index, end: m.index + m[0].length, type: "bracket", content: m[1] });
+  }
+  bracketRe.lastIndex = 0;
+
+  // 按位置排序
+  markers.sort((a, b) => a.index - b.index);
+
+  // 构建节点
+  lastIndex = 0;
+  for (const mark of markers) {
+    if (mark.index < lastIndex) continue; // 跳过嵌套
+
+    // 添加前面的普通文本
+    if (mark.index > lastIndex) {
+      children.push({ type: "text", text: str.slice(lastIndex, mark.index) });
     }
-    children.push({
-      name: "strong",
-      children: [{ type: "text", text: m[1] }],
-    });
-    lastIndex = idx + m[0].length;
+
+    // 添加标记内容
+    if (mark.type === "bold") {
+      children.push({
+        name: "strong",
+        children: [{ type: "text", text: mark.content }],
+      });
+    } else {
+      // 【xxx】用强调样式
+      children.push({
+        name: "span",
+        attrs: { class: "highlight" },
+        children: [{ type: "text", text: mark.content }],
+      });
+    }
+    lastIndex = mark.end;
   }
 
+  // 添加剩余文本
   if (lastIndex < str.length) {
     children.push({ type: "text", text: str.slice(lastIndex) });
   }
@@ -164,16 +201,18 @@ function formatMarkdownImpl(text: string): any[] {
       continue;
     }
 
-    // 列表
+    // 列表：支持 - * + 和数字列表
     const listMatch = trimmed.match(/^[-*+]\s+(.*)$/);
-    if (listMatch) {
+    const numListMatch = trimmed.match(/^\d+\.\s+(.*)$/);
+    if (listMatch || numListMatch) {
       flushPara();
       if (!listBuf) listBuf = [];
-      listBuf.push(listMatch[1]);
+      listBuf.push((listMatch || numListMatch)![1]);
       continue;
     }
 
-    // 普通段落
+    // 普通段落：先清空列表缓冲区
+    flushList();
     paraBuf.push(trimmed);
   }
 
@@ -286,6 +325,40 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     this.setData({ messages: msgs }, () => this.toBottom());
   },
 
+  onQuickStart() {
+    if (this.data.loading) return;
+
+    const cached: any = wx.getStorageSync("last_paipan");
+    if (!cached || !cached.mingpan) {
+      wx.showToast({ title: "请先在排盘页生成命盘", icon: "none" });
+      return;
+    }
+
+    this.setData({ loading: true });
+    this.appendUser("命盘分析");
+
+    request<StartResp>(
+      "/chat/start?stream=0&_ts=" + Date.now(),
+      "POST",
+      { paipan: cached.mingpan, kb_index_dir: "", kb_topk: 3 },
+      { Accept: "application/json" }
+    )
+      .then((resp) => {
+        wx.setStorageSync("conversation_id", resp.conversation_id);
+        this.setData({ conversationId: resp.conversation_id as any });
+
+        const reply = normalizeReply(resp.reply || "（无响应）");
+        this.appendAssistant(reply);
+      })
+      .catch((err: any) => {
+        this.appendAssistant("生成失败，请稍后再试");
+        console.error("start failed", err);
+      })
+      .finally(() => {
+        this.setData({ loading: false }, () => this.toBottom());
+      });
+  },
+
   onQuickAsk(e: WechatMiniprogram.BaseEvent) {
     const ds: any = e?.currentTarget?.dataset || {};
     const key: string = String(ds.key || "");
@@ -309,7 +382,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
     try {
       const resp = await request<{ reply: string }>(
-        "/api/chat?stream=0&_ts=" + Date.now(),
+        "/chat?stream=0&_ts=" + Date.now(),
         "POST",
         { conversation_id: this.data.conversationId, message: actual },
         { Accept: "application/json" }
@@ -381,7 +454,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     this.appendUser(text);
     this.appendAssistant("思考中…");
 
-    const url = `${API_BASE}/api/chat?stream=0&_ts=${Date.now()}`;
+    const url = `${API_BASE}/chat?stream=0&_ts=${Date.now()}`;
     const payload = { conversation_id: cid, message: text };
 
     console.log("[chat] POST", url, payload);

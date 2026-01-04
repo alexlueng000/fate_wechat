@@ -121,8 +121,7 @@ App({
 
   /** 统一调用后端登录接口 */
   callLoginApi(payload: MpLoginPayload, expectMode: string) {
-    // 注意这里走的是 "api/auth/mp/login"，跟你其它 "api/xxx" 一致
-    request<MpLoginResp>("api/auth/mp/login", "POST", payload)
+    request<MpLoginResp>("auth/mp/login", "POST", payload)
       .then((res) => {
         if (!res || !res.access_token) {
           throw new Error("登录返回无 access_token");

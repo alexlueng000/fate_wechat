@@ -157,6 +157,12 @@
   font-weight: 600;
 }
 
+/* 【xxx】强调样式 */
+.bubble .md .highlight {
+  color: #b83227;
+  font-weight: 600;
+}
+
 /* 如果富文本里有其他全局 reset，强压一层优先级 */
 /* === 强制所有气泡内文字左对齐、无首行缩进 === */
 .bubble,
@@ -252,4 +258,47 @@
   text-align: center;
   font-size: 22rpx;
   color: #9a8f86;
+}
+
+/* ========== Typing Indicator ========== */
+.typing-bubble {
+  padding: 16rpx 20rpx;
+  min-width: 80rpx;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 8rpx;
+  align-items: center;
+}
+
+.typing-dots .dot {
+  width: 12rpx;
+  height: 12rpx;
+  background: #b05544;
+  border-radius: 50%;
+  animation: typing-bounce 1.4s ease-in-out infinite;
+}
+
+.typing-dots .dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-dots .dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dots .dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing-bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-12rpx);
+    opacity: 1;
+  }
 }

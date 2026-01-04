@@ -19,6 +19,18 @@
           </view>
         </view>
       </block>
+
+      <!-- Loading indicator -->
+      <view wx:if="{{loading}}" class="msg left">
+        <view class="bubble typing-bubble">
+          <view class="typing-dots">
+            <view class="dot"></view>
+            <view class="dot"></view>
+            <view class="dot"></view>
+          </view>
+        </view>
+      </view>
+
       <view id="end"></view>
     </view>
 </scroll-view>
@@ -28,7 +40,7 @@
 <view class="card quick-card">
   <view class="quick-title">快捷分析</view>
   <view class="quick-grid">
-    <view class="quick-chip" bindtap="onQuickAsk" data-key="personality" data-label="性格特征">性格特征</view>
+    <view class="quick-chip" bindtap="onQuickStart">命盘分析</view>
     <view class="quick-chip" bindtap="onQuickAsk" data-key="avatar" data-label="人物画像">人物画像</view>
     <view class="quick-chip" bindtap="onQuickAsk" data-key="love_timing" data-label="正缘应期">正缘应期</view>
     <view class="quick-chip" bindtap="onQuickAsk" data-key="career" data-label="事业建议">事业建议</view>

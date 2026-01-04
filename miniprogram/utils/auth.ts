@@ -56,7 +56,7 @@ export async function ensureMpLogin(): Promise<void> {
   console.log("[auth] ensureMpLogin, openid =", openid);
 
   // 直接用 wx.request，避免跟 utils/request.ts 相互引用造成循环依赖
-  const url = BASE_URL + "/auth/mp/login";
+  const url = BASE_URL + "/api/auth/mp/login";
 
   const res = await new Promise<WechatMiniprogram.RequestSuccessCallbackResult>((resolve, reject) => {
     wx.request({
