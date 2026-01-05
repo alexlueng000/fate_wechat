@@ -334,13 +334,17 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       return;
     }
 
+    const form: any = wx.getStorageSync("last_form") || {};
+    const gender = form.gender || "男";
+    const paipan = { ...cached.mingpan, gender };
+
     this.setData({ loading: true });
     this.appendUser("命盘分析");
 
     request<StartResp>(
       "/chat/start?stream=0&_ts=" + Date.now(),
       "POST",
-      { paipan: cached.mingpan, kb_index_dir: "", kb_topk: 3 },
+      { paipan, kb_index_dir: "", kb_topk: 3 },
       { Accept: "application/json" }
     )
       .then((resp) => {
@@ -447,13 +451,17 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       return;
     }
 
+    const form: any = wx.getStorageSync("last_form") || {};
+    const gender = form.gender || "男";
+    const paipan = { ...cached.mingpan, gender };
+
     this.setData({ loading: true });
     wx.showLoading({ title: "生成解读…" });
 
     request<StartResp>(
       "/chat/start?stream=0&_ts=" + Date.now(),
       "POST",
-      { paipan: cached.mingpan, kb_index_dir: "", kb_topk: 3 },
+      { paipan, kb_index_dir: "", kb_topk: 3 },
       { Accept: "application/json" }
     )
       .then((resp) => {

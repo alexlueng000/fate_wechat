@@ -83,6 +83,12 @@ Page<Record<string, any>, PageData>({
         birthplace: (this.data.birthplace || "深圳").trim(),
       };
 
+      // 清除之前的对话记录（新命盘需要重新解读）
+      try {
+        wx.removeStorageSync("conversation_id");
+        wx.removeStorageSync("start_reply");
+      } catch (e) {}
+
       const resp = await request("bazi/calc_paipan", "POST", payload);
 
       // 存排盘结果 + 表单，给 result & chat/start 用
