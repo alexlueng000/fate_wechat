@@ -1,5 +1,4 @@
 // pages/chat/chat.ts
-import { API_BASE } from "../../utils/config";
 import type { ChatMessage } from "../../../typings/types/message";
 import { request } from "../../utils/request";
 
@@ -28,6 +27,7 @@ type Custom = {
   onQuickAsk(e: WechatMiniprogram.BaseEvent): void;
   onQuickStart(): void;
   onClear(): void;
+  onGoToResult(): void;
   onStartFromChat(): void;
   autoSendPrompt(actual: string): Promise<void>;
 };
@@ -399,9 +399,43 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
   },
 
   onClear() {
-    this.setData({ messages: [] });
-    wx.showToast({ title: "已清空", icon: "none" });
-    this.toBottom();
+    wx.showModal({
+      title: "清空对话",
+      content: "确定要清空当前对话记录吗？清空后需要重新开始对话。",
+      confirmText: "清空",
+      confirmColor: "#b83227",
+      success: (res) => {
+        if (!res.confirm) return;
+
+        // 清空消息
+        this.setData({ messages: [] });
+
+        // 清空会话ID
+        this.setData({ conversationId: "" });
+        try {
+          wx.removeStorageSync("conversation_id");
+        } catch (e) {}
+
+        // 重新显示开场白
+        this.appendAssistant(
+          "你好呀～（微笑）\n" +
+            "我不是来剧透你人生的编剧，只是帮你找找藏在命盘里的小彩蛋——可能是你还没发现的潜力，或是未来路上悄悄亮起的路灯（✨）\n" +
+            "毕竟你才是人生的主角，我嘛…只是个带地图的导游～（轻松摊手）\n" +
+            "准备好一起逛逛你的‘人生剧本杀’了吗？放心，不用怕泄露天机，我今天的‘仙气’储备充足！"
+        );
+
+        wx.showToast({ title: "已清空", icon: "none" });
+      },
+    });
+  },
+
+  onGoToResult() {
+    const cached: any = wx.getStorageSync("last_paipan");
+    if (!cached || !cached.mingpan) {
+      wx.showToast({ title: "请先在排盘页生成命盘", icon: "none" });
+      return;
+    }
+    wx.navigateTo({ url: "/pages/result/index" });
   },
 
   onStartFromChat() {
@@ -446,7 +480,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       this.data.conversationId ||
       ((wx.getStorageSync("conversation_id") as string) || "");
     if (!cid) {
-      wx.showToast({ title: "请先在排盘页点击“开始对话”", icon: "none" });
+      wx.showToast({ title: "请先在排盘页点击「开始对话」", icon: "none" });
       return;
     }
 
@@ -454,45 +488,26 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     this.appendUser(text);
     this.appendAssistant("思考中…");
 
-    const url = `${API_BASE}/chat?stream=0&_ts=${Date.now()}`;
-    const payload = { conversation_id: cid, message: text };
-
-    console.log("[chat] POST", url, payload);
-
-    wx.request<{ reply: string }>({
-      url,
-      method: "POST",
-      header: {
-        "content-type": "application/json",
-        Accept: "application/json",
-      },
-      data: payload,
-      timeout: 15000,
-      success: (res) => {
-        const { statusCode } = res;
-        if (statusCode >= 200 && statusCode < 300) {
-          const raw =
-            res.data && typeof (res.data as any).reply === "string"
-              ? (res.data as any).reply
-              : "（无响应）";
-          const reply = normalizeReply(raw);
-          this.replaceLastAssistant(reply);
-          console.log("raw reply:", JSON.stringify(raw));
-        } else {
-          const msg =
-            (res.data as any)?.detail?.[0]?.msg ||
-            (res.data as any)?.detail ||
-            `HTTP ${statusCode}`;
-          this.replaceLastAssistant(`服务端错误：${msg}`);
-        }
-      },
-      fail: (err) => {
-        console.warn("[chat] request fail:", err);
-        this.replaceLastAssistant("网络连接失败，请稍后再试。");
-      },
-      complete: () =>
-        this.setData({ loading: false }, () => this.toBottom()),
-    });
+    // 使用 request 工具，自动带上 token
+    request<{ reply: string }>(
+      "/chat?stream=0&_ts=" + Date.now(),
+      "POST",
+      { conversation_id: cid, message: text },
+      { Accept: "application/json" }
+    )
+      .then((res) => {
+        const reply = normalizeReply((res?.reply || "").replace(/\r\n/g, "\n"));
+        this.replaceLastAssistant(reply);
+        console.log("raw reply:", JSON.stringify(reply));
+        this.setData({ toView: "end" });
+      })
+      .catch((err) => {
+        console.error("[chat] request failed", err);
+        this.replaceLastAssistant("网络似乎有点慢，稍后再试～");
+      })
+      .finally(() => {
+        this.setData({ loading: false }, () => this.toBottom());
+      });
   },
 };
 

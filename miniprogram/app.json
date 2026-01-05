@@ -3,7 +3,11 @@
     "pages/index/index",
     "pages/result/index",
     "pages/chat/chat",
-    "pages/profile/profile"
+    "pages/profile/profile",
+    "pages/privacy/privacy",
+    "pages/feedback/feedback",
+    "pages/history/history",
+    "pages/about/about"
   ],
 
   "window": {

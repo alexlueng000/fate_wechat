@@ -13,40 +13,77 @@
         ID：{{userId || '未登录'}}
       </view>
       <view class="user-sub">
-        环境：{{env}} ｜ 账号：{{accountType}}
+        {{accountType}}
       </view>
     </view>
   </view>
 
-  <!-- 账号与数据 -->
+  <!-- 我的记录 -->
   <view class="card">
-    <view class="cell-title">账号与数据</view>
+    <view class="cell-title">我的记录</view>
+
+    <view class="cell" bindtap="onHistory">
+      <view class="cell-left">
+        <text class="cell-label">历史排盘</text>
+        <text class="cell-desc">查看过往的命盘记录</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
 
     <view class="cell" bindtap="onClearLocal">
       <view class="cell-left">
-        <text class="cell-label">清除排盘与对话数据</text>
-        <text class="cell-desc">清空本地命盘、表单与会话记录，不影响登录状态</text>
-      </view>
-      <text class="cell-arrow">›</text>
-    </view>
-
-    <view class="cell danger" bindtap="onLogout">
-      <view class="cell-left">
-        <text class="cell-label">退出登录</text>
-        <text class="cell-desc">清除当前账号 token，下次将自动重新登录</text>
+        <text class="cell-label">清除数据</text>
+        <text class="cell-desc">清空本地命盘与对话记录</text>
       </view>
       <text class="cell-arrow">›</text>
     </view>
   </view>
 
-  <!-- 隐私 / 协议 / 免责声明 -->
+  <!-- 帮助与反馈 -->
   <view class="card">
-    <view class="cell-title">隐私与说明</view>
+    <view class="cell-title">帮助与反馈</view>
+
+    <view class="cell" bindtap="onHelp">
+      <view class="cell-left">
+        <text class="cell-label">使用帮助</text>
+        <text class="cell-desc">了解如何使用本小程序</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
+
+    <view class="cell" bindtap="onFeedback">
+      <view class="cell-left">
+        <text class="cell-label">意见反馈</text>
+        <text class="cell-desc">告诉我们您的想法</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
+
+    <view class="cell" bindtap="onContact">
+      <view class="cell-left">
+        <text class="cell-label">联系客服</text>
+        <text class="cell-desc">有问题请联系客服</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 关于 -->
+  <view class="card">
+    <view class="cell-title">关于</view>
+
+    <view class="cell" bindtap="onAbout">
+      <view class="cell-left">
+        <text class="cell-label">关于我们</text>
+        <text class="cell-desc">了解应用与开发者信息</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
 
     <view class="cell" bindtap="onPrivacy">
       <view class="cell-left">
         <text class="cell-label">隐私政策</text>
-        <text class="cell-desc">说明我们如何处理和存储你的数据</text>
+        <text class="cell-desc">数据收集与使用说明</text>
       </view>
       <text class="cell-arrow">›</text>
     </view>
@@ -54,7 +91,7 @@
     <view class="cell" bindtap="onAgreement">
       <view class="cell-left">
         <text class="cell-label">用户协议</text>
-        <text class="cell-desc">使用 FateInsight 前请先阅读</text>
+        <text class="cell-desc">使用本服务前请阅读</text>
       </view>
       <text class="cell-arrow">›</text>
     </view>
@@ -62,14 +99,29 @@
     <view class="cell" bindtap="onDisclaimer">
       <view class="cell-left">
         <text class="cell-label">免责声明</text>
-        <text class="cell-desc">命理内容仅供参考，不构成专业意见</text>
+        <text class="cell-desc">命理内容仅供参考</text>
       </view>
       <text class="cell-arrow">›</text>
     </view>
   </view>
 
-  <!-- 底部版本号 -->
+  <!-- 退出登录 -->
+  <view class="card">
+    <view class="cell danger" bindtap="onLogout">
+      <view class="cell-left">
+        <text class="cell-label">退出登录</text>
+        <text class="cell-desc">清除登录信息，下次将重新登录</text>
+      </view>
+      <text class="cell-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 底部版本与评分 -->
   <view class="footer">
-    版本：{{version}}
+    <view class="version">版本：{{version}}</view>
+    <view class="rate-btn" bindtap="onRate">
+      <text>给我们评分</text>
+      <text class="rate-icon">★</text>
+    </view>
   </view>
 </view>

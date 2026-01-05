@@ -1,0 +1,188 @@
+<view class="page">
+  <view class="content">
+    <!-- Privacy Tab -->
+    <view wx:if="{{tab === 'privacy' || !tab}}">
+      <view class="title">隐私政策</view>
+      <view class="subtitle">生效日期：2024年1月1日</view>
+
+      <view class="section">
+        <view class="heading">一、数据收集</view>
+        <view class="text">
+          为了提供八字命盘分析与解读服务，我们需要收集以下信息：
+        </view>
+        <view class="list">
+          <text class="bullet">• 出生信息：出生日期、时间、地点、性别</text>
+          <text class="bullet">• 日历类型：公历或农历</text>
+          <text class="bullet">• 账号信息：微信OpenID（用于身份识别）</text>
+          <text class="bullet">• 对话记录：您与AI助手的对话历史</text>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="heading">二、数据使用</view>
+        <view class="text">
+          我们使用收集的信息用于：
+        </view>
+        <view class="list">
+          <text class="bullet">• 计算八字命盘</text>
+          <text class="bullet">• 生成个性化命理解读</text>
+          <text class="bullet">• 保存您的对话历史以供后续查看</text>
+          <text class="bullet">• 改善服务质量和用户体验</text>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="heading">三、数据存储</view>
+        <view class="text">
+          <text class="highlight">• 本地存储：</text>部分数据（如命盘结果）存储在您的设备本地，清除缓存后将被删除。\n
+          <text class="highlight">• 服务器存储：</text>您的对话记录和账号信息存储在我们的服务器上，采用加密方式保存。\n
+          <text class="highlight">• 保存期限：</text>您可以随时删除本地数据，账号注销后服务器数据也将被清除。
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="heading">四、数据共享</view>
+        <view class="text">
+          <text class="warning">我们承诺：</text>
+        </view>
+        <view class="list">
+          <text class="bullet">• 不会出售您的个人信息</text>
+          <text class="bullet">• 不会向第三方共享您的数据（法律法规要求的除外）</text>
+          <text class="bullet">• 仅使用AI服务提供商处理解读请求，数据不会被用于其他目的</text>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="heading">五、您的权利</view>
+        <view class="list">
+          <text class="bullet">• 访问：您可以在"我的"页面查看和删除本地数据</text>
+          <text class="bullet">• 删除：您可以随时清除本地存储的命盘和对话记录</text>
+          <text class="bullet">• 注销：退出登录后可清除账号信息</text>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="heading">六、联系我们</view>
+        <view class="text">
+          如对本隐私政策有任何疑问，请通过小程序内的客服功能联系我们。
+        </view>
+      </view>
+    </view>
+
+    <!-- Agreement Tab -->
+    <view wx:if="{{tab === 'agreement'}}">
+      <view class="title">用户协议</view>
+      <view class="subtitle">生效日期：2024年1月1日</view>
+
+      <view class="section">
+        <view class="heading">一、服务说明</view>
+        <view class="text">
+          本小程序（以下简称"本服务"）提供八字命盘计算与AI解读功能，仅供娱乐和学习参考。
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="heading">二、用户资格</view>
+        <view class="text">
+          <text class="bullet">• 您必须是年满18周岁的完全民事行为能力人</text>
+          <text class="bullet">• 未成年用户需在监护人的陪同下使用本服务</text>
+          <text class="bullet">• 您应确保提供的信息真实有效</text>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="heading">三、用户行为规范</view>
+        <view class="text">
+          使用本服务时，您承诺遵守以下规范：
+        </view>
+        <view class="list">
+          <text class="bullet">• 不利用本服务从事违法违规活动</text>
+          <text class="bullet">• 不恶意攻击或干扰服务器正常运行</text>
+          <text class="bullet">• 不传播或利用解读结果进行欺诈等行为</text>
+          <text class="bullet">• 尊重他人隐私，不泄露他人信息</text>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="heading">四、服务变更与中断</view>
+        <view class="text">
+          我们保留随时修改、中断或终止服务的权利，无需对您或第三方承担责任。
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="heading">五、免责条款</view>
+        <view class="text">
+          <text class="highlight">• 本服务提供的解读内容仅供参考，不构成任何专业建议</text>
+          <text class="highlight">• 因用户自身原因导致的任何损失，我们不承担责任</text>
+          <text class="highlight">• 因不可抗力导致的服务中断，我们不承担责任</text>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="heading">六、协议修改</view>
+        <view class="text">
+          我们有权随时修改本协议，修改后的协议一经公布即生效。如不同意修改，请停止使用本服务。
+        </view>
+      </view>
+    </view>
+
+    <!-- Disclaimer Tab -->
+    <view wx:if="{{tab === 'disclaimer'}}">
+      <view class="title">免责声明</view>
+      <view class="subtitle">请仔细阅读以下内容</view>
+
+      <view class="section">
+        <view class="heading">重要声明</view>
+        <view class="text warning-text">
+          本小程序提供的八字命盘分析与AI解读内容，基于传统文化理论，仅供娱乐和参考，不构成任何形式的专业建议。
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="heading">不适用场景</view>
+        <view class="text">本服务内容不适用于以下场景：</view>
+        <view class="list">
+          <text class="bullet">• 医疗诊断或健康决策</text>
+          <text class="bullet">• 投资理财建议</text>
+          <text class="bullet">• 法律咨询</text>
+          <text class="bullet">• 婚姻决策</text>
+          <text class="bullet">• 人生重大决策的唯一依据</text>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="heading">准确性说明</view>
+        <view class="text">
+          <text class="highlight">• 八字命理是传统玄学，缺乏科学验证</text>
+          <text class="highlight">• AI解读结果基于算法生成，可能存在误差</text>
+          <text class="highlight">• 相同命盘在不同时机可能产生不同解读</text>
+          <text class="highlight">• 我们不保证任何解读结果的准确性或适用性</text>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="heading">用户责任</view>
+        <view class="text">
+          使用本服务即表示您理解并同意：
+        </view>
+        <view class="list">
+          <text class="bullet">• 理性对待解读结果，不过度依赖</text>
+          <text class="bullet">• 自行承担使用解读结果的风险和后果</text>
+          <text class="bullet">• 因使用本服务产生的任何纠纷，我们不承担责任</text>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="heading">特别提醒</view>
+        <view class="text">
+          真正的人生掌握在您自己手中。命理只是提供一种视角参考，请相信科学，理性对待，运用自己的智慧和努力创造美好未来。
+        </view>
+      </view>
+    </view>
+
+    <view class="footer">
+      继续使用本服务即表示您已阅读、理解并同意以上内容
+    </view>
+  </view>
+</view>

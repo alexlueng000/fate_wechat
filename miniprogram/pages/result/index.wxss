@@ -117,6 +117,28 @@
   color: #8e8174;
 }
 
+/* -------- 分享按钮 -------- */
+.share-btn{
+  margin-top: 16rpx;
+  width: 100%;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  border-radius: 999rpx;
+  background: #fff;
+  color: #b83227;
+  font-size: 28rpx;
+  font-weight: 600;
+  border: 2rpx solid #b83227;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.06);
+}
+
+.share-icon{
+  font-size: 32rpx;
+}
+
 /* -------- 专业细节区域 -------- */
 .detail{
   margin-top: 18rpx;

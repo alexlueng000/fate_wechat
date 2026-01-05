@@ -1,2 +1,58 @@
-<!--pages/history/history.wxml-->
-<text>pages/history/history.wxml</text>
+<view class="page">
+  <view class="content">
+    <!-- 当前命盘 -->
+    <view class="section-title">当前命盘</view>
+    <view wx:if="{{currentPaipan}}" class="card current" bindtap="onViewCurrent">
+      <view class="card-header">
+        <text class="card-name">{{currentPaipan.form.birth_date}} {{currentPaipan.form.birth_time}}</text>
+        <text class="card-tag">当前</text>
+      </view>
+      <view class="card-info">
+        <text class="info-item">{{currentPaipan.form.gender}}</text>
+        <text class="info-item">{{currentPaipan.form.calendar === 'gregorian' ? '公历' : '农历'}}</text>
+        <text class="info-item">{{currentPaipan.form.birthplace}}</text>
+      </view>
+      <view class="card-footer">
+        <text class="footer-text">点击查看详情</text>
+        <text class="footer-arrow">›</text>
+      </view>
+    </view>
+    <view wx:else class="empty">
+      <text class="empty-icon">📋</text>
+      <text class="empty-text">暂无命盘记录</text>
+      <text class="empty-hint">请先在排盘页面生成命盘</text>
+    </view>
+
+    <!-- 历史记录 -->
+    <view class="section-title" wx:if="{{historyList.length > 0}}">历史记录</view>
+    <view class="card-list">
+      <view
+        wx:for="{{historyList}}"
+        wx:key="id"
+        class="card"
+        bindtap="onViewItem"
+        data-item="{{item}}"
+      >
+        <view class="card-header">
+          <text class="card-name">{{item.form.birth_date}} {{item.form.birth_time}}</text>
+        </view>
+        <view class="card-info">
+          <text class="info-item">{{item.form.gender}}</text>
+          <text class="info-item">{{item.form.calendar === 'gregorian' ? '公历' : '农历'}}</text>
+          <text class="info-item">{{item.form.birthplace}}</text>
+        </view>
+        <view class="card-footer">
+          <text class="footer-time">{{item.createdAt}}</text>
+          <text class="footer-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:if="{{!currentPaipan && historyList.length === 0}}" class="empty-state">
+      <text class="empty-icon">📜</text>
+      <text class="empty-text">还没有历史记录</text>
+      <button class="empty-btn" bindtap="onGoToIndex">去排盘</button>
+    </view>
+  </view>
+</view>

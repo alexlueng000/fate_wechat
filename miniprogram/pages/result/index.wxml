@@ -27,10 +27,16 @@
 </view>
 
 <!-- ③ CTA：明确动作 -->
-<button class="cta" loading="{{starting}}" disabled="{{starting}}" bindtap="onStartChat">
+<button class="cta" bindtap="onStartChat">
   解读我的命盘
 </button>
 <view class="cta-sub">可继续问：事业 / 财运 / 感情</view>
+
+<!-- 分享按钮 -->
+<button class="share-btn" open-type="share">
+  <text class="share-icon">📤</text>
+  <text>分享给好友</text>
+</button>
 
 <!-- ④ 专业细节折叠 -->
 <view class="detail">

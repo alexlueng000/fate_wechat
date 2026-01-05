@@ -206,6 +206,31 @@
   gap: 16rpx;
 }
 
+/* ========== 操作按钮栏 ========== */
+.action-bar {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+
+.action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 20rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, .06);
+  font-size: 26rpx;
+  color: #333;
+}
+
+.action-icon {
+  font-size: 32rpx;
+}
+
 .quick-chip {
   background: #fffdfb;
   border: 2rpx dashed #f0cfc3;

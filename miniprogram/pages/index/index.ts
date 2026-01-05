@@ -89,6 +89,9 @@ Page<Record<string, any>, PageData>({
       wx.setStorageSync("last_paipan", resp);
       wx.setStorageSync("last_form", payload);
 
+      // 保存到历史记录
+      this.saveToHistory(payload, resp);
+
       // 跳转结果页
       wx.navigateTo({ url: "/pages/result/index" });
     } catch (err: any) {
@@ -98,6 +101,58 @@ Page<Record<string, any>, PageData>({
       });
     } finally {
       this.setData({ submitting: false });
+    }
+  },
+
+  /** 保存到历史记录 */
+  saveToHistory(form: any, paipan: any) {
+    try {
+      let history: any[] = wx.getStorageSync("paipan_history") || [];
+
+      // 检查是否已存在（相同日期、时间、地点）
+      const exists = history.some(
+        (h) =>
+          h.form.birth_date === form.birth_date &&
+          h.form.birth_time === form.birth_time &&
+          h.form.birthplace === form.birthplace
+      );
+
+      if (!exists) {
+        const record = {
+          id: Date.now().toString(),
+          form,
+          paipan,
+          createdAt: this.formatDate(new Date()),
+        };
+
+        // 最多保存20条记录
+        history.unshift(record);
+        if (history.length > 20) {
+          history = history.slice(0, 20);
+        }
+
+        wx.setStorageSync("paipan_history", history);
+      }
+    } catch (e) {
+      console.error("Save history failed", e);
+    }
+  },
+
+  formatDate(date: Date): string {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    if (days === 0) {
+      return "今天";
+    } else if (days === 1) {
+      return "昨天";
+    } else if (days < 7) {
+      return `${days}天前`;
+    } else {
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      return `${month}月${day}日`;
     }
   },
 });

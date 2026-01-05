@@ -107,3 +107,23 @@
   font-size: 22rpx;
   color: #b0a59d;
 }
+
+.version {
+  margin-bottom: 16rpx;
+}
+
+.rate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 24rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  color: #b83227;
+  font-size: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.rate-icon {
+  font-size: 28rpx;
+}

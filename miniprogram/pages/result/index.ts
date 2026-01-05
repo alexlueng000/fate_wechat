@@ -1,5 +1,3 @@
-import { request } from "../../utils/request";
-
 type PillarPair = [string, string];
 type Mingpan = any;
 
@@ -96,7 +94,6 @@ Page({
     nextDayun: null as DayunItemUI | null,
 
     summaryOpen: false, // 默认收起
-    starting: false,
   },
 
   onLoad() {
@@ -139,40 +136,34 @@ Page({
     this.setData({ summaryOpen: !this.data.summaryOpen });
   },
 
-  async onStartChat() {
-    if (this.data.starting) return; // 防连点
+  onStartChat() {
     const cached: any = wx.getStorageSync("last_paipan");
     if (!cached || !cached.mingpan) {
       wx.showToast({ title: "没有命盘数据", icon: "none" });
       return;
     }
 
-    // 如果已有会话，直接去 chat（避免重复创建）
-    const existing = wx.getStorageSync("conversation_id");
-    if (existing) {
-      wx.switchTab({ url: "/pages/chat/chat" });
-      return;
-    }
+    // 直接跳转到聊天页面
+    wx.switchTab({ url: "/pages/chat/chat" });
+  },
 
-    this.setData({ starting: true });
-    wx.showLoading({ title: "生成解读…" });
+  /** 分享给好友 */
+  onShareAppMessage() {
+    const { summary, pillars } = this.data;
+    return {
+      title: `我的八字命盘：${pillars.day}日主 ${summary.keywords.join("、")}`,
+      path: "/pages/index/index",
+      imageUrl: "",
+    };
+  },
 
-    try {
-      const resp = await request<{ conversation_id: string; reply: string }>(
-        "api/chat/start?stream=0&_ts=" + Date.now(),
-        "POST",
-        { paipan: cached.mingpan, kb_index_dir: "", kb_topk: 3 },
-        { Accept: "application/json" }
-      );
-
-      wx.setStorageSync("conversation_id", resp.conversation_id);
-      wx.setStorageSync("start_reply", resp.reply || "");
-      wx.switchTab({ url: "/pages/chat/chat" });
-    } catch (e: any) {
-      wx.showToast({ title: e?.message || "启动对话失败", icon: "none" });
-    } finally {
-      wx.hideLoading();
-      this.setData({ starting: false });
-    }
+  /** 分享到朋友圈 */
+  onShareTimeline() {
+    const { summary, pillars } = this.data;
+    return {
+      title: `命理八字 - 探索你的命盘，${summary.keywords.join("、")}性格特质`,
+      query: "",
+      imageUrl: "",
+    };
   },
 });

@@ -28,9 +28,9 @@ Page<Data>({
     nickname: "",
     userId: "",
     env: "develop",
-    accountType: "匿名账号",
+    accountType: "小程序账号",
     initials: "FI",
-    version: "0.1.0", // 以后你自己改
+    version: "1.0.0",
   },
 
   onLoad() {
@@ -39,7 +39,7 @@ Page<Data>({
 
     let nickname = "";
     let userId = "";
-    let accountType = "匿名账号";
+    let accountType = "小程序账号";
     let initials = "FI";
 
     if (stored) {
@@ -50,7 +50,7 @@ Page<Data>({
       } else {
         accountType = "小程序账号";
       }
-      const base = nickname || userId || "FateInsight";
+      const base = nickname || userId || "命理八字";
       initials = base.slice(0, 2).toUpperCase();
     }
 
@@ -62,6 +62,11 @@ Page<Data>({
       accountType,
       initials,
     });
+  },
+
+  /** 历史排盘 */
+  onHistory() {
+    wx.navigateTo({ url: "/pages/history/history" });
   },
 
   /** 清除本地命盘和聊天记录（不影响 token） */
@@ -77,14 +82,74 @@ Page<Data>({
         try {
           wx.removeStorageSync("last_paipan");
           wx.removeStorageSync("last_form");
+          wx.removeStorageSync("paipan_history");
           wx.removeStorageSync("conversation_id");
           wx.removeStorageSync("start_reply");
-          // 如果以后你把 messages 也存本地，这里顺便一起清
         } catch (e) {}
 
         wx.showToast({ title: "已清除", icon: "none" });
       },
     });
+  },
+
+  /** 使用帮助 */
+  onHelp() {
+    wx.showModal({
+      title: "使用帮助",
+      content:
+        "1. 在「排盘」页面输入出生信息，点击「开始排盘」\n" +
+        "2. 查看命盘结果，可点击「开始对话」进行AI解读\n" +
+        "3. 在「解读」页面可进行多轮对话，了解性格、事业、财运等\n" +
+        "4. 在「我的」页面可查看历史记录和管理数据",
+      showCancel: false,
+      confirmText: "知道了",
+    });
+  },
+
+  /** 意见反馈 */
+  onFeedback() {
+    wx.navigateTo({ url: "/pages/feedback/feedback" });
+  },
+
+  /** 联系客服 */
+  onContact() {
+    // 打开微信客服
+    wx.openCustomerServiceChat({
+      extInfo: { url: "https://api.fateinsight.site" },
+      corpId: "", // 请替换为您企业的 corpId
+      success: () => {
+        console.log("客服打开成功");
+      },
+      fail: () => {
+        // 如果未配置客服，显示联系方式
+        wx.showModal({
+          title: "联系客服",
+          content: "客服邮箱：support@fateinsight.site\n微信号：FateInsight",
+          showCancel: false,
+          confirmText: "知道了",
+        });
+      },
+    });
+  },
+
+  /** 关于我们 */
+  onAbout() {
+    wx.navigateTo({ url: "/pages/about/about" });
+  },
+
+  /** 隐私政策 */
+  onPrivacy() {
+    wx.navigateTo({ url: "/pages/privacy/privacy" });
+  },
+
+  /** 用户协议 */
+  onAgreement() {
+    wx.navigateTo({ url: "/pages/privacy/privacy?tab=agreement" });
+  },
+
+  /** 免责声明 */
+  onDisclaimer() {
+    wx.navigateTo({ url: "/pages/privacy/privacy?tab=disclaimer" });
   },
 
   /** 退出登录：清掉 token + user，下次重启重新登录 */
@@ -112,36 +177,13 @@ Page<Data>({
     });
   },
 
-  /** 隐私政策 */
-  onPrivacy() {
+  /** 给我们评分 */
+  onRate() {
     wx.showModal({
-      title: "隐私政策",
-      content:
-        "目前仅在本地存储必要数据（如命盘与对话记录），用于提供服务和体验优化，不会对外出售或共享你的个人信息。",
+      title: "感谢支持",
+      content: "感谢您的使用！如需评分，请在微信中搜索本小程序并进行评分。",
       showCancel: false,
       confirmText: "知道了",
-    });
-  },
-
-  /** 用户协议 */
-  onAgreement() {
-    wx.showModal({
-      title: "用户协议",
-      content:
-        "使用本小程序即表示你知晓并同意：本服务仅作为命理娱乐与参考工具，不对任何决策结果承担法律责任。",
-      showCancel: false,
-      confirmText: "了解",
-    });
-  },
-
-  /** 免责声明 */
-  onDisclaimer() {
-    wx.showModal({
-      title: "免责声明",
-      content:
-        "本小程序提供的命盘与解读内容仅供参考，不构成任何法律、金融、医疗、心理等专业建议，请勿将其作为唯一决策依据。",
-      showCancel: false,
-      confirmText: "明白",
     });
   },
 });

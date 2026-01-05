@@ -1,0 +1,147 @@
+.page {
+  min-height: 100vh;
+  background: #f7f3ea;
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+.content {
+  padding-bottom: 40rpx;
+}
+
+/* Logo */
+.logo {
+  text-align: center;
+  padding: 48rpx 0 24rpx;
+}
+
+.logo-text {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #b83227;
+}
+
+.version {
+  text-align: center;
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 32rpx;
+}
+
+/* 卡片 */
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.card-title.warning {
+  color: #b83227;
+}
+
+.card-text {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.8;
+}
+
+.warning-text {
+  color: #b83227;
+}
+
+/* 功能列表 */
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.feature-icon {
+  font-size: 40rpx;
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  border-radius: 16rpx;
+}
+
+.feature-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.feature-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.feature-desc {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 联系方式 */
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.contact-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx;
+  background: #f5f5f5;
+  border-radius: 12rpx;
+}
+
+.contact-label {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.contact-value {
+  font-size: 26rpx;
+  color: #b83227;
+  font-weight: 500;
+}
+
+/* 底部 */
+.footer {
+  text-align: center;
+  padding: 32rpx 0;
+}
+
+.footer-text {
+  display: block;
+  font-size: 22rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+/* 警告卡片 */
+.card-warning {
+  border: 2rpx solid #b83227;
+  background: #fff5f5;
+}

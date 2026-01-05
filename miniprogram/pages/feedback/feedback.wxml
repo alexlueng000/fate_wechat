@@ -1,0 +1,69 @@
+<view class="page">
+  <view class="content">
+    <view class="title">意见反馈</view>
+    <view class="subtitle">您的意见对我们很重要</view>
+
+    <!-- 反馈类型 -->
+    <view class="form-group">
+      <view class="label">反馈类型</view>
+      <view class="type-options">
+        <view
+          class="type-option {{type === 'bug' ? 'active' : ''}}"
+          bindtap="onSelectType"
+          data-type="bug"
+        >
+          功能异常
+        </view>
+        <view
+          class="type-option {{type === 'feature' ? 'active' : ''}}"
+          bindtap="onSelectType"
+          data-type="feature"
+        >
+          功能建议
+        </view>
+        <view
+          class="type-option {{type === 'other' ? 'active' : ''}}"
+          bindtap="onSelectType"
+          data-type="other"
+        >
+          其他
+        </view>
+      </view>
+    </view>
+
+    <!-- 反馈内容 -->
+    <view class="form-group">
+      <view class="label">详细描述 <text class="required">*</text></view>
+      <textarea
+        class="textarea"
+        placeholder="请详细描述您遇到的问题或建议..."
+        value="{{content}}"
+        bindinput="onInputContent"
+        maxlength="500"
+        show-confirm-bar="{{false}}"
+      ></textarea>
+      <view class="count">{{content.length}}/500</view>
+    </view>
+
+    <!-- 联系方式 -->
+    <view class="form-group">
+      <view class="label">联系方式（选填）</view>
+      <input
+        class="input"
+        placeholder="手机号或邮箱，方便我们联系您"
+        value="{{contact}}"
+        bindinput="onInputContact"
+      />
+    </view>
+
+    <!-- 提交按钮 -->
+    <button class="submit-btn" bindtap="onSubmit" disabled="{{submitting}}">
+      {{submitting ? '提交中...' : '提交反馈'}}
+    </button>
+
+    <!-- 提示 -->
+    <view class="tip">
+      感谢您的反馈，我们会尽快处理并改进！
+    </view>
+  </view>
+</view>

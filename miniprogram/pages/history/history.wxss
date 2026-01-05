@@ -1,1 +1,127 @@
-/* pages/history/history.wxss */
+.page {
+  min-height: 100vh;
+  background: #f7f3ea;
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+.content {
+  padding-bottom: 40rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  color: #999;
+  margin: 24rpx 0 12rpx;
+  padding-left: 8rpx;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.card.current {
+  border: 2rpx solid #b83227;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.card-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.card-tag {
+  padding: 4rpx 12rpx;
+  background: #b83227;
+  color: #fff;
+  font-size: 20rpx;
+  border-radius: 8rpx;
+}
+
+.card-info {
+  display: flex;
+  gap: 16rpx;
+  flex-wrap: wrap;
+  margin-bottom: 12rpx;
+}
+
+.info-item {
+  font-size: 24rpx;
+  color: #666;
+  padding: 4rpx 12rpx;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-text {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.footer-time {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.footer-arrow {
+  font-size: 32rpx;
+  color: #ccc;
+}
+
+/* 空状态 */
+.empty {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 80rpx 40rpx;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: #999;
+  display: block;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 120rpx 40rpx;
+}
+
+.empty-btn {
+  margin-top: 32rpx;
+  padding: 20rpx 48rpx;
+  background: #b83227;
+  color: #fff;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+}
