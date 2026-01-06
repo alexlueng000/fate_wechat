@@ -20,6 +20,8 @@ interface Data {
   accountType: string;
   initials: string;
   version: string;
+  avatarUrl: string;      // 用户头像 URL
+  hasAuthorized: boolean;  // 是否已授权
 }
 
 Page<Data>({
@@ -31,6 +33,8 @@ Page<Data>({
     accountType: "小程序账号",
     initials: "FI",
     version: "1.0.0",
+    avatarUrl: "",
+    hasAuthorized: false,
   },
 
   onLoad() {
@@ -41,10 +45,14 @@ Page<Data>({
     let userId = "";
     let accountType = "小程序账号";
     let initials = "FI";
+    let avatarUrl = "";
+    let hasAuthorized = false;
 
     if (stored) {
       nickname = stored.nickname || stored.name || "";
       userId = String(stored.id || "");
+      avatarUrl = stored.avatarUrl || stored.avatar_url || "";
+      hasAuthorized = !!(stored.nickName || nickname && avatarUrl);
       if (stored.mobile || stored.phone) {
         accountType = "已绑定手机";
       } else {
@@ -61,6 +69,8 @@ Page<Data>({
       env,
       accountType,
       initials,
+      avatarUrl,
+      hasAuthorized,
     });
   },
 
@@ -152,6 +162,49 @@ Page<Data>({
     wx.navigateTo({ url: "/pages/privacy/privacy?tab=disclaimer" });
   },
 
+  /** 微信授权：获取用户昵称和头像 */
+  onAuthorize() {
+    const that = this;
+    wx.getUserProfile({
+      desc: "用于完善会员资料，提供更好的服务",
+      success: (res) => {
+        console.log("getUserProfile success", res);
+        const userInfo = res.userInfo;
+
+        // 更新本地存储的用户信息
+        let stored: any = wx.getStorageSync("auth_user") || {};
+        stored = {
+          ...stored,
+          nickname: userInfo.nickName,
+          avatarUrl: userInfo.avatarUrl,
+          nickName: userInfo.nickName,
+          avatar_url: userInfo.avatarUrl,
+        };
+        wx.setStorageSync("auth_user", stored);
+
+        // 更新页面数据
+        const base = userInfo.nickName || that.data.userId || "命理八字";
+        that.setData({
+          nickname: userInfo.nickName,
+          avatarUrl: userInfo.avatarUrl,
+          hasAuthorized: true,
+          initials: base.slice(0, 2).toUpperCase(),
+          user: stored,
+        });
+
+        wx.showToast({ title: "授权成功", icon: "success" });
+      },
+      fail: (err) => {
+        console.error("getUserProfile failed", err);
+        if (err.errMsg && err.errMsg.indexOf("cancel") >= 0) {
+          // 用户取消授权
+          return;
+        }
+        wx.showToast({ title: "授权失败", icon: "none" });
+      },
+    });
+  },
+
   /** 退出登录：清掉 token + user，下次重启重新登录 */
   onLogout() {
     wx.showModal({
@@ -167,6 +220,17 @@ Page<Data>({
           wx.removeStorageSync("auth_user");
           app.globalData.token = null;
         } catch (e) {}
+
+        // 重置页面状态
+        this.setData({
+          user: null,
+          nickname: "",
+          userId: "",
+          avatarUrl: "",
+          hasAuthorized: false,
+          initials: "FI",
+          accountType: "小程序账号",
+        });
 
         wx.showToast({ title: "已退出，将重新登录", icon: "none" });
 

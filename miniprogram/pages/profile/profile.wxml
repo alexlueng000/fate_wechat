@@ -1,8 +1,15 @@
 <view class="page">
   <!-- 顶部用户卡片 -->
   <view class="card card-user">
+    <!-- 头像：显示真实头像或默认头像 -->
     <view class="avatar-wrap">
-      <view class="avatar-text">{{initials}}</view>
+      <image
+        wx:if="{{avatarUrl}}"
+        class="avatar-img"
+        src="{{avatarUrl}}"
+        mode="aspectFill"
+      />
+      <view wx:else class="avatar-text">{{initials}}</view>
     </view>
 
     <view class="user-info">
@@ -15,6 +22,15 @@
       <view class="user-sub">
         {{accountType}}
       </view>
+
+      <!-- 未授权时显示授权按钮 -->
+      <button
+        wx:if="{{!hasAuthorized}}"
+        class="auth-btn"
+        bindtap="onAuthorize"
+      >
+        授权获取微信头像和昵称
+      </button>
     </view>
   </view>
 
