@@ -7,6 +7,9 @@ type StartResp = { conversation_id: string; reply: string };
 // 每条消息：在原有 ChatMessage 上加一个 nodes 字段给 rich-text 用
 interface UIMsg extends ChatMessage {
   nodes: any[];
+  truncated?: boolean;
+  fullContent?: string;
+  isGreeting?: boolean;
 }
 
 interface Data {
@@ -15,6 +18,7 @@ interface Data {
   loading: boolean;
   toView: string;
   conversationId: string;
+  isLoggedIn: boolean;
 }
 
 type Custom = {
@@ -30,6 +34,12 @@ type Custom = {
   onGoToResult(): void;
   onStartFromChat(): void;
   autoSendPrompt(actual: string): Promise<void>;
+  onShowBaziDialog(): void;
+  onBaziDialogClose(): void;
+  truncateContent(content: string): string;
+  onUnlockMessage(e: WechatMiniprogram.BaseEvent): void;
+  onLoginSuccess(e: any): void;
+  checkLoginStatus(): void;
 };
 
 const QUICK_MAP: Record<string, string> = {
@@ -230,16 +240,27 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     loading: false,
     toView: "end",
     conversationId: "",
+    isLoggedIn: false,
   },
 
   onLoad(options) {
-    // 开场白
-    this.appendAssistant(
+    // 检查登录状态
+    this.checkLoginStatus();
+    // 开场白 - 不截断
+    const greetingText =
       "你好呀～（微笑）\n" +
         "我不是来剧透你人生的编剧，只是帮你找找藏在命盘里的小彩蛋——可能是你还没发现的潜力，或是未来路上悄悄亮起的路灯（✨）\n" +
         "毕竟你才是人生的主角，我嘛…只是个带地图的导游～（轻松摊手）\n" +
-        "准备好一起逛逛你的‘人生剧本杀’了吗？放心，不用怕泄露天机，我今天的‘仙气’储备充足！"
-    );
+        "准备好一起逛逛你的'人生剧本杀'了吗？放心，不用怕泄露天机，我今天的'仙气'储备充足！";
+
+    const cleanGreeting = normalizeReply(greetingText);
+    const msg: UIMsg = {
+      role: "assistant",
+      content: cleanGreeting,
+      nodes: formatMarkdownImpl(cleanGreeting),
+      isGreeting: true,
+    } as any;
+    this.setData({ messages: [msg] });
 
     let injected = false;
 
@@ -296,29 +317,57 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     this.setData({ messages: msgs }, () => this.toBottom());
   },
 
-  appendAssistant(text) {
+  appendAssistant(text, isGreeting = false) {
     const clean = normalizeReply(text);
+    const isLoggedIn = this.data.isLoggedIn;
+
+    // 如果是开场白或已登录，不截断
+    let displayContent = clean;
+    let isTruncated = false;
+    if (!isGreeting && !isLoggedIn && clean.length > 50) {
+      displayContent = clean.slice(0, Math.floor(clean.length * 0.5));
+      isTruncated = true;
+    }
+
     const msg: UIMsg = {
       role: "assistant",
-      content: clean,
-      nodes: formatMarkdownImpl(clean),
+      content: displayContent,
+      fullContent: isTruncated ? clean : undefined,
+      truncated: isTruncated,
+      isGreeting: isGreeting,
+      nodes: formatMarkdownImpl(displayContent),
     } as any;
     const msgs = this.data.messages.concat(msg);
     this.setData({ messages: msgs }, () => this.toBottom());
   },
 
-  replaceLastAssistant(text) {
+  replaceLastAssistant(text, isGreeting = false) {
     const clean = normalizeReply(text);
     const msgs = this.data.messages.slice();
-    const node = formatMarkdownImpl(clean);
+    const isLoggedIn = this.data.isLoggedIn;
+
+    // 如果是开场白或已登录，不截断
+    let displayContent = clean;
+    let isTruncated = false;
+    if (!isGreeting && !isLoggedIn && clean.length > 50) {
+      displayContent = clean.slice(0, Math.floor(clean.length * 0.5));
+      isTruncated = true;
+    }
+
+    const node = formatMarkdownImpl(displayContent);
 
     if (msgs.length && msgs[msgs.length - 1].role === "assistant") {
-      msgs[msgs.length - 1].content = clean;
+      msgs[msgs.length - 1].content = displayContent;
+      msgs[msgs.length - 1].fullContent = isTruncated ? clean : undefined;
+      msgs[msgs.length - 1].truncated = isTruncated;
       (msgs[msgs.length - 1] as any).nodes = node;
     } else {
       msgs.push({
         role: "assistant",
-        content: clean,
+        content: displayContent,
+        fullContent: isTruncated ? clean : undefined,
+        truncated: isTruncated,
+        isGreeting: isGreeting,
         nodes: node,
       } as any);
     }
@@ -421,12 +470,12 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
         } catch (e) {}
 
         // 重新显示开场白
-        this.appendAssistant(
+        const greetingText =
           "你好呀～（微笑）\n" +
             "我不是来剧透你人生的编剧，只是帮你找找藏在命盘里的小彩蛋——可能是你还没发现的潜力，或是未来路上悄悄亮起的路灯（✨）\n" +
             "毕竟你才是人生的主角，我嘛…只是个带地图的导游～（轻松摊手）\n" +
-            "准备好一起逛逛你的‘人生剧本杀’了吗？放心，不用怕泄露天机，我今天的‘仙气’储备充足！"
-        );
+            "准备好一起逛逛你的'人生剧本杀'了吗？放心，不用怕泄露天机，我今天的'仙气'储备充足！";
+        this.appendAssistant(greetingText, true);
 
         wx.showToast({ title: "已清空", icon: "none" });
       },
@@ -516,6 +565,110 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       .finally(() => {
         this.setData({ loading: false }, () => this.toBottom());
       });
+  },
+
+  onShowBaziDialog() {
+    const cached: any = wx.getStorageSync("last_paipan");
+    if (!cached || !cached.mingpan) {
+      wx.showToast({ title: "请先在排盘页生成命盘", icon: "none" });
+      return;
+    }
+
+    const dialog = this.selectComponent("#baziDialog");
+    if (dialog) {
+      // 可以从缓存中读取五行数据，如果没有则使用默认值
+      const wuxing = cached?.mingpan?.wuxing_count;
+      let elements: any[] = [
+        { name: 'wood', chinese: '木', percent: 18, color: '#5D8A4A' },
+        { name: 'fire', chinese: '火', percent: 8, color: '#D4534A' },
+        { name: 'earth', chinese: '土', percent: 18, color: '#A67C52' },
+        { name: 'metal', chinese: '金', percent: 23, color: '#B8860B' },
+        { name: 'water', chinese: '水', percent: 33, color: '#4A7BA7' },
+      ];
+
+      if (wuxing) {
+        // 如果后端返回了五行数据，使用后端数据
+        elements = [
+          { name: 'wood', chinese: '木', percent: wuxing.木 || 0, color: '#5D8A4A' },
+          { name: 'fire', chinese: '火', percent: wuxing.火 || 0, color: '#D4534A' },
+          { name: 'earth', chinese: '土', percent: wuxing.土 || 0, color: '#A67C52' },
+          { name: 'metal', chinese: '金', percent: wuxing.金 || 0, color: '#B8860B' },
+          { name: 'water', chinese: '水', percent: wuxing.水 || 0, color: '#4A7BA7' },
+        ];
+      }
+
+      dialog.onOpen({
+        score: 83,
+        elements: elements,
+      });
+    }
+  },
+
+  onBaziDialogClose() {
+    // Dialog closed
+  },
+
+  checkLoginStatus() {
+    try {
+      const userProfile = wx.getStorageSync("user_profile");
+      const isLoggedIn = !!userProfile;
+      this.setData({ isLoggedIn });
+    } catch (e) {
+      this.setData({ isLoggedIn: false });
+    }
+  },
+
+  truncateContent(content: string): string {
+    // 截取50%的内容
+    if (content.length <= 50) return content;
+    return content.slice(0, Math.floor(content.length * 0.5));
+  },
+
+  onUnlockMessage(e: WechatMiniprogram.BaseEvent) {
+    const index = e.currentTarget.dataset.index;
+
+    if (this.data.isLoggedIn) {
+      // 已登录，直接展开
+      const msgs = this.data.messages.slice();
+      const msg = msgs[index];
+      if (msg && msg.fullContent) {
+        msg.content = msg.fullContent;
+        msg.truncated = false;
+        (msg as any).nodes = formatMarkdownImpl(msg.fullContent);
+        this.setData({ messages: msgs });
+      }
+    } else {
+      // 未登录，显示登录弹窗
+      const loginModal = this.selectComponent("#loginModal");
+      if (loginModal) {
+        loginModal.onOpen();
+      }
+    }
+  },
+
+  onLoginSuccess(e: any) {
+    // 登录成功，更新状态
+    this.setData({ isLoggedIn: true });
+
+    // 展开所有被截断的消息
+    const msgs = this.data.messages.map(msg => {
+      if (msg.truncated && msg.fullContent) {
+        return {
+          ...msg,
+          content: msg.fullContent,
+          truncated: false,
+          nodes: formatMarkdownImpl(msg.fullContent),
+        };
+      }
+      return msg;
+    });
+
+    this.setData({ messages: msgs });
+
+    wx.showToast({
+      title: "登录成功，已解锁完整内容",
+      icon: "success",
+    });
   },
 };
 

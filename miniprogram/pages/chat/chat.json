@@ -1,4 +1,7 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "bazi-dialog": "/components/bazi-dialog/bazi-dialog",
+    "login-modal": "/components/login-modal/login-modal"
+  },
   "navigationBarTitleText": "一盏"
 }

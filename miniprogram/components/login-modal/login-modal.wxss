@@ -1,0 +1,175 @@
+/* components/login-modal/login-modal.wxss */
+
+/* 遮罩层 */
+.login-modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(61, 46, 29, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 48rpx;
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 弹窗容器 */
+.login-modal-container {
+  position: relative;
+  width: 100%;
+  max-width: 560rpx;
+  background: linear-gradient(180deg, #FAF8F5 0%, #F5F1E8 100%);
+  border-radius: 32rpx;
+  box-shadow:
+    0 32rpx 80rpx rgba(61, 46, 29, 0.25),
+    0 0 0 1rpx rgba(196, 165, 116, 0.4);
+  overflow: hidden;
+  animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(80rpx) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 顶部装饰线 */
+.modal-top-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6rpx;
+  background: linear-gradient(90deg, transparent 0%, #C4A574 50%, transparent 100%);
+}
+
+/* 关闭按钮 */
+.close-btn {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.close-icon {
+  font-size: 48rpx;
+  color: #8B7765;
+  line-height: 1;
+  font-weight: 300;
+}
+
+/* 内容区 */
+.modal-content {
+  padding: 60rpx 48rpx 52rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 锁图标 */
+.lock-icon {
+  font-size: 88rpx;
+  margin-bottom: 24rpx;
+  animation: lockBounce 1s ease-in-out infinite;
+}
+
+@keyframes lockBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* 标题 */
+.title {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #3D2E1D;
+  margin-bottom: 12rpx;
+  letter-spacing: 2rpx;
+}
+
+.subtitle {
+  font-size: 26rpx;
+  color: #8B7765;
+  margin-bottom: 40rpx;
+}
+
+/* 分隔线装饰 */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  width: 100%;
+  margin-bottom: 40rpx;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1rpx;
+  background: linear-gradient(90deg, transparent, rgba(196, 165, 116, 0.4), transparent);
+}
+
+.divider-dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: #C4A574;
+}
+
+/* 登录按钮 */
+.login-btn {
+  width: 100%;
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  background: linear-gradient(135deg, #07C160 0%, #06AE56 100%);
+  border-radius: 48rpx;
+  border: none;
+  box-shadow: 0 8rpx 24rpx rgba(7, 193, 96, 0.3);
+  font-size: 30rpx;
+  color: #fff;
+  font-weight: 600;
+}
+
+.login-btn::after {
+  border: none;
+}
+
+.login-btn-hover {
+  opacity: 0.9;
+  transform: scale(0.98);
+}
+
+.btn-wechat-icon {
+  font-size: 32rpx;
+}
+
+.btn-text {
+  font-size: 30rpx;
+}
+
+/* 提示文字 */
+.hint-text {
+  margin-top: 24rpx;
+  font-size: 24rpx;
+  color: #A89888;
+}

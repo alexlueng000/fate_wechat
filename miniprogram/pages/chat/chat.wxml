@@ -16,6 +16,13 @@
               class="md"
               nodes="{{item.nodes}}"
             ></rich-text>
+
+            <!-- 解锁提示 -->
+            <view class="unlock-prompt" wx:if="{{item.truncated}}" bindtap="onUnlockMessage" data-index="{{index}}">
+              <view class="unlock-icon">🔓</view>
+              <text class="unlock-text">登录查看完整解读</text>
+              <view class="unlock-arrow">→</view>
+            </view>
           </view>
         </view>
       </block>
@@ -40,6 +47,10 @@
   <view class="action-btn" bindtap="onGoToResult">
     <text class="action-icon">📊</text>
     <text>我的命盘</text>
+  </view>
+  <view class="action-btn" bindtap="onShowBaziDialog">
+    <text class="action-icon">☯️</text>
+    <text>命盘解读</text>
   </view>
   <view class="action-btn" bindtap="onClear">
     <text class="action-icon">🗑️</text>
@@ -79,4 +90,10 @@
 <view class="tip">* 对话仅供参考，不构成专业建议 *</view>
 
 <view style="height: env(safe-area-inset-bottom)"></view>
+
+<!-- 命盘解读弹窗 -->
+<bazi-dialog id="baziDialog" bind:close="onBaziDialogClose"></bazi-dialog>
+
+<!-- 登录弹窗 -->
+<login-modal id="loginModal" bind:login="onLoginSuccess"></login-modal>
 </view>

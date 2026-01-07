@@ -1,0 +1,80 @@
+<!-- components/bazi-dialog/bazi-dialog.wxml -->
+<view class="bazi-dialog-mask" wx:if="{{show}}" bindtap="onMaskTap">
+  <view class="bazi-dialog-container" catchtap="onBubbleTap">
+
+    <!-- 顶部装饰线 -->
+    <view class="dialog-top-line"></view>
+
+    <!-- 装饰角落图案 -->
+    <view class="corner corner-tl">
+      <view class="corner-line-1"></view>
+      <view class="corner-line-2"></view>
+    </view>
+    <view class="corner corner-tr">
+      <view class="corner-line-1"></view>
+      <view class="corner-line-2"></view>
+    </view>
+
+    <!-- 关闭按钮 -->
+    <view class="close-btn" bindtap="onClose">
+      <view class="close-icon"></view>
+    </view>
+
+    <!-- 内容区 -->
+    <view class="dialog-content">
+
+      <!-- 标题 -->
+      <view class="dialog-header">
+        <view class="title">命盘解读</view>
+        <view class="subtitle">五行分析 · 命理洞察</view>
+      </view>
+
+      <!-- 综合评分 -->
+      <view class="score-card">
+        <view class="score-header">
+          <text class="score-label">综合评分</text>
+          <text class="score-value">{{score}}<text class="score-percent">%</text></text>
+        </view>
+        <view class="score-bar-bg">
+          <view class="score-bar-fill" style="width: {{score}}%"></view>
+        </view>
+        <view class="score-desc">命局五行流转顺畅，格局稳健平和</view>
+      </view>
+
+      <!-- 五行分布 -->
+      <view class="elements-section">
+        <view class="section-title">
+          <view class="section-bar"></view>
+          <text>五行分布</text>
+        </view>
+
+        <view class="elements-grid">
+          <view class="element-item" wx:for="{{elements}}" wx:key="name">
+            <!-- 圆形进度条 -->
+            <view class="progress-ring">
+              <canvas
+                type="2d"
+                id="canvas-{{item.name}}"
+                class="progress-canvas"
+                style="width: 128rpx; height: 128rpx;"
+              ></canvas>
+              <view class="element-inner">
+                <text class="element-char" style="color: {{item.color}}">{{item.chinese}}</text>
+              </view>
+            </view>
+            <!-- 元素信息 -->
+            <view class="element-info">
+              <text class="element-name" style="color: {{item.color}}">{{item.chinese}}</text>
+              <text class="element-percent">{{item.percent}}<text class="percent-symbol">%</text></text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+    </view>
+
+    <!-- 底部装饰线 -->
+    <view class="dialog-bottom-line"></view>
+
+  </view>
+</view>
