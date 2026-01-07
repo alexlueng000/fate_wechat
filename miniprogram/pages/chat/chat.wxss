@@ -1,5 +1,5 @@
 .page {
-  background: #f7f3ea;
+  background: linear-gradient(180deg, #f5efe6 0%, #ede6d8 100%);
   min-height: 100vh;
   padding: 16rpx;
   box-sizing: border-box;
@@ -9,10 +9,12 @@
 .chat {
   /* 预留空间给上面的标题 / 快捷区 / 输入栏 */
   height: calc(100vh - 420rpx);
-  background: #fff;
-  border-radius: 16rpx;
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, .06);
-  padding: 16rpx;
+  background: linear-gradient(180deg, #fffbf7 0%, #fff9f4 100%);
+  border-radius: 24rpx;
+  box-shadow:
+    0 4rpx 20rpx rgba(184, 50, 39, 0.08),
+    0 0 0 1rpx rgba(184, 50, 39, 0.04);
+  padding: 20rpx 16rpx;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -23,64 +25,65 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8rpx;
+  gap: 16rpx;
   /* 消息之间间距 */
 }
 
 /* 单条消息行：左/右对齐气泡 */
 .msg {
   display: flex;
-  margin-bottom: 4rpx;
+  margin-bottom: 8rpx;
+  animation: msg-fade-in 0.3s ease-out;
+}
+
+@keyframes msg-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(16rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .msg.left {
   justify-content: flex-start;
+  padding-left: 8rpx;
 }
 
 .msg.right {
   justify-content: flex-end;
+  padding-right: 8rpx;
 }
 
 /* ========== 气泡本体 ========== */
 .bubble {
   max-width: 82%;
-  padding: 8rpx 14rpx;
-  /* 上下 8，左右 14：瘦一点 */
-  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 24rpx;
   white-space: pre-wrap;
-  line-height: 1.5;
-  /* 再收一点行高 */
+  line-height: 1.7;
   box-sizing: border-box;
+  position: relative;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
 }
 
 /* 用户 / 助手不同背景 */
 .msg.left .bubble {
-  background: #f8f3ee;
-  color: #333;
+  background: linear-gradient(135deg, #fff 0%, #fff9f5 100%);
+  color: #2c2c2c;
+  border: 1rpx solid rgba(200, 170, 150, 0.2);
+  border-bottom-left-radius: 8rpx;
 }
 
 .msg.right .bubble {
-  background: #b83227;
+  background: linear-gradient(135deg, #c93d2f 0%, #a8281c 100%);
   color: #fff;
-}
-
-/* 所有文字统一左对齐、无缩进 */
-.bubble .md p,
-.bubble .md h1,
-.bubble .md h2,
-.bubble .md h3,
-.bubble .md ul,
-.bubble .md li,
-.bubble .md strong,
-.bubble .md em {
-  text-align: left !important;
-  text-indent: 0 !important;
-}
-
-/* 兼容你之前的 class，用在纯文本 span 上也没问题 */
-.bubble-text {
-  text-align: left;
-  text-indent: 0 !important;
+  border-bottom-right-radius: 8rpx;
+  box-shadow:
+    0 6rpx 20rpx rgba(184, 50, 39, 0.3),
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.2);
 }
 
 /* ========== Markdown 富文本区 ========== */
@@ -94,21 +97,17 @@
 .bubble .md h1,
 .bubble .md h2,
 .bubble .md h3 {
-  margin: 4rpx 0;
+  margin: 8rpx 0;
   /* 统一小段间距 */
   padding: 0;
-  text-align: left;
-  text-indent: 0;
 }
 
-/* 第一行一定要贴顶，避免“第一句话不顶格”的视觉错觉 */
+/* 第一行一定要贴顶，避免"第一句话不顶格"的视觉错觉 */
 .bubble .md p:first-child,
 .bubble .md h1:first-child,
 .bubble .md h2:first-child,
 .bubble .md h3:first-child {
   margin-top: 0 !important;
-  text-align: left !important;
-  text-indent: 0 !important;
 }
 
 /* 最后一行不要额外 margin-bottom，气泡底边收紧一点 */
@@ -121,35 +120,63 @@
 
 /* 标题字号比正文稍大，但不要夸张，避免撑高气泡 */
 .bubble .md h1 {
-  font-size: 30rpx;
+  font-size: 32rpx;
   font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 12rpx;
+}
+
+.msg.right .bubble .md h1 {
+  color: #fff;
 }
 
 .bubble .md h2 {
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 600;
+  color: #2c2c2c;
+  margin-bottom: 10rpx;
+}
+
+.msg.right .bubble .md h2 {
+  color: #fff;
 }
 
 .bubble .md h3 {
-  font-size: 26rpx;
+  font-size: 28rpx;
   font-weight: 600;
+  color: #3a3a3a;
+  margin-bottom: 8rpx;
+}
+
+.msg.right .bubble .md h3 {
+  color: #fff;
 }
 
 /* 段落正文 */
 .bubble .md p {
-  font-size: 26rpx;
+  font-size: 28rpx;
+  color: #3a3a3a;
+  line-height: 1.8;
+}
+
+.msg.right .bubble .md p {
+  color: rgba(255, 255, 255, 0.95);
 }
 
 /* 列表样式（formatMarkdown 已经转成 ul/li 的话） */
 .bubble .md ul {
-  padding-left: 32rpx;
-  /* 稍微缩进一点 */
-  margin: 4rpx 0;
+  padding-left: 36rpx;
+  margin: 8rpx 0;
 }
 
 .bubble .md li {
-  margin: 2rpx 0;
-  line-height: 1.5;
+  margin: 4rpx 0;
+  line-height: 1.8;
+  color: #3a3a3a;
+}
+
+.msg.right .bubble .md li {
+  color: rgba(255, 255, 255, 0.95);
 }
 
 /* 粗体：不调大行高，避免单行撑高 */
@@ -157,60 +184,55 @@
   font-weight: 600;
 }
 
+.msg.right .bubble .md strong {
+  color: #fff;
+  font-weight: 700;
+}
+
 /* 【xxx】强调样式 */
 .bubble .md .highlight {
-  color: #b83227;
+  color: #c93d2f;
   font-weight: 600;
 }
 
-/* 如果富文本里有其他全局 reset，强压一层优先级 */
-/* === 强制所有气泡内文字左对齐、无首行缩进 === */
-.bubble,
-.bubble view,
-.bubble text,
-.bubble rich-text,
-.bubble .md,
-.bubble .md p,
-.bubble .md h1,
-.bubble .md h2,
-.bubble .md h3,
-.bubble .md ul,
-.bubble .md li {
-  text-align: left !important;
-  text-indent: 0 !important;
+.msg.right .bubble .md .highlight {
+  color: #ffdbd8;
 }
 
 /* ========== 快捷分析卡片区 ========== */
 .card {
-  background: #fff;
-  border-radius: 24rpx;
-  box-shadow: 0 10rpx 28rpx rgba(0, 0, 0, .06);
-  padding: 22rpx;
-  margin-top: 18rpx;
+  background: linear-gradient(135deg, #fff 0%, #fffbf7 100%);
+  border-radius: 28rpx;
+  box-shadow:
+    0 8rpx 24rpx rgba(0, 0, 0, 0.06),
+    0 0 0 1rpx rgba(200, 170, 150, 0.1);
+  padding: 28rpx 24rpx;
+  margin-top: 20rpx;
 }
 
 .quick-card {
-  border: 2rpx solid #f3e7df;
+  border: none;
 }
 
 .quick-title {
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 700;
-  color: #333;
-  margin-bottom: 14rpx;
+  color: #2c2c2c;
+  margin-bottom: 18rpx;
+  padding-left: 4rpx;
 }
 
 .quick-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16rpx;
+  gap: 12rpx;
 }
 
 /* ========== 操作按钮栏 ========== */
 .action-bar {
   display: flex;
-  gap: 12rpx;
-  margin-top: 18rpx;
+  gap: 14rpx;
+  margin-top: 20rpx;
 }
 
 .action-btn {
@@ -218,34 +240,53 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8rpx;
-  padding: 20rpx;
-  background: #fff;
-  border-radius: 16rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, .06);
+  gap: 10rpx;
+  padding: 22rpx 20rpx;
+  background: linear-gradient(135deg, #fff 0%, #fffbf7 100%);
+  border-radius: 20rpx;
+  box-shadow:
+    0 4rpx 16rpx rgba(0, 0, 0, 0.06),
+    0 0 0 1rpx rgba(200, 170, 150, 0.1);
   font-size: 26rpx;
-  color: #333;
+  color: #4a4a4a;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.action-btn:active {
+  transform: scale(0.97);
+  box-shadow:
+    0 2rpx 8rpx rgba(0, 0, 0, 0.06),
+    0 0 0 1rpx rgba(200, 170, 150, 0.1);
 }
 
 .action-icon {
-  font-size: 32rpx;
+  font-size: 36rpx;
 }
 
 .quick-chip {
-  background: #fffdfb;
-  border: 2rpx dashed #f0cfc3;
-  color: #b05544;
-  border-radius: 20rpx;
-  padding: 16rpx 0;
+  background: linear-gradient(135deg, #fff 0%, #fff9f2 100%);
+  border: 2rpx solid rgba(200, 170, 150, 0.25);
+  color: #a83220;
+  border-radius: 24rpx;
+  padding: 20rpx 0;
   text-align: center;
-  font-size: 24rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  box-shadow: 0 2rpx 8rpx rgba(168, 50, 32, 0.08);
+  transition: all 0.2s ease;
+}
+
+.quick-chip:active {
+  transform: scale(0.95);
+  background: linear-gradient(135deg, #fff9f2 0%, #fff4e8 100%);
 }
 
 /* ========== 输入区 + 发送按钮 ========== */
 .inputBar {
-  margin-top: 18rpx;
+  margin-top: 20rpx;
   display: flex;
-  gap: 12rpx;
+  gap: 14rpx;
   align-items: center;
 }
 
@@ -253,56 +294,82 @@
   flex: 1;
   background: #fff;
   border-radius: 999rpx;
-  padding: 18rpx 24rpx;
-  font-size: 26rpx;
-  border: 1rpx solid #eee;
+  padding: 22rpx 28rpx;
+  font-size: 28rpx;
+  border: 2rpx solid rgba(200, 170, 150, 0.2);
+  box-shadow:
+    0 2rpx 8rpx rgba(0, 0, 0, 0.04),
+    inset 0 2rpx 4rpx rgba(0, 0, 0, 0.01);
+  color: #3a3a3a;
+}
+
+.ipt:focus {
+  border-color: rgba(184, 50, 39, 0.3);
 }
 
 /* placeholder 也左对齐、不要缩进 */
 .ipt-input::-webkit-input-placeholder {
   text-align: left;
   text-indent: 0;
+  color: #aaa;
 }
 
 .sendBtn {
   flex: 0 0 auto;
-  padding: 0 40rpx;
-  height: 72rpx;
-  line-height: 72rpx;
-  background: #b83227;
+  padding: 0 44rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  background: linear-gradient(135deg, #c93d2f 0%, #a8281c 100%);
   color: #fff;
   border-radius: 999rpx;
   font-weight: 700;
-  font-size: 28rpx;
-  box-shadow: 0 8rpx 20rpx rgba(184, 50, 39, .25);
+  font-size: 30rpx;
+  box-shadow:
+    0 8rpx 24rpx rgba(184, 50, 39, 0.35),
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.2);
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.sendBtn:active {
+  transform: scale(0.95);
+  box-shadow:
+    0 4rpx 12rpx rgba(184, 50, 39, 0.35),
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.2);
+}
+
+.sendBtn[disabled] {
+  opacity: 0.6;
 }
 
 /* ========== 免责声明 ========== */
 .tip {
-  margin-top: 12rpx;
+  margin-top: 16rpx;
   text-align: center;
   font-size: 22rpx;
-  color: #9a8f86;
+  color: #a89888;
 }
 
 /* ========== Typing Indicator ========== */
 .typing-bubble {
-  padding: 16rpx 20rpx;
-  min-width: 80rpx;
+  padding: 20rpx 24rpx;
+  min-width: 90rpx;
 }
 
 .typing-dots {
   display: flex;
-  gap: 8rpx;
+  gap: 10rpx;
   align-items: center;
+  padding: 4rpx 0;
 }
 
 .typing-dots .dot {
-  width: 12rpx;
-  height: 12rpx;
-  background: #b05544;
+  width: 14rpx;
+  height: 14rpx;
+  background: linear-gradient(135deg, #c93d2f 0%, #a8281c 100%);
   border-radius: 50%;
   animation: typing-bounce 1.4s ease-in-out infinite;
+  box-shadow: 0 2rpx 4rpx rgba(184, 50, 39, 0.3);
 }
 
 .typing-dots .dot:nth-child(1) {
@@ -320,10 +387,10 @@
 @keyframes typing-bounce {
   0%, 60%, 100% {
     transform: translateY(0);
-    opacity: 0.4;
+    opacity: 0.5;
   }
   30% {
-    transform: translateY(-12rpx);
+    transform: translateY(-14rpx);
     opacity: 1;
   }
 }
