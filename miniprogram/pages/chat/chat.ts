@@ -610,8 +610,8 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
   checkLoginStatus() {
     try {
-      const userProfile = wx.getStorageSync("user_profile");
-      const isLoggedIn = !!userProfile;
+      const loggedIn = wx.getStorageSync("user_logged_in");
+      const isLoggedIn = !!loggedIn;
       this.setData({ isLoggedIn });
     } catch (e) {
       this.setData({ isLoggedIn: false });
@@ -647,7 +647,11 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
   },
 
   onLoginSuccess(e: any) {
-    // 登录成功，更新状态
+    // 登录成功，保存状态到 storage（持久化）
+    wx.setStorageSync("user_logged_in", true);
+    wx.setStorageSync("user_logged_in_time", Date.now());
+
+    // 更新页面状态
     this.setData({ isLoggedIn: true });
 
     // 展开所有被截断的消息
@@ -665,10 +669,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
     this.setData({ messages: msgs });
 
-    wx.showToast({
-      title: "登录成功，已解锁完整内容",
-      icon: "success",
-    });
+    // Toast 已经在 login-modal 中显示了，这里不需要再显示
   },
 };
 

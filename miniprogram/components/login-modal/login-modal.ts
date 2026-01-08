@@ -1,8 +1,7 @@
 // components/login-modal/login-modal.ts
-interface UserInfo {
-  avatarUrl: string;
-  nickName: string;
-}
+
+// 简单的登录标记，不再使用已废弃的 getUserProfile
+const LOGIN_STORAGE_KEY = 'user_logged_in';
 
 interface Data {
   show: boolean;
@@ -44,23 +43,17 @@ const options: WechatMiniprogram.Component.Options<Data, {}, {}, Custom> = {
     },
 
     onLogin() {
-      // 使用微信 getUserProfile 获取用户信息
-      wx.getUserProfile({
-        desc: '用于完善会员资料',
-        success: (res) => {
-          const userInfo = res.userInfo;
-          // 保存用户信息
-          wx.setStorageSync('user_profile', userInfo);
+      // 标记用户已登录（用于解锁完整内容）
+      wx.setStorageSync(LOGIN_STORAGE_KEY, true);
+      wx.setStorageSync('user_logged_in_time', Date.now());
 
-          this.setData({ show: false });
-          this.triggerEvent('login', { userInfo });
-        },
-        fail: (err) => {
-          console.log('getUserProfile fail:', err);
-          if (err.errMsg.includes('auth deny')) {
-            wx.showToast({ title: '需要授权才能继续', icon: 'none' });
-          }
-        },
+      this.setData({ show: false });
+      this.triggerEvent('login', { loggedIn: true });
+
+      wx.showToast({
+        title: '登录成功',
+        icon: 'success',
+        duration: 1500,
       });
     },
   },
