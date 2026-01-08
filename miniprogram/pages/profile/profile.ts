@@ -38,6 +38,15 @@ Page<Data>({
   },
 
   onLoad() {
+    this.loadUserInfo();
+  },
+
+  onShow() {
+    // 每次显示页面时重新加载用户信息（登录后返回会触发）
+    this.loadUserInfo();
+  },
+
+  loadUserInfo() {
     const env = app?.globalData?.env || "develop";
     const stored: any = wx.getStorageSync("auth_user") || null;
 
@@ -61,6 +70,8 @@ Page<Data>({
       const base = nickname || userId || "命理八字";
       initials = base.slice(0, 2).toUpperCase();
     }
+
+    console.log('[profile] loaded user:', { nickname, userId, avatarUrl, hasAuthorized });
 
     this.setData({
       user: stored,
@@ -218,6 +229,8 @@ Page<Data>({
         try {
           wx.removeStorageSync("token");
           wx.removeStorageSync("auth_user");
+          wx.removeStorageSync("user_logged_in");
+          wx.removeStorageSync("user_logged_in_time");
           app.globalData.token = null;
         } catch (e) {}
 

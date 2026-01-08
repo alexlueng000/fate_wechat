@@ -25,8 +25,8 @@ type Custom = {
   onInput(e: WechatMiniprogram.Input): void;
   onSend(): void;
   appendUser(text: string): void;
-  appendAssistant(text: string): void;
-  replaceLastAssistant(text: string): void;
+  appendAssistant(text: string, isGreeting?: boolean): void;
+  replaceLastAssistant(text: string, isGreeting?: boolean): void;
   toBottom(): void;
   onQuickAsk(e: WechatMiniprogram.BaseEvent): void;
   onQuickStart(): void;
@@ -253,6 +253,8 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
         "毕竟你才是人生的主角，我嘛…只是个带地图的导游～（轻松摊手）\n" +
         "准备好一起逛逛你的'人生剧本杀'了吗？放心，不用怕泄露天机，我今天的'仙气'储备充足！";
 
+    
+
     const cleanGreeting = normalizeReply(greetingText);
     const msg: UIMsg = {
       role: "assistant",
@@ -295,6 +297,31 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     } else if (!this.data.conversationId) {
       const saved = (wx.getStorageSync("conversation_id") as string) || "";
       if (saved) this.setData({ conversationId: saved });
+    }
+  },
+
+  onShow() {
+    // 每次页面显示时检查登录状态（从登录页返回时会触发）
+    const wasLoggedIn = this.data.isLoggedIn;
+    this.checkLoginStatus();
+
+    // 如果刚刚登录，展开所有被截断的消息
+    if (!wasLoggedIn && this.data.isLoggedIn) {
+      const hasTruncated = this.data.messages.some(m => m.truncated);
+      if (hasTruncated) {
+        const msgs = this.data.messages.map(msg => {
+          if (msg.truncated && msg.fullContent) {
+            return {
+              ...msg,
+              content: msg.fullContent,
+              truncated: false,
+              nodes: formatMarkdownImpl(msg.fullContent),
+            };
+          }
+          return msg;
+        });
+        this.setData({ messages: msgs });
+      }
     }
   },
 
@@ -610,8 +637,20 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
   checkLoginStatus() {
     try {
-      const loggedIn = wx.getStorageSync("user_logged_in");
-      const isLoggedIn = !!loggedIn;
+      // 检查是否有 token 或 auth_user，都表示已登录
+      const token = wx.getStorageSync("token");
+      const authUser = wx.getStorageSync("auth_user");
+      const userLoggedIn = wx.getStorageSync("user_logged_in");
+      const isLoggedIn = !!(token || authUser || userLoggedIn);
+
+      // 调试日志
+      console.log('[chat] checkLoginStatus:', {
+        hasToken: !!token,
+        hasAuthUser: !!authUser,
+        hasUserLoggedIn: !!userLoggedIn,
+        isLoggedIn,
+      });
+
       this.setData({ isLoggedIn });
     } catch (e) {
       this.setData({ isLoggedIn: false });

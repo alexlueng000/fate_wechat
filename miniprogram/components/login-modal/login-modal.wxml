@@ -34,7 +34,7 @@
         hover-class="login-btn-hover"
       >
         <text class="btn-wechat-icon">💬</text>
-        <text class="btn-text">微信快速登录</text>
+        <text class="btn-text">前往登录</text>
       </button>
 
       <!-- 说明 -->

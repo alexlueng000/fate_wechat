@@ -7,7 +7,8 @@
     "pages/privacy/privacy",
     "pages/feedback/feedback",
     "pages/history/history",
-    "pages/about/about"
+    "pages/about/about",
+    "pages/login/login"
   ],
 
   "window": {
