@@ -4,27 +4,19 @@ const app = getApp<{
 }>();
 
 interface Data {
-  tempAvatarUrl: string;
-  tempNickName: string;
-  canLogin: boolean;
   fromPage: string;
 }
 
 type Custom = {
-  onChooseAvatar(e: any): void;
-  onNicknameInput(e: any): void;
   onConfirmLogin(): void;
   onAgreement(): void;
   onPrivacy(): void;
-  doBackendLogin(userInfo: any): Promise<void>;
+  doBackendLogin(code: string): Promise<void>;
   navigateBack(): void;
 };
 
 const options: WechatMiniprogram.Page.Options<Data, Custom> = {
   data: {
-    tempAvatarUrl: '',
-    tempNickName: '',
-    canLogin: false,
     fromPage: 'chat',
   },
 
@@ -33,33 +25,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     this.setData({ fromPage: from });
   },
 
-  onChooseAvatar(e) {
-    const avatarUrl = e.detail.avatarUrl;
-    this.setData({
-      tempAvatarUrl: avatarUrl,
-    });
-    this.checkCanLogin();
-  },
-
-  onNicknameInput(e) {
-    const nickName = (e.detail as any).value;
-    this.setData({
-      tempNickName: nickName,
-    });
-    this.checkCanLogin();
-  },
-
-  checkCanLogin() {
-    const canLogin = this.data.tempNickName.length > 0 && this.data.tempAvatarUrl.length > 0;
-    this.setData({ canLogin });
-  },
-
   async onConfirmLogin() {
-    if (!this.data.canLogin) {
-      wx.showToast({ title: '请完善头像和昵称', icon: 'none' });
-      return;
-    }
-
     wx.showLoading({ title: '登录中...', mask: true });
 
     try {
@@ -75,12 +41,8 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
         throw new Error('wx.login failed');
       }
 
-      // 调用后端登录接口
-      await this.doBackendLogin({
-        code: loginRes.code,
-        nickname: this.data.tempNickName,
-        avatarUrl: this.data.tempAvatarUrl,
-      });
+      // 调用后端登录接口（不传昵称和头像，后端自动生成默认值）
+      await this.doBackendLogin(loginRes.code);
 
       wx.hideLoading();
       wx.showToast({
@@ -99,7 +61,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     }
   },
 
-  async doBackendLogin(userInfo: { code: string; nickname: string; avatarUrl: string }) {
+  async doBackendLogin(code: string) {
     const BASE_URL = 'https://api.fateinsight.site';
 
     return new Promise<void>((resolve, reject) => {
@@ -107,9 +69,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
         url: BASE_URL + '/api/auth/mp/login',
         method: 'POST',
         data: {
-          js_code: userInfo.code,
-          nickname: userInfo.nickname,
-          avatar_url: userInfo.avatarUrl,
+          js_code: code,
         },
         header: {
           'Content-Type': 'application/json',

@@ -1,43 +1,96 @@
+/* pages/profile/profile.wxss */
+
+/* ==================== CSS 变量 ==================== */
+page {
+  --primary: #c93b3a;
+  --primary-light: #e45c5c;
+  --primary-dark: #a82820;
+  --bg: #f7f3ed;
+  --bg-warm: #fbf7f2;
+  --card-bg: #fffbf7;
+  --text-dark: #1a1816;
+  --text-medium: #3a332d;
+  --text-light: #8e8174;
+  --text-hint: #b8a89a;
+  --border-light: rgba(142,129,116,0.15);
+}
+
+/* ==================== 页面基础 ==================== */
 .page {
   min-height: 100vh;
-  background: #f7f3ea;
+  background: linear-gradient(180deg, #f7f3ed 0%, #f5ede1 100%);
   padding: 24rpx;
   box-sizing: border-box;
 }
 
-/* 通用卡片 */
+/* ==================== 通用卡片 ==================== */
 .card {
-  background: #ffffff;
+  background: var(--card-bg);
   border-radius: 24rpx;
-  padding: 24rpx 24rpx 12rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.04);
+  padding: 20rpx 24rpx 12rpx;
+  margin-bottom: 16rpx;
+  box-shadow:
+    0 8rpx 24rpx rgba(26, 24, 22, 0.05),
+    0 0 0 1rpx rgba(255, 255, 255, 0.5) inset;
 }
 
-/* 顶部用户卡片 */
+/* ==================== 顶部用户卡片 ==================== */
 .card-user {
   display: flex;
   align-items: center;
+  padding: 24rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 用户卡片背景装饰 */
+.card-user::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 200rpx;
+  height: 200rpx;
+  background: radial-gradient(circle, rgba(201,59,58,0.06) 0%, transparent 70%);
+  border-radius: 50%;
 }
 
 .avatar-wrap {
   width: 96rpx;
   height: 96rpx;
   border-radius: 999rpx;
-  background: #f0d7cf;
+  background: linear-gradient(135deg, rgba(201, 59, 58, 0.08) 0%, rgba(201, 59, 58, 0.04) 100%);
   justify-content: center;
   align-items: center;
   display: flex;
-  margin-right: 24rpx;
+  margin-right: 20rpx;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+/* 头像渐变边框 */
+.avatar-wrap::after {
+  content: '';
+  position: absolute;
+  inset: -3rpx;
+  border-radius: 999rpx;
+  padding: 3rpx;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.3;
 }
 
 .avatar-text {
-  font-size: 36rpx;
+  font-size: 32rpx;
   font-weight: 700;
-  color: #b83227;
+  color: var(--primary);
+  letter-spacing: 2rpx;
 }
 
-/* 真实头像图片 */
 .avatar-img {
   width: 96rpx;
   height: 96rpx;
@@ -46,56 +99,92 @@
 
 .user-info {
   flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .user-name {
   font-size: 32rpx;
   font-weight: 700;
-  color: #333333;
+  color: var(--text-dark);
   margin-bottom: 8rpx;
+  letter-spacing: 1rpx;
 }
 
-.user-sub {
+.user-meta {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 12rpx;
+}
+
+.user-id,
+.user-type {
   font-size: 22rpx;
-  color: #9a8f86;
+  color: var(--text-light);
 }
 
-/* 授权按钮 */
-.auth-btn {
-  margin-top: 16rpx;
-  padding: 12rpx 24rpx;
-  background: linear-gradient(135deg, #b83227 0%, #d3453a 100%);
-  color: #fff;
-  font-size: 24rpx;
-  border-radius: 24rpx;
-  border: none;
-  box-shadow: 0 4rpx 12rpx rgba(184, 50, 39, 0.25);
-  line-height: 1.4;
+.user-dot {
+  font-size: 20rpx;
+  color: var(--text-hint);
 }
 
-.auth-btn::after {
-  border: none;
+/* 授权提示区域 */
+.auth-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 8rpx 16rpx;
+  background: linear-gradient(135deg, rgba(201,59,58,0.06) 0%, rgba(201,59,58,0.02) 100%);
+  border: 1rpx dashed rgba(201,59,58,0.3);
+  border-radius: 999rpx;
 }
 
-/* 分组标题 */
+.auth-icon {
+  font-size: 18rpx;
+  color: var(--primary);
+}
+
+.auth-text {
+  font-size: 22rpx;
+  color: var(--primary);
+  font-weight: 500;
+  letter-spacing: 1rpx;
+}
+
+.auth-hint:active {
+  background: linear-gradient(135deg, rgba(201,59,58,0.1) 0%, rgba(201,59,58,0.05) 100%);
+}
+
+/* ==================== 分组标题 ==================== */
 .cell-title {
-  font-size: 24rpx;
-  color: #9a8f86;
-  margin-bottom: 8rpx;
+  font-size: 22rpx;
+  color: var(--text-light);
+  margin-bottom: 10rpx;
+  padding-left: 4rpx;
+  letter-spacing: 1rpx;
 }
 
-/* 设置项行 */
+/* ==================== 设置项行 ==================== */
 .cell {
-  padding: 18rpx 0;
-  border-top: 1rpx solid #f0e5dc;
+  padding: 16rpx 4rpx;
+  border-top: 1rpx solid var(--border-light);
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  transition: background 0.2s ease;
 }
 
 .cell:first-of-type {
   border-top: none;
+}
+
+.cell:active {
+  background: rgba(142, 129, 116, 0.04);
+  margin: 0 -4rpx;
+  padding: 16rpx 4rpx;
+  border-radius: 8rpx;
 }
 
 .cell-left {
@@ -103,36 +192,40 @@
 }
 
 .cell-label {
-  font-size: 28rpx;
-  color: #333333;
+  font-size: 27rpx;
+  color: var(--text-medium);
+  font-weight: 500;
 }
 
 .cell-desc {
   display: block;
   margin-top: 4rpx;
-  font-size: 22rpx;
-  color: #b0a59d;
+  font-size: 21rpx;
+  color: var(--text-light);
 }
 
 .cell-arrow {
-  font-size: 32rpx;
-  color: #c5b9af;
-  padding-left: 16rpx;
+  font-size: 28rpx;
+  color: var(--text-hint);
+  padding-left: 12rpx;
+  font-weight: 300;
 }
 
-/* 危险操作高亮 */
+/* ==================== 危险操作 ==================== */
 .cell.danger .cell-label {
-  color: #c0392b;
+  color: var(--primary);
 }
 
+/* ==================== 底部区域 ==================== */
 .footer {
-  margin-top: 40rpx;
+  margin-top: 32rpx;
   text-align: center;
-  font-size: 22rpx;
-  color: #b0a59d;
+  padding: 0 8rpx;
 }
 
 .version {
+  font-size: 21rpx;
+  color: var(--text-light);
   margin-bottom: 16rpx;
 }
 
@@ -140,14 +233,27 @@
   display: inline-flex;
   align-items: center;
   gap: 8rpx;
-  padding: 12rpx 24rpx;
-  background: #fff;
-  border-radius: 24rpx;
-  color: #b83227;
+  padding: 12rpx 28rpx;
+  background: var(--card-bg);
+  border-radius: 999rpx;
+  color: var(--primary);
   font-size: 24rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+  font-weight: 500;
+  box-shadow:
+    0 4rpx 16rpx rgba(201, 59, 58, 0.1),
+    0 0 0 1rpx rgba(255, 255, 255, 0.5) inset;
+  border: 1rpx solid var(--border-light);
+}
+
+.rate-btn:active {
+  transform: scale(0.97);
 }
 
 .rate-icon {
-  font-size: 28rpx;
+  font-size: 24rpx;
+}
+
+/* ==================== Button 样式重置 ==================== */
+button::after {
+  border: none;
 }

@@ -1,91 +1,124 @@
 <view class="page">
-
-<!-- ① 一句话结论（本地秒出） -->
-<view class="hero">
-  <view class="hero-title">你的命盘关键词</view>
-  <view class="hero-tags">
-    <text class="tag" wx:for="{{summary.keywords}}" wx:key="*this">{{item}}</text>
-  </view>
-  <view class="hero-one">{{summary.oneLiner}}</view>
-</view>
-
-<!-- ② 当前阶段（只给现在+下一步） -->
-<view class="stage">
-  <view class="stage-title">你现在的阶段</view>
-  <view class="stage-cards">
-    <view class="stage-card">
-      <view class="stage-h">当前大运</view>
-      <view class="stage-v">{{currentDayun.ganzhi}}</view>
-      <view class="stage-s">{{currentDayun.range}}</view>
-    </view>
-    <view class="stage-card" wx:if="{{nextDayun}}">
-      <view class="stage-h">下一步大运</view>
-      <view class="stage-v">{{nextDayun.ganzhi}}</view>
-      <view class="stage-s">{{nextDayun.range}}</view>
-    </view>
-  </view>
-</view>
-
-<!-- ③ CTA：明确动作 -->
-<button class="cta" bindtap="onStartChat">
-  解读我的命盘
-</button>
-<view class="cta-sub">可继续问：事业 / 财运 / 感情</view>
-
-<!-- 分享按钮 -->
-<button class="share-btn" open-type="share">
-  <text class="share-icon">📤</text>
-  <text>分享给好友</text>
-</button>
-
-<!-- ④ 专业细节折叠 -->
-<view class="detail">
-  <view class="summary" bindtap="toggleSummary">
-    <view class="sum-left">
-      <text class="sum-title">查看专业命盘结构</text>
-      <view class="sum-pillars">
-        <text class="p-tag">年</text><text class="p-val">{{pillars.year}}</text>
-        <text class="p-tag">月</text><text class="p-val">{{pillars.month}}</text>
-        <text class="p-tag">日</text><text class="p-val">{{pillars.day}}</text>
-        <text class="p-tag">时</text><text class="p-val">{{pillars.hour}}</text>
-      </view>
-    </view>
-    <text class="sum-toggle">{{summaryOpen ? '收起 ▲' : '展开 ▼'}}</text>
+  <!-- 背景装饰 -->
+  <view class="bg-decoration">
+    <view class="bg-circle bg-circle-1"></view>
+    <view class="bg-circle bg-circle-2"></view>
+    <view class="bg-gradient"></view>
   </view>
 
-  <view wx:if="{{summaryOpen}}" class="card">
-    <!-- 四柱表：你原来的 table 代码直接放进来 -->
-    <view class="table">
-      <view class="thead">
-        <view class="th first">四柱</view>
-        <view class="th">年柱</view>
-        <view class="th">月柱</view>
-        <view class="th">日柱</view>
-        <view class="th">时柱</view>
+  <!-- 命盘头部卡片 -->
+  <view class="card hero-card">
+    <!-- 八字印章 -->
+    <view class="bazi-seal">
+      <view class="seal-inner">
+        <text class="seal-text">{{pillars.day}}</text>
       </view>
-      <view class="trow">
-        <view class="td first">天干</view>
-        <view class="td" wx:for="{{table.tiangan}}" wx:key="index">{{item}}</view>
-      </view>
-      <view class="trow">
-        <view class="td first">地支</view>
-        <view class="td" wx:for="{{table.dizhi}}" wx:key="index">{{item}}</view>
-      </view>
+      <view class="seal-label">日主</view>
     </view>
 
-    <!-- 大运（全量） -->
-    <view class="section">
-      <view class="sec-title">大运（全量）</view>
-      <view class="luck-grid">
-        <block wx:for="{{dayun}}" wx:key="index">
-          <view class="luck-card4">
-            <text class="luck-ganzhi">{{item.ganzhi}}</text>
-            <text class="luck-age">{{item.range}}</text>
+    <!-- 关键词标签 -->
+    <view class="hero-tags">
+      <text class="hero-tag" wx:for="{{summary.keywords}}" wx:key="*this">{{item}}</text>
+    </view>
+
+    <!-- 一句话解读 -->
+    <view class="hero-desc">{{summary.oneLiner}}</view>
+  </view>
+
+  <!-- 当前大运卡片 -->
+  <view class="card stage-card">
+    <view class="section-header">
+      <text class="section-icon">🌊</text>
+      <text class="section-title">运程阶段</text>
+    </view>
+
+    <view class="dayun-row">
+      <view class="dayun-item current">
+        <view class="dayun-label">当前</view>
+        <view class="dayun-ganzhi">{{currentDayun.ganzhi}}</view>
+        <view class="dayun-range">{{currentDayun.range}}</view>
+      </view>
+      <view class="dayun-item" wx:if="{{nextDayun}}">
+        <view class="dayun-label">下一步</view>
+        <view class="dayun-ganzhi">{{nextDayun.ganzhi}}</view>
+        <view class="dayun-range">{{nextDayun.range}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- CTA 按钮 -->
+  <button class="cta-primary" bindtap="onStartChat">
+    <view class="cta-content">
+      <text class="cta-text">深度解读命盘</text>
+      <text class="cta-icon">→</text>
+    </view>
+  </button>
+  <view class="cta-hint">可询问：事业 · 财运 · 感情 · 健康</view>
+
+  <!-- 分享按钮 -->
+  <button class="share-btn" open-type="share">
+    <text class="share-icon">✥</text>
+    <text>分享命盘</text>
+  </button>
+
+  <!-- 专业详情折叠区 -->
+  <view class="detail-section">
+    <view class="detail-toggle" bindtap="toggleSummary">
+      <view class="detail-left">
+        <text class="detail-title">专业命盘结构</text>
+        <view class="detail-pillars">
+          <view class="pillar-mini">
+            <text class="pillar-label">年</text>
+            <text class="pillar-value">{{pillars.year}}</text>
           </view>
-        </block>
+          <view class="pillar-mini">
+            <text class="pillar-label">月</text>
+            <text class="pillar-value">{{pillars.month}}</text>
+          </view>
+          <view class="pillar-mini">
+            <text class="pillar-label">日</text>
+            <text class="pillar-value">{{pillars.day}}</text>
+          </view>
+          <view class="pillar-mini">
+            <text class="pillar-label">时</text>
+            <text class="pillar-value">{{pillars.hour}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="detail-arrow {{summaryOpen ? 'open' : ''}}">▼</view>
+    </view>
+
+    <view class="detail-card {{summaryOpen ? 'open' : ''}}">
+      <!-- 四柱表格 -->
+      <view class="pillar-table">
+        <view class="table-head">
+          <view class="th first">四柱</view>
+          <view class="th">年柱</view>
+          <view class="th">月柱</view>
+          <view class="th">日柱</view>
+          <view class="th">时柱</view>
+        </view>
+        <view class="table-row">
+          <view class="td first">天干</view>
+          <view class="td" wx:for="{{table.tiangan}}" wx:key="index">{{item}}</view>
+        </view>
+        <view class="table-row">
+          <view class="td first">地支</view>
+          <view class="td" wx:for="{{table.dizhi}}" wx:key="index">{{item}}</view>
+        </view>
+      </view>
+
+      <!-- 大运列表 -->
+      <view class="dayun-section">
+        <view class="dayun-section-title">完整大运</view>
+        <view class="dayun-grid">
+          <view class="dayun-grid-item" wx:for="{{dayun}}" wx:key="index">
+            <text class="grid-ganzhi">{{item.ganzhi}}</text>
+            <text class="grid-range">{{item.range}}</text>
+          </view>
+        </view>
       </view>
     </view>
   </view>
-</view>
 
 </view>

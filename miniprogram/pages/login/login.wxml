@@ -1,77 +1,39 @@
 <view class="page">
-
   <!-- 背景装饰 -->
   <view class="bg-decoration">
     <view class="bg-circle bg-circle-1"></view>
     <view class="bg-circle bg-circle-2"></view>
     <view class="bg-circle bg-circle-3"></view>
+    <view class="bg-gradient"></view>
   </view>
 
   <!-- 内容区 -->
   <view class="content">
 
-    <!-- Logo/图标 -->
-    <view class="logo-section">
-      <view class="logo-circle">
-        <text class="logo-text">易</text>
+    <!-- Logo/印章区域 -->
+    <view class="logo-seal">
+      <view class="seal-inner">
+        <text class="seal-text">一盏</text>
       </view>
-      <view class="app-name">一盏</view>
-      <view class="app-desc">探索命理，洞察人生</view>
+      <view class="logo-title">一盏大师</view>
+      <view class="logo-subtitle">知命 · 达命 · 造命</view>
     </view>
 
     <!-- 登录提示 -->
     <view class="login-hint">
-      <view class="hint-icon">🔐</view>
-      <view class="hint-text">登录后解锁完整AI解读内容</view>
+      <text class="hint-icon">🔐</text>
+      <text class="hint-text">登录解锁完整AI解读功能</text>
     </view>
 
-    <!-- 用户信息表单 -->
-    <view class="user-form">
-
-      <!-- 头像选择 -->
-      <view class="form-item">
-        <view class="form-label">选择头像</view>
-        <button
-          class="avatar-btn"
-          open-type="chooseAvatar"
-          bindchooseavatar="onChooseAvatar"
-        >
-          <image
-            class="avatar-preview"
-            src="{{tempAvatarUrl}}"
-            mode="aspectFill"
-          ></image>
-          <view class="avatar-mask" wx:if="{{!tempAvatarUrl}}">
-            <text class="avatar-plus">+</text>
-          </view>
-        </button>
+    <!-- 微信登录按钮 -->
+    <button class="login-btn" bindtap="onConfirmLogin">
+      <view class="btn-content">
+        <text class="btn-icon">✦</text>
+        <text class="btn-text">微信一键登录</text>
       </view>
-
-      <!-- 昵称输入 -->
-      <view class="form-item">
-        <view class="form-label">设置昵称</view>
-        <input
-          class="nickname-input"
-          type="nickname"
-          placeholder="请输入昵称"
-          value="{{tempNickName}}"
-          bindinput="onNicknameInput"
-        />
-      </view>
-
-    </view>
-
-    <!-- 登录按钮 -->
-    <button
-      class="login-btn {{canLogin ? '' : 'login-btn-disabled'}}"
-      bindtap="onConfirmLogin"
-      disabled="{{!canLogin}}"
-    >
-      <text class="btn-icon">💬</text>
-      <text class="btn-text">{{canLogin ? '确认登录' : '请完善信息'}}</text>
     </button>
 
-    <!-- 用户协议提示 -->
+    <!-- 用户协议 -->
     <view class="agreement-tip">
       <text class="tip-text">登录即表示同意</text>
       <text class="link-text" bindtap="onAgreement">《用户协议》</text>
@@ -80,5 +42,4 @@
     </view>
 
   </view>
-
 </view>

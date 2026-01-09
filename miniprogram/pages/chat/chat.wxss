@@ -1,45 +1,58 @@
+/* pages/chat/chat.wxss */
+
+/* ==================== CSS 变量 ==================== */
+page {
+  --primary: #c93b3a;
+  --primary-light: #e45c5c;
+  --primary-dark: #a82820;
+  --bg: #f7f3ed;
+  --bg-warm: #fbf7f2;
+  --card-bg: #fffbf7;
+  --text-dark: #1a1816;
+  --text-medium: #3a332d;
+  --text-light: #8e8174;
+  --text-hint: #b8a89a;
+  --border-light: rgba(142,129,116,0.15);
+}
+
+/* ==================== 页面基础 ==================== */
 .page {
-  background: linear-gradient(180deg, #f5efe6 0%, #ede6d8 100%);
   min-height: 100vh;
+  background: linear-gradient(180deg, #f7f3ed 0%, #f5ede1 100%);
   padding: 16rpx;
   box-sizing: border-box;
 }
 
-/* ========== 聊天区容器 ========== */
+/* ==================== 聊天区容器 ==================== */
 .chat {
-  /* 预留空间给上面的标题 / 快捷区 / 输入栏 */
-  height: calc(100vh - 420rpx);
+  height: calc(100vh - 380rpx);
   background: linear-gradient(180deg, #fffbf7 0%, #fff9f4 100%);
   border-radius: 24rpx;
   box-shadow:
-    0 4rpx 20rpx rgba(184, 50, 39, 0.08),
-    0 0 0 1rpx rgba(184, 50, 39, 0.04);
-  padding: 20rpx 16rpx;
+    0 4rpx 20rpx rgba(184, 50, 39, 0.06),
+    0 0 0 1rpx rgba(184, 50, 39, 0.03);
+  padding: 16rpx 12rpx;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
 }
 
-/* 滚动区（如果你外面有 scroll-view，就挂在 scroll-view 上） */
+/* 滚动区 */
 .chat-inner {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
-  /* 消息之间间距 */
+  gap: 12rpx;
 }
 
-/* 单条消息行：左/右对齐气泡 */
+/* 单条消息行 */
 .msg {
   display: flex;
   margin-bottom: 8rpx;
-  animation: msg-fade-in 0.3s ease-out;
+  animation: msgFadeIn 0.3s ease-out;
 }
 
-@keyframes msg-fade-in {
+@keyframes msgFadeIn {
   from {
     opacity: 0;
-    transform: translateY(16rpx);
+    transform: translateY(12rpx);
   }
   to {
     opacity: 1;
@@ -49,60 +62,59 @@
 
 .msg.left {
   justify-content: flex-start;
-  padding-left: 8rpx;
+  padding-left: 4rpx;
 }
 
 .msg.right {
   justify-content: flex-end;
-  padding-right: 8rpx;
+  padding-right: 4rpx;
 }
 
-/* ========== 气泡本体 ========== */
+/* ==================== 气泡本体 ==================== */
 .bubble {
-  max-width: 82%;
-  padding: 20rpx 24rpx;
-  border-radius: 24rpx;
+  max-width: 90%;
+  padding: 16rpx 20rpx;
+  border-radius: 20rpx;
   white-space: pre-wrap;
-  line-height: 1.7;
+  line-height: 1.6;
   box-sizing: border-box;
   position: relative;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 }
 
-/* 用户 / 助手不同背景 */
+/* 助手气泡 */
 .msg.left .bubble {
   background: linear-gradient(135deg, #fff 0%, #fff9f5 100%);
   color: #2c2c2c;
-  border: 1rpx solid rgba(200, 170, 150, 0.2);
-  border-bottom-left-radius: 8rpx;
+  border: 1rpx solid rgba(200, 170, 150, 0.15);
+  border-left: 4rpx solid var(--primary);
+  border-bottom-left-radius: 6rpx;
 }
 
+/* 用户气泡 */
 .msg.right .bubble {
-  background: linear-gradient(135deg, #c93d2f 0%, #a8281c 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: #fff;
-  border-bottom-right-radius: 8rpx;
+  border-bottom-right-radius: 6rpx;
   box-shadow:
-    0 6rpx 20rpx rgba(184, 50, 39, 0.3),
-    inset 0 1rpx 0 rgba(255, 255, 255, 0.2);
+    0 4rpx 12rpx rgba(201, 59, 58, 0.2),
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.15);
 }
 
-/* ========== Markdown 富文本区 ========== */
-/* 假设 rich-text 用的是 <rich-text class="md" ...> */
+/* ==================== Markdown 富文本 ==================== */
 .bubble .md {
   display: block;
 }
 
-/* 段落 & 标题：收紧间距，防止气泡纵向撑太高 */
+/* 标题与段落 */
 .bubble .md p,
 .bubble .md h1,
 .bubble .md h2,
 .bubble .md h3 {
-  margin: 10rpx 0;
-  /* 统一小段间距 */
+  margin: 6rpx 0;
   padding: 0;
 }
 
-/* 第一行一定要贴顶，避免"第一句话不顶格"的视觉错觉 */
 .bubble .md p:first-child,
 .bubble .md h1:first-child,
 .bubble .md h2:first-child,
@@ -110,7 +122,6 @@
   margin-top: 0 !important;
 }
 
-/* 最后一行不要额外 margin-bottom，气泡底边收紧一点 */
 .bubble .md p:last-child,
 .bubble .md h1:last-child,
 .bubble .md h2:last-child,
@@ -118,26 +129,26 @@
   margin-bottom: 0 !important;
 }
 
-/* 标题字号比正文稍大，但不要夸张，避免撑高气泡 */
+/* 标题样式 */
 .bubble .md h1 {
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 700;
   color: #3D2E1D;
-  margin-bottom: 10rpx;
+  margin: 12rpx 0 8rpx 0;
   padding-bottom: 8rpx;
-  border-bottom: 1rpx solid rgba(196, 165, 116, 0.2);
+  border-bottom: 2rpx solid rgba(201, 61, 47, 0.15);
 }
 
 .msg.right .bubble .md h1 {
   color: #fff;
-  border-bottom: 1rpx solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2rpx solid rgba(255, 255, 255, 0.2);
 }
 
 .bubble .md h2 {
-  font-size: 26rpx;
+  font-size: 24rpx;
   font-weight: 600;
   color: #3D2E1D;
-  margin-bottom: 8rpx;
+  margin: 10rpx 0 6rpx 0;
 }
 
 .msg.right .bubble .md h2 {
@@ -145,10 +156,10 @@
 }
 
 .bubble .md h3 {
-  font-size: 25rpx;
+  font-size: 23rpx;
   font-weight: 600;
-  color: #5C4D3C;
-  margin-bottom: 6rpx;
+  color: #3D2E1D;
+  margin: 8rpx 0 4rpx 0;
 }
 
 .msg.right .bubble .md h3 {
@@ -157,40 +168,41 @@
 
 /* 段落正文 */
 .bubble .md p {
-  font-size: 27rpx;
+  font-size: 24rpx;
   color: #3a3a3a;
-  line-height: 1.75;
+  line-height: 1.6;
 }
 
 .msg.right .bubble .md p {
   color: rgba(255, 255, 255, 0.95);
 }
 
-/* 列表样式（formatMarkdown 已经转成 ul/li 的话） */
+/* 列表样式 */
 .bubble .md ul {
   padding-left: 0;
-  margin: 12rpx 0;
+  margin: 10rpx 0;
   list-style: none;
 }
 
 .bubble .md li {
-  margin: 8rpx 0;
-  line-height: 1.7;
+  margin: 6rpx 0;
+  line-height: 1.6;
   color: #3a3a3a;
-  padding-left: 32rpx;
+  padding-left: 16rpx;
+  text-indent: -8rpx;
   position: relative;
-  font-size: 27rpx;
+  font-size: 24rpx;
 }
 
 .bubble .md li::before {
   content: '';
   position: absolute;
-  left: 8rpx;
-  top: 11rpx;
-  width: 8rpx;
-  height: 8rpx;
+  left: 0rpx;
+  top: 8rpx;
+  width: 6rpx;
+  height: 6rpx;
   border-radius: 50%;
-  background: #C4A574;
+  background: var(--primary);
 }
 
 .msg.right .bubble .md li {
@@ -198,10 +210,10 @@
 }
 
 .msg.right .bubble .md li::before {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.5);
 }
 
-/* 粗体：不调大行高，避免单行撑高 */
+/* 粗体 */
 .bubble .md strong {
   font-weight: 600;
 }
@@ -213,7 +225,7 @@
 
 /* 【xxx】强调样式 */
 .bubble .md .highlight {
-  color: #c93d2f;
+  color: var(--primary);
   font-weight: 600;
 }
 
@@ -221,82 +233,46 @@
   color: #ffdbd8;
 }
 
-/* ========== 快捷分析卡片区 ========== */
+/* ==================== 快捷分析卡 ==================== */
 .card {
   background: linear-gradient(135deg, #fff 0%, #fffbf7 100%);
-  border-radius: 28rpx;
+  border-radius: 24rpx;
   box-shadow:
-    0 8rpx 24rpx rgba(0, 0, 0, 0.06),
-    0 0 0 1rpx rgba(200, 170, 150, 0.1);
-  padding: 28rpx 24rpx;
-  margin-top: 20rpx;
+    0 6rpx 20rpx rgba(26, 24, 22, 0.04),
+    0 0 0 1rpx rgba(200, 170, 150, 0.08);
+  padding: 20rpx 20rpx;
+  margin-top: 14rpx;
 }
 
 .quick-card {
   border: none;
+  padding: 18rpx 20rpx;
 }
 
 .quick-title {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: #2c2c2c;
-  margin-bottom: 18rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--text-medium);
+  margin-bottom: 12rpx;
   padding-left: 4rpx;
 }
 
 .quick-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12rpx;
-}
-
-/* ========== 操作按钮栏 ========== */
-.action-bar {
-  display: flex;
-  gap: 14rpx;
-  margin-top: 20rpx;
-}
-
-.action-btn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6rpx;
-  padding: 18rpx 12rpx;
-  background: linear-gradient(135deg, #fff 0%, #fffbf7 100%);
-  border-radius: 20rpx;
-  box-shadow:
-    0 4rpx 16rpx rgba(0, 0, 0, 0.06),
-    0 0 0 1rpx rgba(200, 170, 150, 0.1);
-  font-size: 22rpx;
-  color: #4a4a4a;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.action-icon {
-  font-size: 28rpx;
-}
-
-.action-btn:active {
-  transform: scale(0.97);
-  box-shadow:
-    0 2rpx 8rpx rgba(0, 0, 0, 0.06),
-    0 0 0 1rpx rgba(200, 170, 150, 0.1);
+  gap: 10rpx;
 }
 
 .quick-chip {
   background: linear-gradient(135deg, #fff 0%, #fff9f2 100%);
-  border: 2rpx solid rgba(200, 170, 150, 0.25);
-  color: #a83220;
-  border-radius: 24rpx;
-  padding: 20rpx 0;
+  border: 1rpx solid rgba(200, 170, 150, 0.2);
+  color: var(--primary);
+  border-radius: 20rpx;
+  padding: 14rpx 0;
   text-align: center;
-  font-size: 26rpx;
+  font-size: 24rpx;
   font-weight: 500;
-  box-shadow: 0 2rpx 8rpx rgba(168, 50, 32, 0.08);
+  box-shadow: 0 2rpx 6rpx rgba(168, 50, 32, 0.06);
   transition: all 0.2s ease;
 }
 
@@ -305,11 +281,48 @@
   background: linear-gradient(135deg, #fff9f2 0%, #fff4e8 100%);
 }
 
-/* ========== 输入区 + 发送按钮 ========== */
-.inputBar {
-  margin-top: 20rpx;
+/* ==================== 操作按钮栏 ==================== */
+.action-bar {
   display: flex;
-  gap: 14rpx;
+  gap: 10rpx;
+  margin-top: 14rpx;
+}
+
+.action-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4rpx;
+  padding: 14rpx 8rpx;
+  background: linear-gradient(135deg, #fff 0%, #fffbf7 100%);
+  border-radius: 18rpx;
+  box-shadow:
+    0 3rpx 12rpx rgba(26, 24, 22, 0.04),
+    0 0 0 1rpx rgba(200, 170, 150, 0.08);
+  font-size: 20rpx;
+  color: var(--text-medium);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.action-icon {
+  font-size: 24rpx;
+}
+
+.action-btn:active {
+  transform: scale(0.96);
+  box-shadow:
+    0 1rpx 6rpx rgba(26, 24, 22, 0.04),
+    0 0 0 1rpx rgba(200, 170, 150, 0.08);
+}
+
+/* ==================== 输入区 ==================== */
+.inputBar {
+  margin-top: 14rpx;
+  display: flex;
+  gap: 10rpx;
   align-items: center;
 }
 
@@ -317,39 +330,32 @@
   flex: 1;
   background: #fff;
   border-radius: 999rpx;
-  padding: 22rpx 28rpx;
-  font-size: 28rpx;
-  border: 2rpx solid rgba(200, 170, 150, 0.2);
+  padding: 18rpx 22rpx;
+  font-size: 26rpx;
+  border: 1rpx solid var(--border-light);
   box-shadow:
-    0 2rpx 8rpx rgba(0, 0, 0, 0.04),
-    inset 0 2rpx 4rpx rgba(0, 0, 0, 0.01);
+    0 2rpx 6rpx rgba(0, 0, 0, 0.03),
+    inset 0 1rpx 2rpx rgba(0, 0, 0, 0.01);
   color: #3a3a3a;
 }
 
 .ipt:focus {
-  border-color: rgba(184, 50, 39, 0.3);
-}
-
-/* placeholder 也左对齐、不要缩进 */
-.ipt-input::-webkit-input-placeholder {
-  text-align: left;
-  text-indent: 0;
-  color: #aaa;
+  border-color: rgba(184, 50, 39, 0.2);
 }
 
 .sendBtn {
   flex: 0 0 auto;
-  padding: 0 44rpx;
-  height: 80rpx;
-  line-height: 80rpx;
-  background: linear-gradient(135deg, #c93d2f 0%, #a8281c 100%);
+  padding: 0 36rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: #fff;
   border-radius: 999rpx;
   font-weight: 700;
-  font-size: 30rpx;
+  font-size: 26rpx;
   box-shadow:
-    0 8rpx 24rpx rgba(184, 50, 39, 0.35),
-    inset 0 1rpx 0 rgba(255, 255, 255, 0.2);
+    0 6rpx 16rpx rgba(201, 59, 58, 0.25),
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.15);
   border: none;
   transition: all 0.2s ease;
 }
@@ -357,42 +363,41 @@
 .sendBtn:active {
   transform: scale(0.95);
   box-shadow:
-    0 4rpx 12rpx rgba(184, 50, 39, 0.35),
-    inset 0 1rpx 0 rgba(255, 255, 255, 0.2);
+    0 3rpx 10rpx rgba(201, 59, 58, 0.25),
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.15);
 }
 
 .sendBtn[disabled] {
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
-/* ========== 免责声明 ========== */
+/* ==================== 免责声明 ==================== */
 .tip {
-  margin-top: 16rpx;
+  margin-top: 12rpx;
   text-align: center;
-  font-size: 22rpx;
-  color: #a89888;
+  font-size: 20rpx;
+  color: var(--text-light);
 }
 
-/* ========== Typing Indicator ========== */
+/* ==================== Typing Indicator ==================== */
 .typing-bubble {
-  padding: 20rpx 24rpx;
-  min-width: 90rpx;
+  padding: 16rpx 20rpx;
+  min-width: 70rpx;
 }
 
 .typing-dots {
   display: flex;
-  gap: 10rpx;
+  gap: 8rpx;
   align-items: center;
   padding: 4rpx 0;
 }
 
 .typing-dots .dot {
-  width: 14rpx;
-  height: 14rpx;
-  background: linear-gradient(135deg, #c93d2f 0%, #a8281c 100%);
+  width: 12rpx;
+  height: 12rpx;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   border-radius: 50%;
-  animation: typing-bounce 1.4s ease-in-out infinite;
-  box-shadow: 0 2rpx 4rpx rgba(184, 50, 39, 0.3);
+  animation: typingBounce 1.2s ease-in-out infinite;
 }
 
 .typing-dots .dot:nth-child(1) {
@@ -400,83 +405,53 @@
 }
 
 .typing-dots .dot:nth-child(2) {
-  animation-delay: 0.2s;
+  animation-delay: 0.15s;
 }
 
 .typing-dots .dot:nth-child(3) {
-  animation-delay: 0.4s;
+  animation-delay: 0.3s;
 }
 
-@keyframes typing-bounce {
+@keyframes typingBounce {
   0%, 60%, 100% {
     transform: translateY(0);
-    opacity: 0.5;
+    opacity: 0.4;
   }
   30% {
-    transform: translateY(-14rpx);
+    transform: translateY(-10rpx);
     opacity: 1;
   }
 }
 
-/* ========== 解锁提示 ========== */
+/* ==================== 解锁提示 ==================== */
 .unlock-prompt {
-  margin-top: 12rpx;
-  padding: 16rpx 20rpx;
-  background: linear-gradient(135deg, rgba(196, 165, 116, 0.15) 0%, rgba(196, 165, 116, 0.08) 100%);
-  border-radius: 16rpx;
+  margin-top: 10rpx;
+  padding: 12rpx 16rpx;
+  background: linear-gradient(135deg, rgba(196, 165, 116, 0.12) 0%, rgba(196, 165, 116, 0.06) 100%);
+  border-radius: 14rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8rpx;
-  border: 1rpx dashed rgba(196, 165, 116, 0.4);
-  animation: pulseGlow 2s ease-in-out infinite;
-}
-
-@keyframes pulseGlow {
-  0%, 100% {
-    background: linear-gradient(135deg, rgba(196, 165, 116, 0.15) 0%, rgba(196, 165, 116, 0.08) 100%);
-  }
-  50% {
-    background: linear-gradient(135deg, rgba(196, 165, 116, 0.22) 0%, rgba(196, 165, 116, 0.12) 100%);
-  }
+  gap: 6rpx;
+  border: 1rpx dashed rgba(196, 165, 116, 0.3);
 }
 
 .unlock-icon {
-  font-size: 28rpx;
-  animation: unlockBounce 1.5s ease-in-out infinite;
-}
-
-@keyframes unlockBounce {
-  0%, 100% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(-10deg);
-  }
-  75% {
-    transform: rotate(10deg);
-  }
+  font-size: 22rpx;
 }
 
 .unlock-text {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #A67C52;
   font-weight: 500;
 }
 
 .unlock-arrow {
-  font-size: 24rpx;
+  font-size: 20rpx;
   color: #A67C52;
-  animation: arrowSlide 1s ease-in-out infinite;
 }
 
-@keyframes arrowSlide {
-  0%, 100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(6rpx);
-    opacity: 0.6;
-  }
+/* ==================== Button 样式重置 ==================== */
+button::after {
+  border: none;
 }

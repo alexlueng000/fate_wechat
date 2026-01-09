@@ -22,6 +22,7 @@ interface Data {
   version: string;
   avatarUrl: string;      // 用户头像 URL
   hasAuthorized: boolean;  // 是否已授权
+  isLoggedIn: boolean;     // 是否已登录
 }
 
 Page<Data>({
@@ -35,6 +36,7 @@ Page<Data>({
     version: "1.0.0",
     avatarUrl: "",
     hasAuthorized: false,
+    isLoggedIn: false,
   },
 
   onLoad() {
@@ -49,6 +51,7 @@ Page<Data>({
   loadUserInfo() {
     const env = app?.globalData?.env || "develop";
     const stored: any = wx.getStorageSync("auth_user") || null;
+    const token = wx.getStorageSync("token") || null;
 
     let nickname = "";
     let userId = "";
@@ -56,6 +59,7 @@ Page<Data>({
     let initials = "FI";
     let avatarUrl = "";
     let hasAuthorized = false;
+    let isLoggedIn = !!token;  // 有 token 即为已登录
 
     if (stored) {
       nickname = stored.nickname || stored.name || "";
@@ -71,7 +75,7 @@ Page<Data>({
       initials = base.slice(0, 2).toUpperCase();
     }
 
-    console.log('[profile] loaded user:', { nickname, userId, avatarUrl, hasAuthorized });
+    console.log('[profile] loaded user:', { nickname, userId, avatarUrl, hasAuthorized, isLoggedIn });
 
     this.setData({
       user: stored,
@@ -82,6 +86,7 @@ Page<Data>({
       initials,
       avatarUrl,
       hasAuthorized,
+      isLoggedIn,
     });
   },
 
@@ -173,46 +178,10 @@ Page<Data>({
     wx.navigateTo({ url: "/pages/privacy/privacy?tab=disclaimer" });
   },
 
-  /** 微信授权：获取用户昵称和头像 */
+  /** 登录/授权：跳转到登录页 */
   onAuthorize() {
-    const that = this;
-    wx.getUserProfile({
-      desc: "用于完善会员资料，提供更好的服务",
-      success: (res) => {
-        console.log("getUserProfile success", res);
-        const userInfo = res.userInfo;
-
-        // 更新本地存储的用户信息
-        let stored: any = wx.getStorageSync("auth_user") || {};
-        stored = {
-          ...stored,
-          nickname: userInfo.nickName,
-          avatarUrl: userInfo.avatarUrl,
-          nickName: userInfo.nickName,
-          avatar_url: userInfo.avatarUrl,
-        };
-        wx.setStorageSync("auth_user", stored);
-
-        // 更新页面数据
-        const base = userInfo.nickName || that.data.userId || "命理八字";
-        that.setData({
-          nickname: userInfo.nickName,
-          avatarUrl: userInfo.avatarUrl,
-          hasAuthorized: true,
-          initials: base.slice(0, 2).toUpperCase(),
-          user: stored,
-        });
-
-        wx.showToast({ title: "授权成功", icon: "success" });
-      },
-      fail: (err) => {
-        console.error("getUserProfile failed", err);
-        if (err.errMsg && err.errMsg.indexOf("cancel") >= 0) {
-          // 用户取消授权
-          return;
-        }
-        wx.showToast({ title: "授权失败", icon: "none" });
-      },
+    wx.navigateTo({
+      url: '/pages/login/login?from=profile'
     });
   },
 
@@ -241,6 +210,7 @@ Page<Data>({
           userId: "",
           avatarUrl: "",
           hasAuthorized: false,
+          isLoggedIn: false,
           initials: "FI",
           accountType: "小程序账号",
         });

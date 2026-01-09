@@ -13,24 +13,18 @@
     </view>
 
     <view class="user-info">
-      <view class="user-name">
-        {{nickname || '未命名用户'}}
-      </view>
-      <view class="user-sub">
-        ID：{{userId || '未登录'}}
-      </view>
-      <view class="user-sub">
-        {{accountType}}
+      <view class="user-name">{{isLoggedIn ? (nickname || '未命名用户') : '未登录'}}</view>
+      <view class="user-meta" wx:if="{{isLoggedIn}}">
+        <text class="user-id">ID：{{userId || '未登录'}}</text>
+        <text class="user-dot">·</text>
+        <text class="user-type">{{accountType}}</text>
       </view>
 
-      <!-- 未授权时显示授权按钮 -->
-      <button
-        wx:if="{{!hasAuthorized}}"
-        class="auth-btn"
-        bindtap="onAuthorize"
-      >
-        授权获取微信头像和昵称
-      </button>
+      <!-- 未登录时显示登录提示 -->
+      <view wx:if="{{!isLoggedIn}}" class="auth-hint" bindtap="onAuthorize">
+        <text class="auth-icon">✦</text>
+        <text class="auth-text">登录解锁更多功能</text>
+      </view>
     </view>
   </view>
 
@@ -122,7 +116,7 @@
   </view>
 
   <!-- 退出登录 -->
-  <view class="card">
+  <view class="card" wx:if="{{isLoggedIn}}">
     <view class="cell danger" bindtap="onLogout">
       <view class="cell-left">
         <text class="cell-label">退出登录</text>

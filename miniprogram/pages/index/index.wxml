@@ -1,74 +1,121 @@
 <view class="page">
+  <!-- 背景装饰 -->
+  <view class="bg-decoration">
+    <view class="bg-circle bg-circle-1"></view>
+    <view class="bg-circle bg-circle-2"></view>
+    <view class="bg-circle bg-circle-3"></view>
+    <view class="bg-gradient"></view>
+  </view>
+
   <view class="top-spacer"></view>
 
   <view class="card">
-    <!-- 标题区 -->
-    <view class="title">3 分钟生成你的八字人生结构图</view>
-    <view class="subtitle">基于传统命理模型 × AI 结构化分析</view>
-
-    <!-- 用途说明 -->
-    <view class="intro">
-      输入出生信息，用于生成你的个人命盘结构  
-      数据仅用于本次分析，不会保存或对外展示
+    <!-- Logo/印章区域 -->
+    <view class="logo-seal">
+      <view class="seal-inner">
+        <text class="seal-text">一盏</text>
+      </view>
+      <view class="logo-title">一盏大师</view>
+      <view class="logo-subtitle">知命 · 达命 · 造命</view>
     </view>
 
-    <!-- 性别 -->
-    <view class="field-row">
-      <view class="field-label">性别</view>
-      <view class="btn-group">
-        <button class="btn {{gender==='男'?'primary':''}}" size="mini" bindtap="setMale">男</button>
-        <button class="btn {{gender==='女'?'primary alt':''}}" size="mini" bindtap="setFemale">女</button>
+    <!-- 分隔线 -->
+    <view class="divider"></view>
+
+    <!-- 性别选择 -->
+    <view class="field-group">
+      <view class="field-header">
+        <text class="field-icon">♂</text>
+        <text class="field-label">您的性别</text>
+      </view>
+      <view class="toggle-group">
+        <view class="toggle-item {{gender==='男'?'active':''}}" bindtap="setMale">
+          <text class="toggle-text">男</text>
+        </view>
+        <view class="toggle-item {{gender==='女'?'active':''}}" bindtap="setFemale">
+          <text class="toggle-text">女</text>
+        </view>
       </view>
     </view>
 
-    <!-- 历法 -->
-    <view class="field-row">
-      <view class="field-label">历法</view>
-      <view class="btn-group">
-        <button class="btn {{calendar==='公历'?'primary':''}}" size="mini" bindtap="setSolar">公历</button>
-        <button class="btn {{calendar==='农历'?'primary alt':''}}" size="mini" bindtap="setLunar">农历</button>
+    <!-- 历法选择 -->
+    <view class="field-group">
+      <view class="field-header">
+        <text class="field-icon">📅</text>
+        <text class="field-label">历法类型</text>
+      </view>
+      <view class="toggle-group">
+        <view class="toggle-item {{calendar==='公历'?'active':''}}" bindtap="setSolar">
+          <text class="toggle-text">公历</text>
+        </view>
+        <view class="toggle-item {{calendar==='农历'?'active':''}}" bindtap="setLunar">
+          <text class="toggle-text">农历</text>
+        </view>
       </view>
     </view>
 
     <!-- 出生日期 -->
-    <view class="input-wrap">
-      <text class="label">出生日期</text>
+    <view class="field-group">
+      <view class="field-header">
+        <text class="field-icon">🎂</text>
+        <text class="field-label">出生日期</text>
+      </view>
       <picker mode="date" value="{{birth_date}}" start="1900-01-01" end="2099-12-31" bindchange="onPickDate">
-        <view class="input picker-input">{{birth_date}}</view>
+        <view class="picker-box">
+          <text class="picker-value">{{birth_date}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
       </picker>
-      <image class="input-icon" src="/images/icon-calendar.png"></image>
     </view>
 
     <!-- 出生时间 -->
-    <view class="input-wrap">
-      <text class="label">出生时间</text>
+    <view class="field-group">
+      <view class="field-header">
+        <text class="field-icon">⏰</text>
+        <text class="field-label">出生时间</text>
+      </view>
       <picker mode="time" value="{{birth_time}}" bindchange="onPickTime">
-        <view class="input picker-input">{{birth_time}}</view>
+        <view class="picker-box">
+          <text class="picker-value">{{birth_time}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
       </picker>
-      <image class="input-icon" src="/images/icon-clock.png"></image>
     </view>
 
     <!-- 出生地点 -->
-    <view class="input-wrap input-wrap-last">
-      <text class="label">出生地点</text>
-      <input
-        class="input"
-        placeholder="例如：深圳"
-        placeholder-style="color: rgba(43,38,33,0.45);"
-        value="{{birthplace}}"
-        bindinput="onInputPlace"
-      />
-      <image class="input-icon" src="/images/icon-location.png"></image>
+    <view class="field-group field-group-last">
+      <view class="field-header">
+        <text class="field-icon">📍</text>
+        <text class="field-label">出生地点</text>
+      </view>
+      <view class="input-box">
+        <input
+          class="text-input"
+          placeholder="请输入出生城市"
+          placeholder-style="color: #b8a89a;"
+          value="{{birthplace}}"
+          bindinput="onInputPlace"
+        />
+      </view>
     </view>
 
-    <!-- CTA -->
+    <!-- 隐私说明 -->
+    <view class="privacy-note">
+      <text class="note-icon">🔒</text>
+      <text class="note-text">您的信息仅用于本次分析，不会保存或对外展示</text>
+    </view>
+
+    <!-- CTA 按钮 -->
     <button
-      class="cta"
+      class="cta-btn {{submitting?'loading':''}}"
       loading="{{submitting}}"
       disabled="{{submitting}}"
       bindtap="onStart"
     >
-      查看我的命盘
+      <view class="cta-content">
+        <text class="cta-text">{{submitting?'生成中...':'查看我的命盘'}}</text>
+        <text class="cta-icon" wx:if="{{!submitting}}">✦</text>
+      </view>
     </button>
 
   </view>
