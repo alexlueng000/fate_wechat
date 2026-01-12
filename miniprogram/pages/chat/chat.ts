@@ -19,6 +19,10 @@ interface Data {
   toView: string;
   conversationId: string;
   isLoggedIn: boolean;
+  // 引导卡片和自动启动相关状态
+  showGuideCard: boolean;
+  hasPaipan: boolean;
+  autoStarted: boolean;
 }
 
 type Custom = {
@@ -40,6 +44,10 @@ type Custom = {
   onUnlockMessage(e: WechatMiniprogram.BaseEvent): void;
   onLoginSuccess(e: any): void;
   checkLoginStatus(): void;
+  // 新增方法
+  checkAndAutoStart(): void;
+  onGoToPaipan(): void;
+  onShowHistory(): void;
 };
 
 const QUICK_MAP: Record<string, string> = {
@@ -241,6 +249,10 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     toView: "end",
     conversationId: "",
     isLoggedIn: false,
+    // 引导卡片和自动启动相关状态
+    showGuideCard: false,
+    hasPaipan: false,
+    autoStarted: false,
   },
 
   onLoad(options) {
@@ -296,6 +308,9 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       const saved = (wx.getStorageSync("conversation_id") as string) || "";
       if (saved) this.setData({ conversationId: saved });
     }
+
+    // 检查命盘数据并自动启动或显示引导卡片
+    this.checkAndAutoStart();
   },
 
   onShow() {
@@ -705,6 +720,78 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     this.setData({ messages: msgs });
 
     // Toast 已经在 login-modal 中显示了，这里不需要再显示
+  },
+
+  // ========== 引导卡片和自动启动 ==========
+
+  /**
+   * 检查命盘数据，有则自动开始解读，无则显示引导卡片
+   */
+  checkAndAutoStart() {
+    // 如果已经尝试过自动启动，跳过
+    if (this.data.autoStarted) {
+      return;
+    }
+
+    const cached: any = wx.getStorageSync("last_paipan");
+
+    if (!cached || !cached.mingpan) {
+      // 无命盘数据 - 显示引导卡片
+      this.setData({
+        hasPaipan: false,
+        showGuideCard: true,
+        autoStarted: true
+      });
+      return;
+    }
+
+    // 有命盘数据 - 自动开始解读
+    const form: any = wx.getStorageSync("last_form") || {};
+    const gender = form.gender || "男";
+    const paipan = { ...cached.mingpan, gender };
+
+    this.setData({
+      hasPaipan: true,
+      showGuideCard: false,
+      autoStarted: true,
+      loading: true
+    });
+
+    request<StartResp>(
+      "/chat/start?stream=0&_ts=" + Date.now(),
+      "POST",
+      { paipan, kb_index_dir: "", kb_topk: 3 },
+      { Accept: "application/json" }
+    )
+      .then((resp) => {
+        wx.setStorageSync("conversation_id", resp.conversation_id);
+        this.setData({ conversationId: resp.conversation_id as any });
+
+        const reply = normalizeReply(resp.reply || "（无响应）");
+        this.appendAssistant(reply);
+      })
+      .catch((err: any) => {
+        console.error("Auto-start failed", err);
+        // 自动启动失败，显示提示
+        this.appendAssistant("解读启动失败，请点击「命盘分析」重试");
+      })
+      .finally(() => {
+        this.setData({ loading: false }, () => this.toBottom());
+      });
+  },
+
+  /**
+   * 跳转到排盘页
+   */
+  onGoToPaipan() {
+    wx.switchTab({ url: "/pages/index/index" });
+  },
+
+  /**
+   * 查看历史命盘
+   */
+  onShowHistory() {
+    wx.navigateTo({ url: "/pages/history/history" });
   },
 };
 

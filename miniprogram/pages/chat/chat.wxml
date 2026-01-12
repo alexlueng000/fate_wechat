@@ -42,16 +42,35 @@
     </view>
 </scroll-view>
 
+<!-- 引导卡片 - 无命盘时显示 -->
+<view class="guide-card" wx:if="{{showGuideCard && !hasPaipan}}">
+  <view class="guide-icon">🎯</view>
+  <view class="guide-title">开始您的命理解读之旅</view>
+  <view class="guide-desc">
+    还没有生成命盘，需要先完成排盘才能开始AI解读
+  </view>
+  <view class="guide-actions">
+    <view class="guide-btn primary" bindtap="onGoToPaipan">
+      前往排盘
+    </view>
+    <view class="guide-btn secondary" bindtap="onShowHistory">
+      使用历史命盘
+    </view>
+  </view>
+</view>
+
 <!-- 操作按钮 -->
 <view class="action-bar">
   <view class="action-btn" bindtap="onGoToResult">
     <text class="action-icon">📊</text>
     <text>我的命盘</text>
   </view>
+  <!-- 隐藏命盘解读按钮
   <view class="action-btn" bindtap="onShowBaziDialog">
     <text class="action-icon">☯️</text>
     <text>命盘解读</text>
   </view>
+  -->
   <view class="action-btn" bindtap="onClear">
     <text class="action-icon">🗑️</text>
     <text>清空对话</text>
