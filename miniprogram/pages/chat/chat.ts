@@ -2,8 +2,12 @@
 import type { ChatMessage } from "../../../typings/types/message";
 import { request } from "../../utils/request";
 import { ChatWebSocket } from "../../utils/websocket";
+import { WS_BASE } from "../../utils/config";
 
 type StartResp = { conversation_id: string; reply: string };
+
+// 模块级标志：防止自动启动重复执行（不受 setData 异步影响）
+let _hasAutoStarted = false;
 
 // 每条消息：在原有 ChatMessage 上加一个 nodes 字段给 rich-text 用
 interface UIMsg extends ChatMessage {
@@ -343,11 +347,6 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     }
   },
 
-  onReady() {
-    // 页面渲染完成后，检查是否需要自动启动
-    this.checkAndAutoStart();
-  },
-
   onInput(e) {
     const val = (e.detail as any).value as string;
     this.setData({ input: val });
@@ -443,7 +442,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
     // 使用 WebSocket 流式响应
     const ws = new ChatWebSocket(
-      'wss://api.fateinsight.site/api/chat/ws/chat',
+      `${WS_BASE}/chat`,
       (data) => {
         // 处理 meta 事件
         if (data.meta?.conversation_id) {
@@ -454,9 +453,13 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
         // 处理 text 事件（增量更新）
         if (data.text) {
-          const newText = this.data.streamingText + data.text;
-          this.setData({ streamingText: newText });
-          this.replaceLastAssistant(newText);
+          // 后端 send replace: true 表示发送的是累积文本，直接替换；否则累加
+          const displayText = (data as any).replace === true
+            ? data.text
+            : this.data.streamingText + data.text;
+
+          this.setData({ streamingText: displayText });
+          this.replaceLastAssistant(displayText);
           this.toBottom();
         }
       },
@@ -503,13 +506,17 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
     // 使用 WebSocket 流式响应
     const ws = new ChatWebSocket(
-      'wss://api.fateinsight.site/api/chat/ws/chat',
+      `${WS_BASE}/chat`,
       (data) => {
         // 处理 text 事件（增量更新）
         if (data.text) {
-          const newText = this.data.streamingText + data.text;
-          this.setData({ streamingText: newText });
-          this.replaceLastAssistant(newText);
+          // 后端 send replace: true 表示发送的是累积文本，直接替换；否则累加
+          const displayText = (data as any).replace === true
+            ? data.text
+            : this.data.streamingText + data.text;
+
+          this.setData({ streamingText: displayText });
+          this.replaceLastAssistant(displayText);
           this.toBottom();
         }
       },
@@ -548,6 +555,12 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
         this.setData({ conversationId: "" });
         try {
           wx.removeStorageSync("conversation_id");
+        } catch (e) {}
+
+        // 重置自动启动标志，允许下次进入时自动启动
+        _hasAutoStarted = false;
+        try {
+          wx.removeStorageSync("last_start_date");
         } catch (e) {}
 
         // 重新显示开场白
@@ -626,7 +639,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
     // 使用 WebSocket 流式响应
     const ws = new ChatWebSocket(
-      'wss://api.fateinsight.site/api/chat/ws/chat',
+      `${WS_BASE}/chat`,
       (data) => {
         // 处理 meta 事件
         if (data.meta?.conversation_id) {
@@ -637,9 +650,13 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
         // 处理 text 事件（增量更新）
         if (data.text) {
-          const newText = this.data.streamingText + data.text;
-          this.setData({ streamingText: newText });
-          this.replaceLastAssistant(newText);
+          // 后端 send replace: true 表示发送的是累积文本，直接替换；否则累加
+          const displayText = (data as any).replace === true
+            ? data.text
+            : this.data.streamingText + data.text;
+
+          this.setData({ streamingText: displayText });
+          this.replaceLastAssistant(displayText);
           this.toBottom();
         }
       },
@@ -785,10 +802,13 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
    * 检查命盘数据，有则自动开始解读，无则显示引导卡片
    */
   checkAndAutoStart() {
-    // 如果已经尝试过自动启动，跳过
-    if (this.data.autoStarted) {
+    // 使用模块级变量检查（同步，立即生效）
+    if (_hasAutoStarted) {
       return;
     }
+
+    // 立即设置标志（防止竞态）
+    _hasAutoStarted = true;
 
     const cached: any = wx.getStorageSync("last_paipan");
 
@@ -817,7 +837,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
     // 使用 WebSocket 流式响应
     const ws = new ChatWebSocket(
-      'wss://api.fateinsight.site/api/chat/ws/chat',
+      `${WS_BASE}/chat`,
       (data) => {
         // 处理 meta 事件
         if (data.meta?.conversation_id) {
@@ -828,9 +848,13 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
         // 处理 text 事件（增量更新）
         if (data.text) {
-          const newText = this.data.streamingText + data.text;
-          this.setData({ streamingText: newText });
-          this.replaceLastAssistant(newText);
+          // 后端 send replace: true 表示发送的是累积文本，直接替换；否则累加
+          const displayText = (data as any).replace === true
+            ? data.text
+            : this.data.streamingText + data.text;
+
+          this.setData({ streamingText: displayText });
+          this.replaceLastAssistant(displayText);
           this.toBottom();
         }
       },
