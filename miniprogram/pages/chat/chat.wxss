@@ -41,16 +41,6 @@ page {
 .guide-icon {
   font-size: 48rpx;
   margin-bottom: 12rpx;
-  animation: bounce 2s ease-in-out infinite;
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8rpx);
-  }
 }
 
 .guide-title {
@@ -80,7 +70,7 @@ page {
   text-align: center;
   font-size: 26rpx;
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .guide-btn.primary {
@@ -93,20 +83,17 @@ page {
 
 .guide-btn.primary:active {
   transform: scale(0.96);
-  box-shadow:
-    0 2rpx 8rpx rgba(201, 59, 58, 0.25),
-    inset 0 1rpx 0 rgba(255, 255, 255, 0.15);
 }
 
 .guide-btn.secondary {
-  background: linear-gradient(135deg, #fff 0%, #fff9f2 100%);
+  background: #fff;
   color: var(--primary);
   border: 1rpx solid rgba(200, 170, 150, 0.3);
 }
 
 .guide-btn.secondary:active {
   transform: scale(0.96);
-  background: linear-gradient(135deg, #fff9f2 0%, #fff4e8 100%);
+  background: #fff9f2;
 }
 
 /* ==================== 聊天区容器 ==================== */

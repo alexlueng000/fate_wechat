@@ -1,6 +1,7 @@
 // pages/chat/chat.ts
 import type { ChatMessage } from "../../../typings/types/message";
 import { request } from "../../utils/request";
+import { ChatWebSocket } from "../../utils/websocket";
 
 type StartResp = { conversation_id: string; reply: string };
 
@@ -23,6 +24,8 @@ interface Data {
   showGuideCard: boolean;
   hasPaipan: boolean;
   autoStarted: boolean;
+  // 流式响应相关
+  streamingText: string;
 }
 
 type Custom = {
@@ -253,6 +256,8 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     showGuideCard: false,
     hasPaipan: false,
     autoStarted: false,
+    // 流式响应相关
+    streamingText: "",
   },
 
   onLoad(options) {
@@ -336,6 +341,11 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
         this.setData({ messages: msgs });
       }
     }
+  },
+
+  onReady() {
+    // 页面渲染完成后，检查是否需要自动启动
+    this.checkAndAutoStart();
   },
 
   onInput(e) {
@@ -427,29 +437,47 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     const gender = form.gender || "男";
     const paipan = { ...cached.mingpan, gender };
 
-    this.setData({ loading: true });
+    this.setData({ loading: true, streamingText: "" });
     this.appendUser("命盘分析");
+    this.appendAssistant("思考中…");
 
-    request<StartResp>(
-      "/chat/start?stream=0&_ts=" + Date.now(),
-      "POST",
-      { paipan, kb_index_dir: "", kb_topk: 3 },
-      { Accept: "application/json" }
-    )
-      .then((resp) => {
-        wx.setStorageSync("conversation_id", resp.conversation_id);
-        this.setData({ conversationId: resp.conversation_id as any });
+    // 使用 WebSocket 流式响应
+    const ws = new ChatWebSocket(
+      'wss://api.fateinsight.site/api/chat/ws/chat',
+      (data) => {
+        // 处理 meta 事件
+        if (data.meta?.conversation_id) {
+          wx.setStorageSync("conversation_id", data.meta.conversation_id);
+          this.setData({ conversationId: data.meta.conversation_id as any });
+          return;
+        }
 
-        const reply = normalizeReply(resp.reply || "（无响应）");
-        this.appendAssistant(reply);
-      })
-      .catch((err: any) => {
-        this.appendAssistant("生成失败，请稍后再试");
-        console.error("start failed", err);
-      })
-      .finally(() => {
-        this.setData({ loading: false }, () => this.toBottom());
-      });
+        // 处理 text 事件（增量更新）
+        if (data.text) {
+          const newText = this.data.streamingText + data.text;
+          this.setData({ streamingText: newText });
+          this.replaceLastAssistant(newText);
+          this.toBottom();
+        }
+      },
+      () => {
+        // 流式完成
+        this.setData({ loading: false, streamingText: "" });
+        this.toBottom();
+      },
+      (err: any) => {
+        console.error("Quick start failed", err);
+        this.replaceLastAssistant("生成失败，请稍后再试");
+        this.setData({ loading: false, streamingText: "" });
+      }
+    );
+
+    ws.connect({
+      action: "start",
+      paipan: paipan,
+      kb_index_dir: "",
+      kb_topk: 3,
+    });
   },
 
   onQuickAsk(e: WechatMiniprogram.BaseEvent) {
@@ -470,25 +498,38 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
   },
 
   async autoSendPrompt(actual: string) {
-    this.setData({ loading: true });
+    this.setData({ loading: true, streamingText: "" });
     this.appendAssistant("思考中…");
 
-    try {
-      const resp = await request<{ reply: string }>(
-        "/chat?stream=0&_ts=" + Date.now(),
-        "POST",
-        { conversation_id: this.data.conversationId, message: actual },
-        { Accept: "application/json" }
-      );
-      const reply = normalizeReply((resp?.reply || "").replace(/\r\n/g, "\n"));
-      this.replaceLastAssistant(reply);
-      console.log("raw reply:", JSON.stringify(reply));
-      this.setData({ toView: "end" });
-    } catch (err) {
-      this.replaceLastAssistant("网络似乎有点慢，稍后再试～");
-    } finally {
-      this.setData({ loading: false });
-    }
+    // 使用 WebSocket 流式响应
+    const ws = new ChatWebSocket(
+      'wss://api.fateinsight.site/api/chat/ws/chat',
+      (data) => {
+        // 处理 text 事件（增量更新）
+        if (data.text) {
+          const newText = this.data.streamingText + data.text;
+          this.setData({ streamingText: newText });
+          this.replaceLastAssistant(newText);
+          this.toBottom();
+        }
+      },
+      () => {
+        // 流式完成
+        this.setData({ loading: false, streamingText: "" });
+        this.toBottom();
+      },
+      (err) => {
+        console.error("[WebSocket] error:", err);
+        this.replaceLastAssistant("网络似乎有点慢，稍后再试～");
+        this.setData({ loading: false, streamingText: "" });
+      }
+    );
+
+    ws.connect({
+      action: "send",
+      conversation_id: this.data.conversationId,
+      message: actual,
+    });
   },
 
   onClear() {
@@ -579,30 +620,46 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       return;
     }
 
-    this.setData({ input: "", loading: true });
+    this.setData({ input: "", loading: true, streamingText: "" });
     this.appendUser(text);
     this.appendAssistant("思考中…");
 
-    // 使用 request 工具，自动带上 token
-    request<{ reply: string }>(
-      "/chat?stream=0&_ts=" + Date.now(),
-      "POST",
-      { conversation_id: cid, message: text },
-      { Accept: "application/json" }
-    )
-      .then((res) => {
-        const reply = normalizeReply((res?.reply || "").replace(/\r\n/g, "\n"));
-        this.replaceLastAssistant(reply);
-        console.log("raw reply:", JSON.stringify(reply));
-        this.setData({ toView: "end" });
-      })
-      .catch((err) => {
-        console.error("[chat] request failed", err);
-        this.replaceLastAssistant("网络似乎有点慢，稍后再试～");
-      })
-      .finally(() => {
-        this.setData({ loading: false }, () => this.toBottom());
-      });
+    // 使用 WebSocket 流式响应
+    const ws = new ChatWebSocket(
+      'wss://api.fateinsight.site/api/chat/ws/chat',
+      (data) => {
+        // 处理 meta 事件
+        if (data.meta?.conversation_id) {
+          wx.setStorageSync("conversation_id", data.meta.conversation_id);
+          this.setData({ conversationId: data.meta.conversation_id as any });
+          return;
+        }
+
+        // 处理 text 事件（增量更新）
+        if (data.text) {
+          const newText = this.data.streamingText + data.text;
+          this.setData({ streamingText: newText });
+          this.replaceLastAssistant(newText);
+          this.toBottom();
+        }
+      },
+      () => {
+        // 流式完成
+        this.setData({ loading: false, streamingText: "" });
+        this.toBottom();
+      },
+      (err) => {
+        console.error("[WebSocket] error:", err);
+        this.replaceLastAssistant("网络似乎有点慢，请重试～");
+        this.setData({ loading: false, streamingText: "" });
+      }
+    );
+
+    ws.connect({
+      action: "send",
+      conversation_id: cid,
+      message: text,
+    });
   },
 
   onShowBaziDialog() {
@@ -736,7 +793,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     const cached: any = wx.getStorageSync("last_paipan");
 
     if (!cached || !cached.mingpan) {
-      // 无命盘数据 - 显示引导卡片
+      // 无命盘数据 - 显示引导卡片（不发起请求）
       this.setData({
         hasPaipan: false,
         showGuideCard: true,
@@ -754,30 +811,52 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       hasPaipan: true,
       showGuideCard: false,
       autoStarted: true,
-      loading: true
+      loading: true,
+      streamingText: ""
     });
 
-    request<StartResp>(
-      "/chat/start?stream=0&_ts=" + Date.now(),
-      "POST",
-      { paipan, kb_index_dir: "", kb_topk: 3 },
-      { Accept: "application/json" }
-    )
-      .then((resp) => {
-        wx.setStorageSync("conversation_id", resp.conversation_id);
-        this.setData({ conversationId: resp.conversation_id as any });
+    // 使用 WebSocket 流式响应
+    const ws = new ChatWebSocket(
+      'wss://api.fateinsight.site/api/chat/ws/chat',
+      (data) => {
+        // 处理 meta 事件
+        if (data.meta?.conversation_id) {
+          wx.setStorageSync("conversation_id", data.meta.conversation_id);
+          this.setData({ conversationId: data.meta.conversation_id as any });
+          return;
+        }
 
-        const reply = normalizeReply(resp.reply || "（无响应）");
-        this.appendAssistant(reply);
-      })
-      .catch((err: any) => {
+        // 处理 text 事件（增量更新）
+        if (data.text) {
+          const newText = this.data.streamingText + data.text;
+          this.setData({ streamingText: newText });
+          this.replaceLastAssistant(newText);
+          this.toBottom();
+        }
+      },
+      () => {
+        // 流式完成
+        this.setData({ loading: false, streamingText: "" });
+        this.toBottom();
+      },
+      (err: any) => {
         console.error("Auto-start failed", err);
-        // 自动启动失败，显示提示
-        this.appendAssistant("解读启动失败，请点击「命盘分析」重试");
-      })
-      .finally(() => {
-        this.setData({ loading: false }, () => this.toBottom());
-      });
+        // 失败后显示引导卡片，让用户手动重试
+        this.setData({
+          showGuideCard: true,
+          hasPaipan: true,
+          loading: false,
+          streamingText: ""
+        });
+      }
+    );
+
+    ws.connect({
+      action: "start",
+      paipan: paipan,
+      kb_index_dir: "",
+      kb_topk: 3,
+    });
   },
 
   /**
