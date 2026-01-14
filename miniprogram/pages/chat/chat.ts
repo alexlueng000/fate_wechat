@@ -102,16 +102,18 @@ function normalizeReply(text: string): string {
 // ===== 内联加粗：**xxx** 和 【xxx】 =====
 function parseInline(str: string): any[] {
   const children: any[] = [];
-  // 匹配 **bold** 或 【bracketed】
+  // 匹配 **bold**、【bracketed】、〖warning〗、《info》
   const boldRe = /\*\*(.+?)\*\*/g;
   const bracketRe = /【(.+?)】/g;
+  const warningRe = /〖(.+?)〗/g;
+  const infoRe = /《(.+?)》/g;
 
   // 先处理【】
   let lastIndex = 0;
   let m: RegExpExecArray | null;
 
   // 收集所有标记位置
-  const markers: { index: number; end: number; type: "bold" | "bracket"; content: string }[] = [];
+  const markers: { index: number; end: number; type: "bold" | "bracket" | "warning" | "info"; content: string }[] = [];
 
   while ((m = boldRe.exec(str)) !== null) {
     markers.push({ index: m.index, end: m.index + m[0].length, type: "bold", content: m[1] });
@@ -122,6 +124,16 @@ function parseInline(str: string): any[] {
     markers.push({ index: m.index, end: m.index + m[0].length, type: "bracket", content: m[1] });
   }
   bracketRe.lastIndex = 0;
+
+  while ((m = warningRe.exec(str)) !== null) {
+    markers.push({ index: m.index, end: m.index + m[0].length, type: "warning", content: m[1] });
+  }
+  warningRe.lastIndex = 0;
+
+  while ((m = infoRe.exec(str)) !== null) {
+    markers.push({ index: m.index, end: m.index + m[0].length, type: "info", content: m[1] });
+  }
+  infoRe.lastIndex = 0;
 
   // 按位置排序
   markers.sort((a, b) => a.index - b.index);
@@ -142,11 +154,25 @@ function parseInline(str: string): any[] {
         name: "strong",
         children: [{ type: "text", text: mark.content }],
       });
-    } else {
-      // 【xxx】用强调样式
+    } else if (mark.type === "bracket") {
+      // 【xxx】红色强调
       children.push({
         name: "span",
         attrs: { class: "highlight" },
+        children: [{ type: "text", text: mark.content }],
+      });
+    } else if (mark.type === "warning") {
+      // 〖xxx〗橙色强调
+      children.push({
+        name: "span",
+        attrs: { class: "highlight-warning" },
+        children: [{ type: "text", text: mark.content }],
+      });
+    } else if (mark.type === "info") {
+      // 《xxx》蓝色强调
+      children.push({
+        name: "span",
+        attrs: { class: "highlight-info" },
         children: [{ type: "text", text: mark.content }],
       });
     }
@@ -265,6 +291,9 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
   },
 
   onLoad(options) {
+    // 重置自动启动标志（允许页面重新加载时重新检查）
+    _hasAutoStarted = false;
+
     // 检查登录状态
     this.checkLoginStatus();
     // 开场白 - 不截断
@@ -272,7 +301,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       "你好呀～我不是来剧透人生的，只是帮你找找藏在命盘里的小彩蛋。" +
       "你才是主角，我只是个带地图的导游。准备好了吗？一起逛逛你的'人生剧本'～";
 
-    
+
 
     const cleanGreeting = normalizeReply(greetingText);
     const msg: UIMsg = {
@@ -583,6 +612,23 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     wx.navigateTo({ url: "/pages/result/index" });
   },
 
+  onShowFormatGuide() {
+    wx.showModal({
+      title: "Markdown格式说明",
+      content:
+        "AI回复支持以下格式:\n\n" +
+        "【重要】- 红色强调\n" +
+        "〖注意〗- 橙色强调\n" +
+        "《参考》- 蓝色强调\n\n" +
+        "## 主标题\n" +
+        "### 次标题\n" +
+        "#### 三级标题\n\n" +
+        "**粗体** *斜体*",
+      showCancel: false,
+      confirmText: "知道了"
+    });
+  },
+
   onStartFromChat() {
     if (this.data.loading) return;
 
@@ -722,17 +768,13 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
   checkLoginStatus() {
     try {
-      // 检查是否有 token 或 auth_user，都表示已登录
+      // 统一只检查 token，与 profile.ts 保持一致
       const token = wx.getStorageSync("token");
-      const authUser = wx.getStorageSync("auth_user");
-      const userLoggedIn = wx.getStorageSync("user_logged_in");
-      const isLoggedIn = !!(token || authUser || userLoggedIn);
+      const isLoggedIn = !!token;
 
       // 调试日志
       console.log('[chat] checkLoginStatus:', {
         hasToken: !!token,
-        hasAuthUser: !!authUser,
-        hasUserLoggedIn: !!userLoggedIn,
         isLoggedIn,
       });
 
@@ -811,6 +853,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     _hasAutoStarted = true;
 
     const cached: any = wx.getStorageSync("last_paipan");
+    const form: any = wx.getStorageSync("last_form") || {};
 
     if (!cached || !cached.mingpan) {
       // 无命盘数据 - 显示引导卡片（不发起请求）
@@ -822,8 +865,25 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       return;
     }
 
+    // 检查出生地是否为用户提供
+    if (!form.birthplace_provided) {
+      // 有命盘但无出生地 - 显示引导卡片并提示
+      this.setData({
+        hasPaipan: true,
+        showGuideCard: true,
+        autoStarted: true
+      });
+
+      // 添加友好提示消息
+      const promptText =
+        "检测到您还没有输入出生地点哦～\n\n" +
+        "出生地点对于准确的命理分析很重要，因为它影响真太阳时的计算。\n\n" +
+        "建议您返回排盘页面补充出生地信息，以获得更精准的解读。";
+      this.appendAssistant(promptText, true);
+      return;
+    }
+
     // 有命盘数据 - 自动开始解读
-    const form: any = wx.getStorageSync("last_form") || {};
     const gender = form.gender || "男";
     const paipan = { ...cached.mingpan, gender };
 

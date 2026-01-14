@@ -44,17 +44,17 @@
 
 <!-- 引导卡片 - 无命盘或自动启动失败时显示 -->
 <view class="guide-card" wx:if="{{showGuideCard}}">
-  <view class="guide-icon">🎯</view>
-  <view class="guide-title">{{hasPaipan ? '重新开始解读' : '开始您的命理解读之旅'}}</view>
+  <view class="guide-icon">{{hasPaipan ? '📍' : '🎯'}}</view>
+  <view class="guide-title">{{hasPaipan ? '需要补充出生地信息' : '开始您的命理解读之旅'}}</view>
   <view class="guide-desc">
-    {{hasPaipan ? '点击下方按钮重新获取AI解读' : '还没有生成命盘，需要先完成排盘才能开始AI解读'}}
+    {{hasPaipan ? '出生地点对命理分析很重要，建议返回排盘页面补充出生地信息以获得更准确的解读' : '还没有生成命盘，需要先完成排盘才能开始AI解读'}}
   </view>
   <view class="guide-actions">
     <view class="guide-btn primary" bindtap="onGoToPaipan" wx:if="{{!hasPaipan}}">
       前往排盘
     </view>
-    <view class="guide-btn primary" bindtap="onQuickStart" wx:if="{{hasPaipan}}">
-      重新开始
+    <view class="guide-btn primary" bindtap="onGoToPaipan" wx:if="{{hasPaipan}}">
+      补充出生地
     </view>
     <view class="guide-btn secondary" bindtap="onShowHistory">
       使用历史命盘
@@ -77,6 +77,10 @@
   <view class="action-btn" bindtap="onClear">
     <text class="action-icon">🗑️</text>
     <text>清空对话</text>
+  </view>
+  <view class="action-btn" bindtap="onShowFormatGuide">
+    <text class="action-icon">📝</text>
+    <text>格式说明</text>
   </view>
 </view>
 

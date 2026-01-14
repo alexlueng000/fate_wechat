@@ -119,7 +119,8 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
   navigateBack() {
     if (this.data.fromPage === 'chat') {
-      wx.switchTab({ url: '/pages/chat/chat' });
+      // 使用 reLaunch 确保页面完全重新加载，触发 onLoad 和 onShow
+      wx.reLaunch({ url: '/pages/chat/chat' });
     } else {
       wx.navigateBack();
     }

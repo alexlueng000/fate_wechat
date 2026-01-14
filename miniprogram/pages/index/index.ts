@@ -75,12 +75,16 @@ Page<Record<string, any>, PageData>({
 
     this.setData({ submitting: true });
     try {
+      // 检查用户是否输入了出生地
+      const birthplaceProvided = !!this.data.birthplace.trim();
+
       const payload = {
         gender: this.data.gender,                                   // "男" / "女"
         calendar: this.data.calendar === "公历" ? "gregorian" : "lunar",
         birth_date: this.data.birth_date,                           // "YYYY-MM-DD"
         birth_time: this.data.birth_time,                           // "HH:mm"
         birthplace: (this.data.birthplace || "深圳").trim(),
+        birthplace_provided: birthplaceProvided,                    // 标志：用户是否输入了出生地
       };
 
       // 清除之前的对话记录（新命盘需要重新解读）

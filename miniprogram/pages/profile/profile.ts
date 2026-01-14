@@ -15,7 +15,7 @@ interface User {
 interface Data {
   user: User | null;
   nickname: string;
-  userId: string;
+  username: string;
   env: string;
   accountType: string;
   initials: string;
@@ -29,7 +29,7 @@ Page<Data>({
   data: {
     user: null,
     nickname: "",
-    userId: "",
+    username: "",
     env: "develop",
     accountType: "小程序账号",
     initials: "FI",
@@ -54,7 +54,7 @@ Page<Data>({
     const token = wx.getStorageSync("token") || null;
 
     let nickname = "";
-    let userId = "";
+    let username = "";
     let accountType = "小程序账号";
     let initials = "FI";
     let avatarUrl = "";
@@ -63,7 +63,7 @@ Page<Data>({
 
     if (stored) {
       nickname = stored.nickname || stored.name || "";
-      userId = String(stored.id || "");
+      username = stored.username || "";
       avatarUrl = stored.avatarUrl || stored.avatar_url || "";
       hasAuthorized = !!(stored.nickName || nickname && avatarUrl);
       if (stored.mobile || stored.phone) {
@@ -71,16 +71,16 @@ Page<Data>({
       } else {
         accountType = "小程序账号";
       }
-      const base = nickname || userId || "命理八字";
+      const base = nickname || username || "命理八字";
       initials = base.slice(0, 2).toUpperCase();
     }
 
-    console.log('[profile] loaded user:', { nickname, userId, avatarUrl, hasAuthorized, isLoggedIn });
+    console.log('[profile] loaded user:', { nickname, username, avatarUrl, hasAuthorized, isLoggedIn });
 
     this.setData({
       user: stored,
       nickname,
-      userId,
+      username,
       env,
       accountType,
       initials,
@@ -200,6 +200,7 @@ Page<Data>({
           wx.removeStorageSync("auth_user");
           wx.removeStorageSync("user_logged_in");
           wx.removeStorageSync("user_logged_in_time");
+          wx.removeStorageSync("mp_openid");  // 清除 auth.ts 中的本地 openid
           app.globalData.token = null;
         } catch (e) {}
 
@@ -207,7 +208,7 @@ Page<Data>({
         this.setData({
           user: null,
           nickname: "",
-          userId: "",
+          username: "",
           avatarUrl: "",
           hasAuthorized: false,
           isLoggedIn: false,
