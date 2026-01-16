@@ -55,6 +55,11 @@ type Custom = {
   checkAndAutoStart(): void;
   onGoToPaipan(): void;
   onShowHistory(): void;
+  checkDefaultChart(): void;
+  startWithDefaultChart(chartData: any): void;
+  showNoChartTip(): void;
+  startWithPaipan(mingpan: any, gender: string): void;
+  sendWithMingpan(message: string, mingpan: any): void;
 };
 
 const QUICK_MAP: Record<string, string> = {
@@ -674,7 +679,11 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     const cid =
       this.data.conversationId ||
       ((wx.getStorageSync("conversation_id") as string) || "");
-    if (!cid) {
+
+    // 检查是否有默认命盘需要传递（首次对话时）
+    const currentMingpan: any = wx.getStorageSync("current_mingpan");
+
+    if (!cid && !currentMingpan) {
       wx.showToast({ title: "请先在排盘页点击「开始对话」", icon: "none" });
       return;
     }
@@ -682,6 +691,12 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     this.setData({ input: "", loading: true, streamingText: "" });
     this.appendUser(text);
     this.appendAssistant("思考中…");
+
+    // 如果没有会话ID但有默认命盘，使用 HTTP 请求（带 mingpan 参数）
+    if (!cid && currentMingpan) {
+      this.sendWithMingpan(text, currentMingpan);
+      return;
+    }
 
     // 使用 WebSocket 流式响应
     const ws = new ChatWebSocket(
@@ -723,6 +738,41 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       conversation_id: cid,
       message: text,
     });
+  },
+
+  /**
+   * 使用默认命盘发送首条消息（HTTP 请求，带 mingpan 参数）
+   */
+  sendWithMingpan(message: string, mingpan: any) {
+    request<any>(
+      "/chat?stream=0&_ts=" + Date.now(),
+      "POST",
+      {
+        conversation_id: "",
+        message,
+        mingpan
+      },
+      { Accept: "application/json" }
+    )
+      .then((resp) => {
+        if (resp.conversation_id) {
+          wx.setStorageSync("conversation_id", resp.conversation_id);
+          this.setData({ conversationId: resp.conversation_id });
+          // 清除 current_mingpan，后续对话不再需要
+          wx.removeStorageSync("current_mingpan");
+        }
+
+        const reply = normalizeReply(resp.reply || "（无响应）");
+        this.replaceLastAssistant(reply);
+      })
+      .catch((err: any) => {
+        console.error("sendWithMingpan failed:", err);
+        this.replaceLastAssistant("网络似乎有点慢，请重试～");
+      })
+      .finally(() => {
+        this.setData({ loading: false });
+        this.toBottom();
+      });
   },
 
   onShowBaziDialog() {
@@ -841,7 +891,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
   // ========== 引导卡片和自动启动 ==========
 
   /**
-   * 检查命盘数据，有则自动开始解读，无则显示引导卡片
+   * 检查命盘数据，有则自动开始解读，无则检查默认命盘或显示引导卡片
    */
   checkAndAutoStart() {
     // 使用模块级变量检查（同步，立即生效）
@@ -854,9 +904,41 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
     const cached: any = wx.getStorageSync("last_paipan");
     const form: any = wx.getStorageSync("last_form") || {};
+    const token = wx.getStorageSync("token");
 
-    if (!cached || !cached.mingpan) {
-      // 无命盘数据 - 显示引导卡片（不发起请求）
+    console.log("[chat] checkAndAutoStart:", {
+      hasLastPaipan: !!(cached && cached.mingpan),
+      hasToken: !!token,
+    });
+
+    // 有刚排的盘，直接使用
+    if (cached && cached.mingpan) {
+      // 检查出生地是否为用户提供
+      if (!form.birthplace_provided) {
+        // 有命盘但无出生地 - 显示引导卡片并提示
+        this.setData({
+          hasPaipan: true,
+          showGuideCard: true,
+          autoStarted: true
+        });
+
+        // 添加友好提示消息
+        const promptText =
+          "检测到您还没有输入出生地点哦～\n\n" +
+          "出生地点对于准确的命理分析很重要，因为它影响真太阳时的计算。\n\n" +
+          "建议您返回排盘页面补充出生地信息，以获得更精准的解读。";
+        this.appendAssistant(promptText, true);
+        return;
+      }
+
+      // 有命盘数据 - 自动开始解读
+      this.startWithPaipan(cached.mingpan, form.gender || "男");
+      return;
+    }
+
+    // 没有刚排的盘，检查默认命盘
+    if (!token) {
+      // 未登录 - 显示引导卡片
       this.setData({
         hasPaipan: false,
         showGuideCard: true,
@@ -865,27 +947,91 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       return;
     }
 
-    // 检查出生地是否为用户提供
-    if (!form.birthplace_provided) {
-      // 有命盘但无出生地 - 显示引导卡片并提示
-      this.setData({
-        hasPaipan: true,
-        showGuideCard: true,
-        autoStarted: true
+    // 已登录，检查默认命盘
+    this.checkDefaultChart();
+  },
+
+  /**
+   * 检查用户的默认命盘
+   */
+  checkDefaultChart() {
+    console.log("[chat] checkDefaultChart: 开始检查默认命盘");
+    request<any>("/charts/default", "GET")
+      .then((res) => {
+        console.log("[chat] checkDefaultChart 响应:", res);
+        if (res && res.chart_data) {
+          // 有默认命盘，弹窗确认
+          wx.showModal({
+            title: "加载命盘",
+            content: "是否加载您保存的命盘？",
+            confirmText: "加载",
+            cancelText: "取消",
+            success: (result) => {
+              if (result.confirm) {
+                // 用户确认加载默认命盘
+                this.startWithDefaultChart(res.chart_data);
+              } else {
+                // 用户取消，提示去排盘
+                this.showNoChartTip();
+              }
+            }
+          });
+        } else {
+          // 没有默认命盘
+          this.showNoChartTip();
+        }
+      })
+      .catch((err) => {
+        console.error("[chat] checkDefaultChart 失败:", err);
+        // 请求失败，显示引导卡片
+        this.setData({
+          hasPaipan: false,
+          showGuideCard: true,
+          autoStarted: true
+        });
       });
+  },
 
-      // 添加友好提示消息
-      const promptText =
-        "检测到您还没有输入出生地点哦～\n\n" +
-        "出生地点对于准确的命理分析很重要，因为它影响真太阳时的计算。\n\n" +
-        "建议您返回排盘页面补充出生地信息，以获得更精准的解读。";
-      this.appendAssistant(promptText, true);
-      return;
-    }
+  /**
+   * 使用默认命盘开始对话（不生成AI开场白）
+   */
+  startWithDefaultChart(chartData: any) {
+    const gender = chartData.gender || "男";
 
-    // 有命盘数据 - 自动开始解读
-    const gender = form.gender || "男";
-    const paipan = { ...cached.mingpan, gender };
+    this.setData({
+      hasPaipan: true,
+      showGuideCard: false,
+      autoStarted: true
+    });
+
+    // 显示固定开场白
+    const greetingText = "你好！我已经看到你的命盘了。你可以问我关于事业、财运、感情、健康等方面的问题。";
+    this.appendAssistant(greetingText, true);
+
+    // 保存命盘数据到本地，供后续对话使用
+    wx.setStorageSync("current_mingpan", { ...chartData, gender });
+  },
+
+  /**
+   * 显示无命盘提示
+   */
+  showNoChartTip() {
+    wx.showModal({
+      title: "提示",
+      content: "请先进行排盘",
+      showCancel: false,
+      confirmText: "去排盘",
+      success: () => {
+        wx.switchTab({ url: "/pages/index/index" });
+      }
+    });
+  },
+
+  /**
+   * 使用排盘数据开始对话（生成AI开场白）
+   */
+  startWithPaipan(mingpan: any, gender: string) {
+    const paipan = { ...mingpan, gender };
 
     this.setData({
       hasPaipan: true,

@@ -152,6 +152,66 @@ Page({
     wx.navigateBack({ delta: 1 });
   },
 
+  /** 保存命盘 */
+  onSaveChart() {
+    const token = wx.getStorageSync("token");
+    if (!token) {
+      wx.showModal({
+        title: "提示",
+        content: "请先登录后再保存命盘",
+        confirmText: "去登录",
+        success: (res) => {
+          if (res.confirm) {
+            wx.switchTab({ url: "/pages/profile/profile" });
+          }
+        }
+      });
+      return;
+    }
+
+    const cached: any = wx.getStorageSync("last_paipan");
+    if (!cached || !cached.mingpan) {
+      wx.showToast({ title: "没有命盘数据", icon: "none" });
+      return;
+    }
+
+    // 弹窗输入命盘名称
+    wx.showModal({
+      title: "保存命盘",
+      editable: true,
+      placeholderText: "请输入命盘名称（如：我的命盘）",
+      success: (res) => {
+        if (res.confirm && res.content) {
+          this.doSaveChart(res.content.trim(), cached);
+        } else if (res.confirm && !res.content) {
+          wx.showToast({ title: "请输入名称", icon: "none" });
+        }
+      }
+    });
+  },
+
+  /** 执行保存命盘 API 调用 */
+  doSaveChart(name: string, cached: any) {
+    const { request } = require("../../utils/request");
+
+    wx.showLoading({ title: "保存中..." });
+
+    request("/charts", "POST", {
+      name,
+      birth_info: cached.birth_info || {},
+      chart_data: cached.mingpan
+    })
+      .then(() => {
+        wx.hideLoading();
+        wx.showToast({ title: "保存成功", icon: "success" });
+      })
+      .catch((err: Error) => {
+        wx.hideLoading();
+        console.error("保存命盘失败:", err);
+        wx.showToast({ title: "保存失败", icon: "none" });
+      });
+  },
+
   /** 重新排盘 */
   onRePaipan() {
     wx.switchTab({ url: "/pages/index/index" });

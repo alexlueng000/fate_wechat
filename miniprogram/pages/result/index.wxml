@@ -63,10 +63,10 @@
   </button>
   <view class="cta-hint">可询问：事业 · 财运 · 感情 · 健康</view>
 
-  <!-- 分享按钮 -->
-  <button class="share-btn" open-type="share">
-    <text class="share-icon">✥</text>
-    <text>分享命盘</text>
+  <!-- 保存命盘按钮 -->
+  <button class="save-btn" bindtap="onSaveChart">
+    <text class="save-icon">💾</text>
+    <text>保存命盘</text>
   </button>
 
   <!-- 专业详情折叠区 -->
