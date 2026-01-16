@@ -147,6 +147,16 @@ Page({
     wx.switchTab({ url: "/pages/chat/chat" });
   },
 
+  /** 返回上一页 */
+  onGoBack() {
+    wx.navigateBack({ delta: 1 });
+  },
+
+  /** 重新排盘 */
+  onRePaipan() {
+    wx.switchTab({ url: "/pages/index/index" });
+  },
+
   /** 分享给好友 */
   onShareAppMessage() {
     const { summary, pillars } = this.data;

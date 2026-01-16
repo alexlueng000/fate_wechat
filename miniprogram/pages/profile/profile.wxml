@@ -13,12 +13,7 @@
     </view>
 
     <view class="user-info">
-      <view class="user-name">{{isLoggedIn ? (nickname || '未命名用户') : '未登录'}}</view>
-      <view class="user-meta" wx:if="{{isLoggedIn}}">
-        <text class="user-id">用户名：{{username || '未登录'}}</text>
-        <text class="user-dot">·</text>
-        <text class="user-type">{{accountType}}</text>
-      </view>
+      <view class="user-name">{{isLoggedIn ? (username || '未登录') : '未登录'}}</view>
 
       <!-- 未登录时显示登录提示 -->
       <view wx:if="{{!isLoggedIn}}" class="auth-hint" bindtap="onAuthorize">

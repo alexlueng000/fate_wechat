@@ -1,4 +1,12 @@
 <view class="page">
+  <!-- 顶部导航栏 -->
+  <view class="nav-bar">
+    <view class="nav-back" bindtap="onGoBack">
+      <text class="nav-back-icon">‹</text>
+      <text class="nav-back-text">返回</text>
+    </view>
+  </view>
+
   <!-- 背景装饰 -->
   <view class="bg-decoration">
     <view class="bg-circle bg-circle-1"></view>

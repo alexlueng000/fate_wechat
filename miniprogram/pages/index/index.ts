@@ -72,6 +72,7 @@ Page<Record<string, any>, PageData>({
     // 简单校验
     if (!this.data.birth_date) { wx.showToast({ title: "请选择出生日期", icon: "none" }); return; }
     if (!this.data.birth_time) { wx.showToast({ title: "请选择出生时间", icon: "none" }); return; }
+    if (!this.data.birthplace.trim()) { wx.showToast({ title: "请输入出生地点", icon: "none" }); return; }
 
     this.setData({ submitting: true });
     try {

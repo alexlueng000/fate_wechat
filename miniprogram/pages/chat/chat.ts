@@ -895,6 +895,9 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       streamingText: ""
     });
 
+    // 先添加"思考中…"消息，避免替换开场白
+    this.appendAssistant("思考中…");
+
     // 使用 WebSocket 流式响应
     const ws = new ChatWebSocket(
       `${WS_BASE}/chat`,
