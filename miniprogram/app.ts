@@ -41,8 +41,8 @@ App({
     // 应用更新检查
     this.initUpdateManager();
 
-    // 执行登录流程
-    this.bootstrapLogin();
+    // 不再自动登录，用户需要时再手动触发登录
+    // this.bootstrapLogin();
   },
 
   initUpdateManager() {

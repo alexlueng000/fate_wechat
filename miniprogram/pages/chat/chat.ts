@@ -51,6 +51,7 @@ type Custom = {
   onUnlockMessage(e: WechatMiniprogram.BaseEvent): void;
   onLoginSuccess(e: any): void;
   checkLoginStatus(): void;
+  checkTruncateLastMessage(): void;
   // 新增方法
   checkAndAutoStart(): void;
   onGoToPaipan(): void;
@@ -242,8 +243,8 @@ function formatMarkdownImpl(text: string): any[] {
     if (headingMatch) {
       flushPara();
       flushList();
-      const level = Math.min(headingMatch[1].length, 3);
-      const tag = ("h" + level) as "h1" | "h2" | "h3";
+      const level = Math.min(headingMatch[1].length, 4);
+      const tag = ("h" + level) as "h1" | "h2" | "h3" | "h4";
       const content = headingMatch[2].trim();
       nodes.push({
         name: tag,
@@ -374,6 +375,18 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
         this.setData({ messages: msgs });
       }
     }
+
+    // 检查是否有新的命盘数据需要自动启动
+    // （从结果页 switchTab 过来时，onLoad 不会触发，需要在 onShow 中检查）
+    const newPaipanPending = wx.getStorageSync("new_paipan_pending");
+    if (newPaipanPending) {
+      // 清除标志并重置自动启动状态
+      wx.removeStorageSync("new_paipan_pending");
+      _hasAutoStarted = false;
+      this.checkAndAutoStart();
+    } else if (!_hasAutoStarted) {
+      this.checkAndAutoStart();
+    }
   },
 
   onInput(e) {
@@ -423,11 +436,12 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     const clean = normalizeReply(text);
     const msgs = this.data.messages.slice();
     const isLoggedIn = this.data.isLoggedIn;
+    const isStreaming = this.data.loading; // 流式输出中不截断
 
-    // 如果是开场白或已登录，不截断
+    // 如果是开场白、已登录或正在流式输出，不截断
     let displayContent = clean;
     let isTruncated = false;
-    if (!isGreeting && !isLoggedIn && clean.length > 50) {
+    if (!isGreeting && !isLoggedIn && !isStreaming && clean.length > 50) {
       displayContent = clean.slice(0, Math.floor(clean.length * 0.5));
       isTruncated = true;
     }
@@ -495,6 +509,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       () => {
         // 流式完成
         this.setData({ loading: false, streamingText: "" });
+        this.checkTruncateLastMessage();
         this.toBottom();
       },
       (err: any) => {
@@ -552,6 +567,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       () => {
         // 流式完成
         this.setData({ loading: false, streamingText: "" });
+        this.checkTruncateLastMessage();
         this.toBottom();
       },
       (err) => {
@@ -709,6 +725,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       () => {
         // 流式完成
         this.setData({ loading: false, streamingText: "" });
+        this.checkTruncateLastMessage();
         this.toBottom();
       },
       (err) => {
@@ -781,6 +798,27 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       this.setData({ isLoggedIn });
     } catch (e) {
       this.setData({ isLoggedIn: false });
+    }
+  },
+
+  /** 流式完成后检查是否需要截断最后一条消息 */
+  checkTruncateLastMessage() {
+    if (this.data.isLoggedIn) return; // 已登录不截断
+
+    const msgs = this.data.messages.slice();
+    if (!msgs.length) return;
+
+    const lastMsg = msgs[msgs.length - 1];
+    if (lastMsg.role !== "assistant" || lastMsg.isGreeting || lastMsg.truncated) return;
+
+    const content = lastMsg.content || "";
+    if (content.length > 50) {
+      const displayContent = content.slice(0, Math.floor(content.length * 0.5));
+      lastMsg.content = displayContent;
+      lastMsg.fullContent = content;
+      lastMsg.truncated = true;
+      (lastMsg as any).nodes = formatMarkdownImpl(displayContent);
+      this.setData({ messages: msgs });
     }
   },
 
@@ -924,6 +962,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       () => {
         // 流式完成
         this.setData({ loading: false, streamingText: "" });
+        this.checkTruncateLastMessage();
         this.toBottom();
       },
       (err: any) => {

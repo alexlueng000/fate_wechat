@@ -92,6 +92,8 @@ Page<Record<string, any>, PageData>({
       try {
         wx.removeStorageSync("conversation_id");
         wx.removeStorageSync("start_reply");
+        // 标记有新命盘需要解读
+        wx.setStorageSync("new_paipan_pending", true);
       } catch (e) {}
 
       const resp = await request("bazi/calc_paipan", "POST", payload);
