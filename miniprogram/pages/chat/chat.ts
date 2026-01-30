@@ -396,6 +396,24 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       // 清除标志并重置自动启动状态
       wx.removeStorageSync("new_paipan_pending");
       _hasAutoStarted = false;
+
+      // 清空之前的对话，重新显示开场白
+      const greetingText =
+        "你好呀～🎭 我不是来剧透人生的，只是帮你找找藏在命盘里的小彩蛋。" +
+        "你才是主角，我只是个带地图的导游。准备好了吗？一起逛逛你的'人生剧本'～🗺️";
+      const cleanGreeting = normalizeReply(greetingText);
+      const msg: UIMsg = {
+        role: "assistant",
+        content: cleanGreeting,
+        nodes: formatMarkdownImpl(cleanGreeting),
+        isGreeting: true,
+      } as any;
+      this.setData({
+        messages: [msg],
+        conversationId: "",
+        streamingText: "",
+      });
+
       this.checkAndAutoStart();
     } else if (!_hasAutoStarted) {
       this.checkAndAutoStart();
