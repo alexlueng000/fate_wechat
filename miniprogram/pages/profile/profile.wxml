@@ -29,8 +29,8 @@
 
     <view class="cell" bindtap="onHistory">
       <view class="cell-left">
-        <text class="cell-label">历史排盘</text>
-        <text class="cell-desc">查看过往的命盘记录</text>
+        <text class="cell-label">历史分析</text>
+        <text class="cell-desc">查看过往的分析记录</text>
       </view>
       <text class="cell-arrow">›</text>
     </view>
@@ -38,7 +38,7 @@
     <view class="cell" bindtap="onClearLocal">
       <view class="cell-left">
         <text class="cell-label">清除数据</text>
-        <text class="cell-desc">清空本地命盘与对话记录</text>
+        <text class="cell-desc">清空本地分析与对话记录</text>
       </view>
       <text class="cell-arrow">›</text>
     </view>
@@ -104,7 +104,7 @@
     <view class="cell" bindtap="onDisclaimer">
       <view class="cell-left">
         <text class="cell-label">免责声明</text>
-        <text class="cell-desc">命理内容仅供参考</text>
+        <text class="cell-desc">分析内容仅供参考</text>
       </view>
       <text class="cell-arrow">›</text>
     </view>

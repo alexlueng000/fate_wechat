@@ -43,7 +43,21 @@ Page<Record<string, any>, PageData>({
   onLoad() {
     const t = todayStr();
     this.setData({ birth_date: t.date, birth_time: t.time });
-    // this.testPing();
+    this.checkDisclaimer();
+  },
+
+  checkDisclaimer() {
+    const accepted = wx.getStorageSync('disclaimer_accepted_v1');
+    if (!accepted || !accepted.accepted) {
+      const modal = this.selectComponent('#disclaimerModal');
+      if (modal) {
+        (modal as any).onOpen();
+      }
+    }
+  },
+
+  onDisclaimerAgree() {
+    // 用户已同意免责声明
   },
 
   onPickDate(e: any) { this.setData({ birth_date: e.detail.value || this.data.birth_date }); },
@@ -53,18 +67,6 @@ Page<Record<string, any>, PageData>({
   setFemale() { this.setData({ gender: "女" }); },
   setSolar()  { this.setData({ calendar: "公历" }); },
   setLunar()  { this.setData({ calendar: "农历" }); },
-
-  testPing() {
-    request('', 'GET')
-      .then((res) => {
-        // 你的后端可能返回 {status:"ok"} 或字符串
-        this.setData({ ping: JSON.stringify(res) });
-      })
-      .catch((e) => {
-        console.error('ping失败', e);
-        wx.showToast({ title: 'ping 失败', icon: 'none' });
-      });
-  },
 
   async onStart() {
     if (this.data.submitting) return;

@@ -15,10 +15,9 @@
   padding: 48rpx 0 24rpx;
 }
 
-.logo-text {
-  font-size: 48rpx;
-  font-weight: 700;
-  color: #b83227;
+.logo-image {
+  width: 180rpx;
+  height: 180rpx;
 }
 
 .version {

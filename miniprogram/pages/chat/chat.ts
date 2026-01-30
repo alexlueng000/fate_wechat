@@ -30,6 +30,8 @@ interface Data {
   autoStarted: boolean;
   // 流式响应相关
   streamingText: string;
+  // 免登录首次查看状态
+  hasUsedFreeStart: boolean;
 }
 
 type Custom = {
@@ -56,6 +58,9 @@ type Custom = {
   checkAndAutoStart(): void;
   onGoToPaipan(): void;
   onShowHistory(): void;
+  // 检查是否需要登录才能继续操作
+  checkLoginForContinue(): boolean;
+  showLoginModal(): void;
 };
 
 const QUICK_MAP: Record<string, string> = {
@@ -289,18 +294,24 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     autoStarted: false,
     // 流式响应相关
     streamingText: "",
+    // 免登录首次查看状态 - 从 storage 读取
+    hasUsedFreeStart: wx.getStorageSync("has_used_free_start") || false,
   },
 
   onLoad(options) {
     // 重置自动启动标志（允许页面重新加载时重新检查）
     _hasAutoStarted = false;
 
+    // 清除 new_paipan_pending 标志，防止 onShow 重复触发
+    // （onLoad 已经会调用 checkAndAutoStart，不需要 onShow 再触发）
+    wx.removeStorageSync("new_paipan_pending");
+
     // 检查登录状态
     this.checkLoginStatus();
     // 开场白 - 不截断
     const greetingText =
-      "你好呀～我不是来剧透人生的，只是帮你找找藏在命盘里的小彩蛋。" +
-      "你才是主角，我只是个带地图的导游。准备好了吗？一起逛逛你的'人生剧本'～";
+      "你好呀～🎭 我不是来剧透人生的，只是帮你找找藏在命盘里的小彩蛋。" +
+      "你才是主角，我只是个带地图的导游。准备好了吗？一起逛逛你的'人生剧本'～🗺️";
 
 
 
@@ -357,7 +368,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
     const wasLoggedIn = this.data.isLoggedIn;
     this.checkLoginStatus();
 
-    // 如果刚刚登录，展开所有被截断的消息
+    // 如果刚刚登录，展开所有被截断的消息并重置免费查看标志
     if (!wasLoggedIn && this.data.isLoggedIn) {
       const hasTruncated = this.data.messages.some(m => m.truncated);
       if (hasTruncated) {
@@ -374,6 +385,8 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
         });
         this.setData({ messages: msgs });
       }
+      // 登录后重置免费查看标志
+      this.setData({ hasUsedFreeStart: false });
     }
 
     // 检查是否有新的命盘数据需要自动启动
@@ -469,6 +482,9 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
   onQuickStart() {
     if (this.data.loading) return;
 
+    // 检查是否需要登录（如果是非首次调用）
+    if (this.checkLoginForContinue()) return;
+
     const cached: any = wx.getStorageSync("last_paipan");
     if (!cached || !cached.mingpan) {
       wx.showToast({ title: "请先在排盘页生成命盘", icon: "none" });
@@ -507,7 +523,11 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
         }
       },
       () => {
-        // 流式完成
+        // 流式完成 - 标记已使用首次免费查看
+        if (!this.data.isLoggedIn && !this.data.hasUsedFreeStart) {
+          this.setData({ hasUsedFreeStart: true });
+          wx.setStorageSync("has_used_free_start", true);
+        }
         this.setData({ loading: false, streamingText: "" });
         this.checkTruncateLastMessage();
         this.toBottom();
@@ -537,6 +557,9 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       return;
     }
     if (this.data.loading) return;
+
+    // 检查是否需要登录
+    if (this.checkLoginForContinue()) return;
 
     this.appendUser(label);
 
@@ -610,8 +633,8 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
         // 重新显示开场白
         const greetingText =
-          "你好呀～我不是来剧透人生的，只是帮你找找藏在命盘里的小彩蛋。" +
-          "你才是主角，我只是个带地图的导游。准备好了吗？一起逛逛你的'人生剧本'～";
+          "你好呀～🎭 我不是来剧透人生的，只是帮你找找藏在命盘里的小彩蛋。" +
+          "你才是主角，我只是个带地图的导游。准备好了吗？一起逛逛你的'人生剧本'～🗺️";
         this.appendAssistant(greetingText, true);
 
         wx.showToast({ title: "已清空", icon: "none" });
@@ -673,6 +696,12 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
         const reply = normalizeReply(resp.reply || "（无响应）");
         this.appendAssistant(reply);
+
+        // 标记已使用首次免费查看
+        if (!this.data.isLoggedIn && !this.data.hasUsedFreeStart) {
+          this.setData({ hasUsedFreeStart: true });
+          wx.setStorageSync("has_used_free_start", true);
+        }
       })
       .catch((err: any) => {
         wx.showToast({ title: err?.message || "启动失败", icon: "none" });
@@ -686,6 +715,9 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
   onSend() {
     const text = this.data.input.trim();
     if (!text || this.data.loading) return;
+
+    // 检查是否需要登录
+    if (this.checkLoginForContinue()) return;
 
     const cid =
       this.data.conversationId ||
@@ -789,12 +821,6 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
       const token = wx.getStorageSync("token");
       const isLoggedIn = !!token;
 
-      // 调试日志
-      console.log('[chat] checkLoginStatus:', {
-        hasToken: !!token,
-        isLoggedIn,
-      });
-
       this.setData({ isLoggedIn });
     } catch (e) {
       this.setData({ isLoggedIn: false });
@@ -804,6 +830,7 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
   /** 流式完成后检查是否需要截断最后一条消息 */
   checkTruncateLastMessage() {
     if (this.data.isLoggedIn) return; // 已登录不截断
+    if (!this.data.hasUsedFreeStart) return; // 首次免费查看不截断
 
     const msgs = this.data.messages.slice();
     if (!msgs.length) return;
@@ -857,6 +884,9 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
 
     // 更新页面状态
     this.setData({ isLoggedIn: true });
+
+    // 登录后重置免费查看标志（因为已登录用户不受限制）
+    this.setData({ hasUsedFreeStart: false });
 
     // 展开所有被截断的消息
     const msgs = this.data.messages.map(msg => {
@@ -960,7 +990,11 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
         }
       },
       () => {
-        // 流式完成
+        // 流式完成 - 标记已使用首次免费查看
+        if (!this.data.isLoggedIn && !this.data.hasUsedFreeStart) {
+          this.setData({ hasUsedFreeStart: true });
+          wx.setStorageSync("has_used_free_start", true);
+        }
         this.setData({ loading: false, streamingText: "" });
         this.checkTruncateLastMessage();
         this.toBottom();
@@ -997,6 +1031,33 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
    */
   onShowHistory() {
     wx.navigateTo({ url: "/pages/history/history" });
+  },
+
+  /**
+   * 检查是否需要登录才能继续操作
+   * 返回 true 表示需要登录（已拦截），false 表示可以继续
+   */
+  checkLoginForContinue(): boolean {
+    // 已登录或未使用过首次免费查看，允许继续
+    if (this.data.isLoggedIn || !this.data.hasUsedFreeStart) {
+      return false;
+    }
+
+    // 已使用过首次免费查看但未登录，显示登录弹窗
+    this.showLoginModal();
+    return true;
+  },
+
+  /**
+   * 显示登录弹窗
+   */
+  showLoginModal() {
+    const loginModal = this.selectComponent("#loginModal");
+    if (loginModal) {
+      loginModal.onOpen();
+    } else {
+      wx.showToast({ title: "请先登录", icon: "none" });
+    }
   },
 };
 

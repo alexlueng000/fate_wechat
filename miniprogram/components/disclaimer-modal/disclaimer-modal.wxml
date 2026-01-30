@@ -1,0 +1,76 @@
+<view class="disclaimer-mask" wx:if="{{show}}">
+  <view class="disclaimer-container" catchtap="onBubbleTap">
+
+    <!-- 顶部装饰线 -->
+    <view class="modal-top-line"></view>
+
+    <!-- 头部 -->
+    <view class="modal-header">
+      <view class="header-icon">📜</view>
+      <view class="header-title">免责声明</view>
+      <view class="header-subtitle">使用前请仔细阅读</view>
+    </view>
+
+    <!-- 分隔线 -->
+    <view class="divider">
+      <view class="divider-line"></view>
+      <view class="divider-dot"></view>
+      <view class="divider-line"></view>
+    </view>
+
+    <!-- 可滚动内容区 -->
+    <scroll-view class="content-scroll" scroll-y="true">
+      <view class="content-section">
+        <view class="section-title">【服务性质】</view>
+        <view class="section-text">
+          本服务提供的性格分析与AI对话内容，基于中国传统文化，仅供娱乐参考和文化学习之用，不具有任何科学依据。
+        </view>
+      </view>
+
+      <view class="content-section">
+        <view class="section-title">【重要提醒】</view>
+        <view class="section-text">
+          <view class="bullet">• 解读内容仅供参考，请勿作为人生重大决策的唯一依据</view>
+          <view class="bullet">• 本服务不能替代医疗、法律、心理咨询等专业服务</view>
+          <view class="bullet">• 请理性看待解读结果，保持独立思考和判断能力</view>
+          <view class="bullet">• 未成年人请在监护人陪同下使用</view>
+        </view>
+      </view>
+
+      <view class="content-section">
+        <view class="section-title">【免责条款】</view>
+        <view class="section-text">
+          <view class="bullet">• 我们不对解读内容的准确性、完整性作任何保证</view>
+          <view class="bullet">• 因使用本服务产生的任何直接或间接损失，我们不承担责任</view>
+          <view class="bullet">• 您应自行承担使用本服务的风险和后果</view>
+        </view>
+      </view>
+
+      <view class="content-section">
+        <view class="section-title">【特别声明】</view>
+        <view class="section-text highlight-text">
+          命运掌握在自己手中，传统命理只是文化的一种表达方式。请相信科学，理性对待，用智慧和努力创造美好人生。
+        </view>
+      </view>
+
+      <!-- 底部间距 -->
+      <view class="scroll-bottom-space"></view>
+    </scroll-view>
+
+    <!-- 同意提示 -->
+    <view class="agreement-hint">
+      点击下方按钮即表示您已阅读、理解并同意以上内容
+    </view>
+
+    <!-- 同意按钮 -->
+    <button
+      class="agree-btn"
+      bindtap="onAgree"
+      hover-class="agree-btn-hover"
+    >
+      <text class="btn-icon">✓</text>
+      <text class="btn-text">同意并继续</text>
+    </button>
+
+  </view>
+</view>

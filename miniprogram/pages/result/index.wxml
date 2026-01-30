@@ -37,7 +37,7 @@
   <view class="card stage-card">
     <view class="section-header">
       <text class="section-icon">🌊</text>
-      <text class="section-title">运程阶段</text>
+      <text class="section-title">人生阶段</text>
     </view>
 
     <view class="dayun-row">
@@ -57,23 +57,23 @@
   <!-- CTA 按钮 -->
   <button class="cta-primary" bindtap="onStartChat">
     <view class="cta-content">
-      <text class="cta-text">深度解读命盘</text>
+      <text class="cta-text">深度分析</text>
       <text class="cta-icon">→</text>
     </view>
   </button>
-  <view class="cta-hint">可询问：事业 · 财运 · 感情 · 健康</view>
+  <view class="cta-hint">可询问：事业 · 感情 · 健康</view>
 
   <!-- 分享按钮 -->
   <button class="share-btn" open-type="share">
     <text class="share-icon">✥</text>
-    <text>分享命盘</text>
+    <text>分享分析</text>
   </button>
 
   <!-- 专业详情折叠区 -->
   <view class="detail-section">
     <view class="detail-toggle" bindtap="toggleSummary">
       <view class="detail-left">
-        <text class="detail-title">专业命盘结构</text>
+        <text class="detail-title">专业分析结构</text>
         <view class="detail-pillars">
           <view class="pillar-mini">
             <text class="pillar-label">年</text>

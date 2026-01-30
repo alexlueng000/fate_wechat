@@ -25,8 +25,8 @@
 
       <!-- 标题 -->
       <view class="dialog-header">
-        <view class="title">命盘解读</view>
-        <view class="subtitle">五行分析 · 命理洞察</view>
+        <view class="title">性格分析</view>
+        <view class="subtitle">五行分析 · 性格洞察</view>
       </view>
 
       <!-- 综合评分 -->
@@ -38,7 +38,7 @@
         <view class="score-bar-bg">
           <view class="score-bar-fill" style="width: {{score}}%"></view>
         </view>
-        <view class="score-desc">命局五行流转顺畅，格局稳健平和</view>
+        <view class="score-desc">五行分布均衡，性格特点稳健平和</view>
       </view>
 
       <!-- 五行分布 -->

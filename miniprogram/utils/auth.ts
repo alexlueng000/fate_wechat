@@ -53,8 +53,6 @@ export async function ensureMpLogin(): Promise<void> {
 
   const openid = getLocalOpenId();
 
-  console.log("[auth] ensureMpLogin, openid =", openid);
-
   // 直接用 wx.request，避免跟 utils/request.ts 相互引用造成循环依赖
   const url = BASE_URL + "/api/auth/mp/login";
 
@@ -84,7 +82,6 @@ export async function ensureMpLogin(): Promise<void> {
   });
 
   const { statusCode } = res;
-  console.log("[auth] mp_login status =", statusCode, "data =", res.data);
 
   if (statusCode < 200 || statusCode >= 300) {
     throw new Error("mp_login HTTP " + statusCode);
@@ -107,5 +104,4 @@ export async function ensureMpLogin(): Promise<void> {
 
   setToken(token);
   wx.setStorageSync(STORAGE_USER, payload.user || null);
-  console.log("[auth] login ok, token saved");
 }

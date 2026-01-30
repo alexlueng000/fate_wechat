@@ -207,7 +207,7 @@ page {
 
 /* 标题样式 */
 .bubble .md h1 {
-  font-size: 22rpx;
+  font-size: 18rpx;
   font-weight: 700;
   color: #3D2E1D;
   margin: 12rpx 0 8rpx 0;
@@ -221,7 +221,7 @@ page {
 }
 
 .bubble .md h2 {
-  font-size: 22rpx;
+  font-size: 16rpx;
   font-weight: 600;
   color: #3D2E1D;
   margin: 10rpx 0 6rpx 0;
@@ -232,7 +232,7 @@ page {
 }
 
 .bubble .md h3 {
-  font-size: 22rpx;
+  font-size: 16rpx;
   font-weight: 600;
   color: #3D2E1D;
   margin: 8rpx 0 4rpx 0;
@@ -243,7 +243,7 @@ page {
 }
 
 .bubble .md h4 {
-  font-size: 22rpx;
+  font-size: 16rpx;
   font-weight: 600;
   color: #5a4a3a;
   margin: 6rpx 0 4rpx 0;
@@ -255,7 +255,7 @@ page {
 
 /* 段落正文 */
 .bubble .md p {
-  font-size: 24rpx;
+  font-size: 16rpx;
   color: #3a3a3a;
   line-height: 1.6;
 }
@@ -300,9 +300,10 @@ page {
   background: rgba(255, 255, 255, 0.5);
 }
 
-/* 粗体 */
+/* 粗体 - 朱红色突出 */
 .bubble .md strong {
   font-weight: 600;
+  color: var(--primary);
 }
 
 .msg.right .bubble .md strong {

@@ -12,7 +12,7 @@
   ],
 
   "window": {
-    "navigationBarTitleText": "一盏大师",
+    "navigationBarTitleText": "易凡文化",
     "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTextStyle": "black",
     "backgroundTextStyle": "dark",
@@ -28,13 +28,13 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "排盘",
+        "text": "分析",
         "iconPath": "assets/tab-index.png",
         "selectedIconPath": "assets/tab-index-selected.png"
       },
       {
         "pagePath": "pages/chat/chat",
-        "text": "解读",
+        "text": "对话",
         "iconPath": "assets/tab-chat.png",
         "selectedIconPath": "assets/tab-chat-selected.png"
       },

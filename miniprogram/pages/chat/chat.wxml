@@ -20,7 +20,7 @@
             <!-- 解锁提示 -->
             <view class="unlock-prompt" wx:if="{{item.truncated}}" bindtap="onUnlockMessage" data-index="{{index}}">
               <view class="unlock-icon">🔓</view>
-              <text class="unlock-text">登录查看完整解读</text>
+              <text class="unlock-text">登录查看完整分析</text>
               <view class="unlock-arrow">→</view>
             </view>
           </view>
@@ -45,13 +45,13 @@
 <!-- 引导卡片 - 无命盘或自动启动失败时显示 -->
 <view class="guide-card" wx:if="{{showGuideCard}}">
   <view class="guide-icon">{{hasPaipan ? '📍' : '🎯'}}</view>
-  <view class="guide-title">{{hasPaipan ? '需要补充出生地信息' : '开始您的命理解读之旅'}}</view>
+  <view class="guide-title">{{hasPaipan ? '需要补充出生地信息' : '开始您的文化探索之旅'}}</view>
   <view class="guide-desc">
-    {{hasPaipan ? '出生地点对命理分析很重要，建议返回排盘页面补充出生地信息以获得更准确的解读' : '还没有生成命盘，需要先完成排盘才能开始AI解读'}}
+    {{hasPaipan ? '出生地点对性格分析很重要，建议返回分析页面补充出生地信息以获得更准确的分析' : '还没有生成分析，需要先完成分析才能开始AI对话'}}
   </view>
   <view class="guide-actions">
     <view class="guide-btn primary" bindtap="onGoToPaipan" wx:if="{{!hasPaipan}}">
-      前往排盘
+      前往分析
     </view>
     <view class="guide-btn primary" bindtap="onGoToPaipan" wx:if="{{hasPaipan}}">
       补充出生地
@@ -66,7 +66,7 @@
 <view class="action-bar">
   <view class="action-btn" bindtap="onGoToResult">
     <text class="action-icon">📊</text>
-    <text>我的命盘</text>
+    <text>我的分析</text>
   </view>
   <!-- 隐藏命盘解读按钮
   <view class="action-btn" bindtap="onShowBaziDialog">
@@ -88,11 +88,11 @@
 <view class="card quick-card">
   <view class="quick-title">快捷分析</view>
   <view class="quick-grid">
-    <view class="quick-chip" bindtap="onQuickStart">命盘分析</view>
+    <view class="quick-chip" bindtap="onQuickStart">性格分析</view>
     <view class="quick-chip" bindtap="onQuickAsk" data-key="avatar" data-label="人物画像">人物画像</view>
-    <view class="quick-chip" bindtap="onQuickAsk" data-key="love_timing" data-label="正缘应期">正缘应期</view>
+    <view class="quick-chip" bindtap="onQuickAsk" data-key="love_timing" data-label="正缘应期">人际关系</view>
     <view class="quick-chip" bindtap="onQuickAsk" data-key="career" data-label="事业建议">事业建议</view>
-    <view class="quick-chip" bindtap="onQuickAsk" data-key="wealth" data-label="财运">财运</view>
+    <view class="quick-chip" bindtap="onQuickAsk" data-key="wealth" data-label="财运">事业发展</view>
     <view class="quick-chip" bindtap="onQuickAsk" data-key="health" data-label="健康">健康</view>
   </view>
 </view>

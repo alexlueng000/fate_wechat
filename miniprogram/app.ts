@@ -132,8 +132,6 @@ App({
         try {
           wx.setStorageSync("auth_user", res.user || null);
         } catch (e) {}
-
-        console.log("Login ok:", res.mode || expectMode);
       })
       .catch((e: any) => {
         console.error("Login failed", e);

@@ -75,8 +75,6 @@ Page<Data>({
       initials = base.slice(0, 2).toUpperCase();
     }
 
-    console.log('[profile] loaded user:', { nickname, username, avatarUrl, hasAuthorized, isLoggedIn });
-
     this.setData({
       user: stored,
       nickname,
@@ -144,7 +142,7 @@ Page<Data>({
       extInfo: { url: "https://api.fateinsight.site" },
       corpId: "", // 请替换为您企业的 corpId
       success: () => {
-        console.log("客服打开成功");
+        // 客服打开成功
       },
       fail: () => {
         // 如果未配置客服，显示联系方式

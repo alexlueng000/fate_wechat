@@ -3,12 +3,12 @@
     <!-- Privacy Tab -->
     <view wx:if="{{tab === 'privacy' || !tab}}">
       <view class="title">隐私政策</view>
-      <view class="subtitle">生效日期：2024年1月1日</view>
+      <view class="subtitle">生效日期：2026年1月1日</view>
 
       <view class="section">
         <view class="heading">一、数据收集</view>
         <view class="text">
-          为了提供八字命盘分析与解读服务，我们需要收集以下信息：
+          为了提供性格分析服务，我们需要收集以下信息：
         </view>
         <view class="list">
           <text class="bullet">• 出生信息：出生日期、时间、地点、性别</text>
@@ -24,8 +24,8 @@
           我们使用收集的信息用于：
         </view>
         <view class="list">
-          <text class="bullet">• 计算八字命盘</text>
-          <text class="bullet">• 生成个性化命理解读</text>
+          <text class="bullet">• 生成性格分析</text>
+          <text class="bullet">• 生成个性化分析</text>
           <text class="bullet">• 保存您的对话历史以供后续查看</text>
           <text class="bullet">• 改善服务质量和用户体验</text>
         </view>
@@ -72,12 +72,12 @@
     <!-- Agreement Tab -->
     <view wx:if="{{tab === 'agreement'}}">
       <view class="title">用户协议</view>
-      <view class="subtitle">生效日期：2024年1月1日</view>
+      <view class="subtitle">生效日期：2026年1月1日</view>
 
       <view class="section">
         <view class="heading">一、服务说明</view>
         <view class="text">
-          本小程序（以下简称"本服务"）提供八字命盘计算与AI解读功能，仅供娱乐和学习参考。
+          本小程序（以下简称"本服务"）提供性格分析与AI对话功能，仅供娱乐和学习参考。
         </view>
       </view>
 
@@ -135,7 +135,7 @@
       <view class="section">
         <view class="heading">重要声明</view>
         <view class="text warning-text">
-          本小程序提供的八字命盘分析与AI解读内容，基于传统文化理论，仅供娱乐和参考，不构成任何形式的专业建议。
+          本小程序提供的性格分析与AI对话内容，基于中国传统文化理论，仅供娱乐和参考，不构成任何形式的专业建议。
         </view>
       </view>
 
@@ -154,7 +154,7 @@
       <view class="section">
         <view class="heading">准确性说明</view>
         <view class="text">
-          <text class="highlight">• 八字命理是传统玄学，缺乏科学验证</text>
+          <text class="highlight">• 本服务基于传统文化理论，仅供娱乐参考</text>
           <text class="highlight">• AI解读结果基于算法生成，可能存在误差</text>
           <text class="highlight">• 相同命盘在不同时机可能产生不同解读</text>
           <text class="highlight">• 我们不保证任何解读结果的准确性或适用性</text>

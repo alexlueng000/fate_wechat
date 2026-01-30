@@ -10,13 +10,11 @@
   <view class="top-spacer"></view>
 
   <view class="card">
-    <!-- Logo/印章区域 -->
+    <!-- Logo区域 -->
     <view class="logo-seal">
-      <view class="seal-inner">
-        <text class="seal-text">一盏</text>
-      </view>
-      <view class="logo-title">一盏大师</view>
-      <view class="logo-subtitle">知命 · 达命 · 造命</view>
+      <!-- <image class="logo-image" src="/images/yifan_logo.png" mode="aspectFit" /> -->
+      <view class="logo-title">易凡文化</view>
+      <view class="logo-subtitle">探索 · 发现 · 成长</view>
     </view>
 
     <!-- 分隔线 -->
@@ -113,10 +111,13 @@
       bindtap="onStart"
     >
       <view class="cta-content">
-        <text class="cta-text">{{submitting?'生成中...':'查看我的命盘'}}</text>
+        <text class="cta-text">{{submitting?'生成中...':'查看我的分析'}}</text>
         <text class="cta-icon" wx:if="{{!submitting}}">✦</text>
       </view>
     </button>
 
   </view>
+
+  <!-- 免责声明弹窗 -->
+  <disclaimer-modal id="disclaimerModal" bind:agree="onDisclaimerAgree" />
 </view>

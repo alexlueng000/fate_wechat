@@ -20,7 +20,6 @@ export function request<T>(
 ): Promise<T> {
   return new Promise((resolve, reject) => {
     const url = joinURL(BASE_URL, path);
-    console.log("➡️ request:", method, url);
 
     wx.request({
       url,
@@ -38,8 +37,6 @@ export function request<T>(
       timeout: 60000,
       success(res) {
         const { statusCode } = res;
-        // 统一打印，方便你在 Console 看到返回（即使 Network 面板预览不了）
-        console.log("✅ success:", statusCode, "headers:", res.header, "data:", res.data);
 
         if (statusCode >= 200 && statusCode < 300) {
           // dataType=json 时，小程序已帮你把 JSON 解析成对象；

@@ -10,13 +10,9 @@
   <!-- 内容区 -->
   <view class="content">
 
-    <!-- Logo/印章区域 -->
+    <!-- Logo区域 -->
     <view class="logo-seal">
-      <view class="seal-inner">
-        <text class="seal-text">一盏</text>
-      </view>
-      <view class="logo-title">一盏大师</view>
-      <view class="logo-subtitle">知命 · 达命 · 造命</view>
+      <image class="logo-image" src="/images/yifan_logo.png" mode="aspectFit" />
     </view>
 
     <!-- 登录提示 -->

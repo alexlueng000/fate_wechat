@@ -27,22 +27,18 @@ class ChatWebSocket {
   }
 
   connect(data: any) {
-    console.log('[WebSocket] Connecting to', this.url);
-
     this.socket = wx.connectSocket({
       url: this.url,
       header: this.getHeaders(),
     });
 
     this.socket.onOpen(() => {
-      console.log('[WebSocket] Connected, sending data');
       // 连接建立后发送数据
       this.socket!.send({ data: JSON.stringify(data) });
     });
 
     this.socket.onMessage((res) => {
       const msg = res.data as string;
-      console.log('[WebSocket] Received:', msg);
 
       if (msg === '[DONE]') {
         this.onDone();
@@ -70,7 +66,6 @@ class ChatWebSocket {
       console.error('[WebSocket] Error:', err);
       this.reconnectAttempts++;
       if (this.reconnectAttempts <= this.maxReconnectAttempts) {
-        console.log(`[WebSocket] Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
         // 延迟重连
         setTimeout(() => {
           this.connect(data);
@@ -81,7 +76,7 @@ class ChatWebSocket {
     });
 
     this.socket.onClose(() => {
-      console.log('[WebSocket] Closed');
+      // WebSocket closed
     });
   }
 

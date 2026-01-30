@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "命理八字"
+  "navigationBarTitleText": "易凡文化",
+  "usingComponents": {
+    "disclaimer-modal": "/components/disclaimer-modal/disclaimer-modal"
+  }
 }

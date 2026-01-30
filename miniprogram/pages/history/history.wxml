@@ -1,7 +1,7 @@
 <view class="page">
   <view class="content">
-    <!-- 当前命盘 -->
-    <view class="section-title">当前命盘</view>
+    <!-- 当前分析 -->
+    <view class="section-title">当前分析</view>
     <view wx:if="{{currentPaipan}}" class="card current" bindtap="onViewCurrent">
       <view class="card-header">
         <text class="card-name">{{currentPaipan.form.birth_date}} {{currentPaipan.form.birth_time}}</text>
@@ -19,8 +19,8 @@
     </view>
     <view wx:else class="empty">
       <text class="empty-icon">📋</text>
-      <text class="empty-text">暂无命盘记录</text>
-      <text class="empty-hint">请先在排盘页面生成命盘</text>
+      <text class="empty-text">暂无分析记录</text>
+      <text class="empty-hint">请先在分析页面生成分析</text>
     </view>
 
     <!-- 历史记录 -->
@@ -52,7 +52,7 @@
     <view wx:if="{{!currentPaipan && historyList.length === 0}}" class="empty-state">
       <text class="empty-icon">📜</text>
       <text class="empty-text">还没有历史记录</text>
-      <button class="empty-btn" bindtap="onGoToIndex">去排盘</button>
+      <button class="empty-btn" bindtap="onGoToIndex">去分析</button>
     </view>
   </view>
 </view>

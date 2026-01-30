@@ -18,7 +18,7 @@
 
       <!-- 标题 -->
       <view class="title">解锁完整解读</view>
-      <view class="subtitle">登录后查看完整命理分析内容</view>
+      <view class="subtitle">登录后查看完整分析内容</view>
 
       <!-- 分隔线装饰 -->
       <view class="divider">

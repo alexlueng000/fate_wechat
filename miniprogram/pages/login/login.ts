@@ -75,8 +75,6 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
           'Content-Type': 'application/json',
         },
         success: (res) => {
-          console.log('[login] Backend response:', res.statusCode, res.data);
-
           if (res.statusCode >= 200 && res.statusCode < 300) {
             const data = res.data as any;
             const { access_token, user } = data;
@@ -92,7 +90,6 @@ const options: WechatMiniprogram.Page.Options<Data, Custom> = {
               app.globalData.token = access_token;
             }
 
-            console.log('[login] Backend login success, user:', user);
             resolve();
           } else {
             const errorMsg = (res.data as any)?.detail || '登录失败';

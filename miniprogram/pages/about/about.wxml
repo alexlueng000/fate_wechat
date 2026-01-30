@@ -2,17 +2,17 @@
   <view class="content">
     <!-- Logo -->
     <view class="logo">
-      <text class="logo-text">命理八字</text>
+      <image class="logo-image" src="/images/yifan_logo.png" mode="aspectFit" />
     </view>
 
     <!-- 版本信息 -->
-    <view class="version">版本 1.0.0</view>
+    <view class="version">版本 1.0.1</view>
 
     <!-- 简介 -->
     <view class="card">
       <view class="card-title">关于我们</view>
       <view class="card-text">
-        命理八字是一款基于传统八字命理与AI技术的智能解读小程序。我们致力于将传统文化与现代科技结合，为用户提供有趣、有料的命盘分析与解读服务。
+        易凡文化是一款基于中国传统文化与AI技术的智能解读小程序。我们致力于将传统文化与现代科技结合，为用户提供有趣、有料的性格分析与解读服务。
       </view>
     </view>
 
@@ -23,15 +23,15 @@
         <view class="feature-item">
           <text class="feature-icon">🎯</text>
           <view class="feature-content">
-            <text class="feature-name">精准排盘</text>
-            <text class="feature-desc">支持公历/农历，自动排盘</text>
+            <text class="feature-name">精准分析</text>
+            <text class="feature-desc">支持公历/农历，自动分析</text>
           </view>
         </view>
         <view class="feature-item">
           <text class="feature-icon">🤖</text>
           <view class="feature-content">
             <text class="feature-name">AI解读</text>
-            <text class="feature-desc">智能分析性格、事业、财运</text>
+            <text class="feature-desc">智能分析性格、事业、感情</text>
           </view>
         </view>
         <view class="feature-item">
@@ -48,7 +48,7 @@
     <view class="card card-warning">
       <view class="card-title warning">温馨提示</view>
       <view class="card-text warning-text">
-        本应用提供的命理内容仅供娱乐参考，不构成任何专业建议。请理性对待，相信科学。
+        本应用提供的分析内容仅供娱乐参考，不构成任何专业建议。请理性对待，相信科学。
       </view>
     </view>
 
@@ -69,7 +69,7 @@
 
     <!-- 底部信息 -->
     <view class="footer">
-      <text class="footer-text">Copyright © 2024 FateInsight</text>
+      <text class="footer-text">Copyright © 2026 FateInsight</text>
       <text class="footer-text">All Rights Reserved</text>
     </view>
   </view>
